@@ -23,3 +23,5 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+URL: https://github.com/craig-parylo/plotor
+BugReports: https://github.com/craig-parylo/plotor/issues
