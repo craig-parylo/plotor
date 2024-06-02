@@ -1,0 +1,143 @@
+---
+title: "Using plotor"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Using plotor}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message=FALSE}
+library(plotor)
+library(dplyr)
+library(datasets)
+library(tidyr)
+library(stats)
+library(broom)
+library(forcats)
+library(ggplot2)
+```
+
+`plotor` is designed to produce Odds-Ratio plots from a given logistic regression model as produced using the general linear model (glm) package.
+
+## Installing plotor
+`plotor` can be installed via GitHub using the `devtools` package:
+```{r eval=FALSE}
+devtools::install_github()
+```
+
+
+## Example 1 - using the Titanic survivors dataset
+In this example we will explore the likelihood of surviving the Titanic disaster based on passenger economic status (class), sex, and age group.
+
+Start with getting the data from the `datasets` package.
+
+```{r}
+df <- datasets::Titanic |> 
+  as_tibble() |> 
+  # convert counts to observations
+  filter(n > 0) |>
+  uncount(weights = n) |>
+  # convert categorical variables to factors.
+  # we specify an order for levels in Class and Survival, otherwise ordering
+  # in descending order of frequency
+  mutate(
+    Class = Class |>
+      fct(levels = c('1st', '2nd', '3rd', 'Crew')),
+    Sex = Sex |>
+      fct_infreq(),
+    Age = Age |>
+      fct_infreq(),
+    Survived = Survived |>
+      fct(levels = c('No', 'Yes'))
+  )
+
+# preview the data
+df |> 
+  glimpse()
+```
+
+We now have a tibble of data containing four columns:  
+* `Survived` - our outcome variable describing whether the passenger survived `Yes` or died `No`,  
+* `Class` - the passenger class, either `1st`, `2nd`, `3rd` or `Crew`,  
+* `Sex` - the gender of the passenger, either `Male` or `Female`,  
+* `Age` - whether the passenger was an `Adult` or `Child`.  
+
+We next conduct a logistic regression of survival (as a binary factor: 'yes' and 'no') against the characteristics of passenger class, sex and age group. For this we use the Generalised Linear Model function (`glm`) from the `stats` package, specifying:  
+* the family as 'binomial', and  
+* the formula as survival being a function of `Class`, `Sex` and `Age`.  
+```{r}
+# conduct a logistic regression of survival against the other variables
+lr <- glm(
+  data = df,
+  family = 'binomial',
+  formula = Survived ~ Class + Sex + Age
+)
+
+# preview the model as a tidy table
+lr |> 
+  tidy() |> 
+  glimpse()
+```
+
+Finally, we can plot the Odds Ratio of survival using the `plot_or` function.
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+# using plot_or
+plot_or(glm_model_results = lr)
+```
+
+### Change base font size
+To increase the size of the font you can extend the returned plot using the `theme` function from `ggplot2`. Here we set the base size of all fonts in the plot to size 16.
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+plot_or(glm_model_results = lr) + 
+  theme(text = element_text(size = 16))
+```
+
+### Specify the breaks
+Odds Ratio (OR) plots produced by `plotor` are displayed using a log10 x axis.
+
+By default ten breaks are shown, however, this can be altered by extending the `scale_x_log10` function from `ggplot2`. Here we provide a manual list of breaks to use: 
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+plot_or(glm_model_results = lr) + 
+  scale_x_log10(breaks = c(0.1, 0.5, 1, 5, 10))
+```
+
+### Change the dot and whisker colours
+There are three types of colours used for the dots and whiskers in the OR plot, depending on their category.  
+* `Significant` refers to dots where their results indicate a significant finding because their 95% confidence intervals do not touch or cross the value 1 - the line of no effect.  
+* `Comparator` refers to the level of a factor in the model against which the Odds Ratios are calculated.  
+* `Not significant` refers to dots where their results do not indicate a significant finding because their confidence intervals touch or cross the line of no effect.  
+
+The colours for these points can be changed by extending the output using `scale_colour_manual` function from `ggplot2` with a named vector specifying colour values for the three types of colours:
+
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+plot_or(glm_model_results = lr) +
+  scale_colour_manual(values = c(
+    'Significant' = '#44bd32',
+    'Comparator' = '#8c7ae6',
+    'Not significant' = '#e84118')
+  )
+```
+
+### Change the title, subtitle and add a caption
+`plotor` uses the dependent variable as the title of the plot by default with a subtitle indicating this it is an Odds Ratio plot with a 95% confidence interval.
+
+The plot can be customised with your own title, subtitle and add a caption by extending the `labs` function of `ggplot2`.
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+plot_or(glm_model_results = lr) +
+  labs(
+    title = 'Passenger survival from the Titanic disaster',
+    subtitle = 'Odds Ratio of survival by Class, Age and Gender',
+    caption = 'Data source: Dawson, Robert J. MacG. (1995), The ‘Unusual Episode’ Data Revisited. Journal of Statistics Education, 3. doi:10.1080/10691898.1995.11910499'
+  )
+```
