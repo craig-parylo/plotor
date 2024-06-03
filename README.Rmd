@@ -1,0 +1,114 @@
+---
+output: github_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# plotor
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+The goal of plotor is to ...
+
+## Installation
+
+You can install the development version of plotor from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("craig-parylo/plotor")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example, message=FALSE}
+library(plotor)
+library(dplyr)
+library(datasets)
+library(tidyr)
+library(stats)
+library(broom)
+library(forcats)
+library(ggplot2)
+```
+
+In this example we will explore the likelihood of surviving the Titanic
+disaster based on passenger economic status (class), sex, and age group.
+
+Start with getting the data from the datasets package.
+
+```{r}
+df <- datasets::Titanic |> 
+  as_tibble() |> 
+  # convert counts to observations
+  filter(n > 0) |>
+  uncount(weights = n) |>
+  # convert categorical variables to factors.
+  # we specify an order for levels in Class and Survival, otherwise ordering
+  # in descending order of frequency
+  mutate(
+    Class = Class |>
+      fct(levels = c('1st', '2nd', '3rd', 'Crew')),
+    Sex = Sex |>
+      fct_infreq(),
+    Age = Age |>
+      fct_infreq(),
+    Survived = Survived |>
+      fct(levels = c('No', 'Yes'))
+  )
+```
+
+We now have a tibble of data containing four columns:
+
+-   `Survived` - our outcome variable describing whether the passenger
+    survived `Yes` or died `No`,
+
+-   `Class` - the passenger class, either `1st`, `2nd`, `3rd` or `Crew`,
+
+-   `Sex` - the gender of the passenger, either `Male` or `Female`,
+
+-   `Age` - whether the passenger was an `Adult` or `Child`.
+
+We next conduct a logistic regression of survival (as a binary factor:
+'yes' and 'no') against the characteristics of passenger class, sex and
+age group. For this we use the Generalised Linear Model function (`glm`)
+from the `stats` package, specifying:
+
+-   the family as 'binomial', and
+
+-   the formula as survival being a function of `Class`, `Sex` and
+    `Age`.
+
+```{r}
+# conduct a logistic regression of survival against the other variables
+lr <- glm(
+  data = df, 
+  family = 'binomial', 
+  formula = Survived ~ Class + Sex + Age
+  )
+```
+
+Finally, we can plot the Odds Ratio of survival using the `plot_or`
+function.
+
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+# using plot_or 
+plot_or(glm_model_results = lr)
+```
