@@ -18,6 +18,12 @@ You can install the development version of plotor from
 devtools::install_github("craig-parylo/plotor")
 ```
 
+You can also install the latest released version from Cran with:
+
+``` r
+install.packages("plotor")
+```
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
