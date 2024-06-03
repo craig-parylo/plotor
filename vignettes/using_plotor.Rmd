@@ -33,8 +33,15 @@ library(ggplot2)
 
 `plotor` can be installed via GitHub using the `devtools` package:
 
-```{r eval=FALSE}
-devtools::install_github()
+``` r
+# install.packages("devtools")
+devtools::install_github("craig-parylo/plotor")
+```
+
+You can also install the latest released version from Cran with:
+
+``` r
+install.packages("plotor")
 ```
 
 ## Example 1 - using the Titanic survivors dataset
