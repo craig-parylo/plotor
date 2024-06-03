@@ -107,7 +107,7 @@ lr |>
 
 Finally, we can plot the Odds Ratio of survival using the `plot_or` function.
 
-```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='png'}
 # using plot_or
 plot_or(glm_model_results = lr)
 ```
@@ -116,7 +116,7 @@ plot_or(glm_model_results = lr)
 
 To increase the size of the font you can extend the returned plot using the `theme` function from `ggplot2`. Here we set the base size of all fonts in the plot to size 16.
 
-```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='png'}
 plot_or(glm_model_results = lr) + 
   theme(text = element_text(size = 16))
 ```
@@ -127,7 +127,7 @@ Odds Ratio (OR) plots produced by `plotor` are displayed using a log10 x axis.
 
 By default ten breaks are shown, however, this can be altered by extending the `scale_x_log10` function from `ggplot2`. Here we provide a manual list of breaks to use:
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='png'}
 plot_or(glm_model_results = lr) + 
   scale_x_log10(breaks = c(0.1, 0.5, 1, 5, 10))
 ```
@@ -144,7 +144,7 @@ There are three types of colours used for the dots and whiskers in the OR plot, 
 
 The colours for these points can be changed by extending the output using `scale_colour_manual` function from `ggplot2` with a named vector specifying colour values for the three types of colours:
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='png'}
 plot_or(glm_model_results = lr) +
   scale_colour_manual(values = c(
     'Significant' = '#44bd32',
@@ -159,7 +159,7 @@ plot_or(glm_model_results = lr) +
 
 The plot can be customised with your own title, subtitle and add a caption by extending the `labs` function of `ggplot2`.
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.format='png'}
 plot_or(glm_model_results = lr) +
   labs(
     title = 'Passenger survival from the Titanic disaster',
