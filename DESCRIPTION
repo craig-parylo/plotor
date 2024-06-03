@@ -2,7 +2,13 @@ Package: plotor
 Type: Package
 Title: Produces an Odds Ratio Plot from a GLM Model
 Version: 0.1.0
-Author: Craig Parylo
+Authors@R:
+  person(
+    'Craig', 'Parylo', 
+    email = 'craig.parylo2@nhs.net', 
+    role = c('aut', 'cre', 'cph'),
+    comment = c(ORCID = '0000-0003-4297-7808')
+  )
 Maintainer: Craig Parylo <craig.parylo2@nhs.net>
 Description: Produces an Odds Ratio (OR) plot to visualise the result of a logistic regression analysis.
     Provide it with a model produced by glm binomial regression and it will convert the estimates to odds ratios with a 95% confidence interval and plot the results using 'ggplot2'.
@@ -11,6 +17,7 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     broom,
+    datasets,
     dplyr,
     forcats,
     ggplot2,
