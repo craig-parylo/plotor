@@ -15,3 +15,32 @@ ggplot2-produced visualisation
 \description{
 Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
 }
+\examples{
+# libraries
+library(plotor)
+library(datasets)
+library(dplyr)
+library(ggplot2)
+library(stats)
+library(forcats)
+library(tidyr)
+
+# get some data
+df <- datasets::Titanic |>
+  as_tibble() |>
+  # convert aggregated counts to individual observations
+  filter(n > 0) |>
+  uncount(weights = n) |>
+  # convert character variables to factors
+  mutate(across(where(is.character), as.factor))
+
+# perform logistic regression using `glm`
+lr <- glm(
+  data = df,
+  family = 'binomial',
+  formula = Survived ~ Class + Sex + Age
+)
+
+# produce the Odds Ratio plot
+plot_or(lr)
+}
