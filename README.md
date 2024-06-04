@@ -1,12 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# plotor
+# plotor <a href="https://craig-parylo.github.io/plotor/"><img src="man/figures/logo.png" alt="plotor website" align="right" height="138"/></a>
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of plotor is to …
+The goal of plotor is to generate Odds Ratio plots from logistic
+regression models.
 
 ## Installation
 
@@ -26,21 +27,25 @@ install.packages("plotor")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(plotor)
-library(dplyr)
-library(datasets)
-library(tidyr)
-library(stats)
-library(broom)
-library(forcats)
-library(ggplot2)
-```
-
 In this example we will explore the likelihood of surviving the Titanic
 disaster based on passenger economic status (class), sex, and age group.
+
+In addition to `plotor` the packages we will use include `dplyr`,
+`tidyr` and `forcats` for general data wrangling, the `stats` package to
+conduct the logistic regression followed by `broom` to tidy the output
+and convert the results to Odds Ratios and confidence intervals, then
+`ggplot2` to visualise the plot.
+
+``` r
+library(plotor)      # generates Odds Ratio plots
+library(datasets)    # source of example data
+library(dplyr)       # data wrangling
+library(tidyr)       # data wrangling - uncounting aggregated data
+library(forcats)     # data wrangling - handling factor variables
+library(stats)       # perform logistic regression using glm function
+library(broom)       # tidying glm model and producing OR and CI
+library(ggplot2)     # data visualisation
+```
 
 Start with getting the data from the datasets package.
 
@@ -103,3 +108,12 @@ plot_or(glm_model_results = lr)
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.svg" width="100%" />
+
+This plot makes it clear that:
+
+- Children were 2.89 times more likely to survive than Adults,
+
+- Passengers in `2nd`, `3rd` class as well as `Crew` were all less
+  likely to survive than those in `1st` class,
+
+- Women were 11.25 times more likely to survive than men.
