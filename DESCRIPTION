@@ -23,6 +23,7 @@ Imports:
     ggplot2,
     glue,
     here,
+    labelled,
     purrr,
     scales,
     stats,
