@@ -56,6 +56,9 @@ plot_or <- function(glm_model_results) {
   # prepare the data for plotting
   df <- prepare_df_for_plotting(df = df)
 
+  # use labels where provided
+  df <- use_var_labels(df = df, lr = glm_model_results)
+
   # plot the results
   p <- plot_odds_ratio(df = df, model = glm_model_results)
 
@@ -82,7 +85,8 @@ count_rows_by_variable <- function(df, var_name) {
   var = base::as.symbol(var_name)
 
   var_temp <- df |>
-    dplyr::select(tidyselect::any_of(var)) |>
+    #dplyr::select(tidyselect::any_of(var)) |>
+    dplyr::select(tidyselect::all_of(var)) |>
     dplyr::pull()
 
   # calculate rows - split if categorical
@@ -257,4 +261,40 @@ label_groups <- function(group, level) {
     !group == dplyr::lag(group) ~ group,
     .default = ''
   )
+}
+
+#' Use Variable Labels
+#'
+#' Where variables have been given a label attribute then the label is used in the plot
+#'
+#' @param df Tibble of data expanded with variables to aid plotting - as outputted from `prepare_df_for_plotting`
+#' @param lr Results from a GLM binomial model results
+#'
+#' @return Tibble of data with group labels used where available
+use_var_labels <- function(df, lr) {
+
+  # get the data from lr
+  df_model <- lr$data
+
+  # get the variable labels as a list
+  vars_labels = sapply(df_model, function(x){attr(x,"label")})
+
+  # convert to a tibble and handle any missing labels
+  vars_labels = tibble(
+    group = names(vars_labels),
+    label = vars_labels |> as.character()
+  ) |>
+    mutate(label = label |> na_if(y = 'NULL'))
+
+  # left join the labels to the df, change group to match the label (where available)
+  df <- df |>
+    left_join(
+      y = vars_labels,
+      by = 'group'
+    ) |>
+    mutate(group = coalesce(label, group)) |>
+    select(-label)
+
+  return(df)
+
 }
