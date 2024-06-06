@@ -112,7 +112,7 @@ model (glm) package.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"plotor"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example-1---using-the-titanic-survivors-dataset">Example 1 - using the Titanic survivors dataset<a class="anchor" aria-label="anchor" href="#example-1---using-the-titanic-survivors-dataset"></a>
+<h2 id="example-1---using-the-titanic-survivors-data-set">Example 1 - using the Titanic survivors data set<a class="anchor" aria-label="anchor" href="#example-1---using-the-titanic-survivors-data-set"></a>
 </h2>
 <p>In this example we will explore the likelihood of surviving the
 Titanic disaster based on passenger economic status (class), sex, and
@@ -140,8 +140,7 @@ package.</p>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># preview the data</span></span>
-<span><span class="va">df</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 2,201</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
 <span><span class="co">#&gt; $ Class    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> 3rd, 3rd, 3rd, 3rd, 3rd, 3rd, 3rd, 3rd, 3rd, 3rd, 3rd, 3rd, 3…</span></span>
@@ -265,6 +264,150 @@ caption by extending the <code>labs</code> function of
 <span>    caption <span class="op">=</span> <span class="st">'Data source: Dawson, Robert J. MacG. (1995), The ‘Unusual Episode’ Data Revisited. Journal of Statistics Education, 3. doi:10.1080/10691898.1995.11910499'</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="using_plotor_files/figure-html/unnamed-chunk-8-1.png" width="864"></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="example-2---using-the-smoking-alcohol-and-oesophageal-cancer-data-set">Example 2 - using the Smoking, Alcohol and Oesophageal Cancer data
+set<a class="anchor" aria-label="anchor" href="#example-2---using-the-smoking-alcohol-and-oesophageal-cancer-data-set"></a>
+</h2>
+<p>This data set comes from a case-control study of oesophageal cancer
+Ile-et-Vilaine, France. It contains three explanatory variables:</p>
+<ul>
+<li><p><code>agegp</code> - the age group of each participant,</p></li>
+<li><p><code>alcgp</code> - the alcohol consumption of each participant,
+measured in grams per day,</p></li>
+<li><p><code>tobgp</code> - the tobacco consumption of each participant,
+measured in grams per day.</p></li>
+</ul>
+<p>To look at the likelihood of a participant to develop oesophageal
+cancer we can perform logistic regression against these variables.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/esoph.html" class="external-link">esoph</a></span> <span class="op">|&gt;</span> </span>
+<span>  <span class="co"># convert aggregated data to tidy observational data</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span></span>
+<span>    cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ncases</span>, <span class="va">ncontrols</span><span class="op">)</span>,</span>
+<span>    names_to <span class="op">=</span> <span class="st">'Group'</span>,</span>
+<span>    values_to <span class="op">=</span> <span class="st">'people'</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/uncount.html" class="external-link">uncount</a></span><span class="op">(</span>weights <span class="op">=</span> <span class="va">people</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="co"># prepare the variables</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    <span class="co"># convert the intervention group to a factor</span></span>
+<span>    Group <span class="op">=</span> <span class="va">Group</span> <span class="op">|&gt;</span> </span>
+<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_match.html" class="external-link">case_match</a></span><span class="op">(</span><span class="st">'ncases'</span> <span class="op">~</span> <span class="st">'Case'</span>, <span class="st">'ncontrols'</span> <span class="op">~</span> <span class="st">'Control'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>      <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct.html" class="external-link">fct</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Control'</span>, <span class="st">'Case'</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="co"># remove the ordering from these factors so the glm model doesn't treat</span></span>
+<span>    <span class="co"># them as numeric</span></span>
+<span>    agegp <span class="op">=</span> <span class="va">agegp</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span>ordered <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>,</span>
+<span>    alcgp <span class="op">=</span> <span class="va">alcgp</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span>ordered <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>,</span>
+<span>    tobgp <span class="op">=</span> <span class="va">tobgp</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span>ordered <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># preview the data</span></span>
+<span><span class="va">df</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 975</span></span>
+<span><span class="co">#&gt; Columns: 4</span></span>
+<span><span class="co">#&gt; $ agegp <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> 25-34, 25-34, 25-34, 25-34, 25-34, 25-34, 25-34, 25-34, 25-34, 2…</span></span>
+<span><span class="co">#&gt; $ alcgp <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> 0-39g/day, 0-39g/day, 0-39g/day, 0-39g/day, 0-39g/day, 0-39g/day…</span></span>
+<span><span class="co">#&gt; $ tobgp <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> 0-9g/day, 0-9g/day, 0-9g/day, 0-9g/day, 0-9g/day, 0-9g/day, 0-9g…</span></span>
+<span><span class="co">#&gt; $ Group <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Control, Control, Control, Control, Control, Control, Control, C…</span></span></code></pre></div>
+<p>Next we carry out the logistic regression and then plot the
+results.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># conduct the logistic regression</span></span>
+<span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">'binomial'</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">Group</span> <span class="op">~</span> <span class="va">agegp</span> <span class="op">+</span> <span class="va">alcgp</span> <span class="op">+</span> <span class="va">tobgp</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot the odds ratio plot with customised title</span></span>
+<span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">'Likelihood of developing oesophageal cancer'</span><span class="op">)</span></span></code></pre></div>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-10-1.png" width="864"></p>
+<p>From this we can see there is a strong link between age and
+likelihood of cancer. Compared with those in the <code>25-34</code>
+years group there is a statistically significant increased likelihood of
+being in the case cohort of those in the <code>45-54</code> years group
+(43 times more likely), <code>55-64</code> years group (76 times more
+likely), <code>65-74</code> years group (133 times more likely), and
+<code>75+</code> years group (124 times more likely).</p>
+<p>There is also a strong link between alcohol consumption and
+likelihood of cancer. Compared with those who consumed the least
+alcohol, defined as between 0 and 39 g/day, those who consumed more
+alcohol are more at risk of developing cancer with the greatest risk in
+those who consumed more than 119 g/day, putting them at 36 times more
+likely to develop cancer.</p>
+<p>Tobacco use is a more nuanced picture. There was no detectable
+difference in the likelihood of developing cancer for those in the first
+three groups (<code>0-9g/day</code>, <code>10-19g/day</code> and
+<code>20-29g/day</code>) - seen by the confidence intervals crossing the
+line of no effect. However, there was a statistically significant
+increased risk of developing cancer in those who consumed the most
+tobacco, <code>30+g/day</code>, putting them at 5 times the risk.</p>
+<div class="section level3">
+<h3 id="use-variable-labels">Use variable labels<a class="anchor" aria-label="anchor" href="#use-variable-labels"></a>
+</h3>
+<p>Replacing variable names with a more descriptive label makes the
+plots more accessible to those not involved in the analysis. For
+example, <code>Alcohol consumption (g/day)</code> is a more
+user-friendly label than the name of the variable,
+<code>alcgp</code>.</p>
+<p>There are some amazing packages designed to help label your data. In
+the below example we use the <a href="https://larmarange.github.io/labelled/" class="external-link"><code>labelled</code></a>
+package to label our data before analysing and plotting it.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># library to apply labels to data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create a list of variable = labels</span></span>
+<span><span class="va">var_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  agegp <span class="op">=</span> <span class="st">'Age group'</span>,</span>
+<span>  alcgp <span class="op">=</span> <span class="st">'Alcohol consumption'</span>,</span>
+<span>  tobgp <span class="op">=</span> <span class="st">'Tobacco consumption'</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># label the variables in our data</span></span>
+<span><span class="fu">labelled</span><span class="fu">::</span><span class="fu"><a href="https://larmarange.github.io/labelled/reference/var_label.html" class="external-link">var_label</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">var_labels</span></span>
+<span></span>
+<span><span class="co"># preview the data with labels appplied </span></span>
+<span><span class="fu">labelled</span><span class="fu">::</span><span class="fu"><a href="https://larmarange.github.io/labelled/reference/look_for.html" class="external-link">look_for</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  pos variable label               col_type missing values   </span></span>
+<span><span class="co">#&gt;  1   agegp    Age group           fct      0       25-34    </span></span>
+<span><span class="co">#&gt;                                                    35-44    </span></span>
+<span><span class="co">#&gt;                                                    45-54    </span></span>
+<span><span class="co">#&gt;                                                    55-64    </span></span>
+<span><span class="co">#&gt;                                                    65-74    </span></span>
+<span><span class="co">#&gt;                                                    75+      </span></span>
+<span><span class="co">#&gt;  2   alcgp    Alcohol consumption fct      0       0-39g/day</span></span>
+<span><span class="co">#&gt;                                                    40-79    </span></span>
+<span><span class="co">#&gt;                                                    80-119   </span></span>
+<span><span class="co">#&gt;                                                    120+     </span></span>
+<span><span class="co">#&gt;  3   tobgp    Tobacco consumption fct      0       0-9g/day </span></span>
+<span><span class="co">#&gt;                                                    10-19    </span></span>
+<span><span class="co">#&gt;                                                    20-29    </span></span>
+<span><span class="co">#&gt;                                                    30+      </span></span>
+<span><span class="co">#&gt;  4   Group    —                   fct      0       Control  </span></span>
+<span><span class="co">#&gt;                                                    Case</span></span></code></pre></div>
+<p>Analyse the data using logistic regression as before and plot the
+result.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># conduct the logistic regression</span></span>
+<span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">'binomial'</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">Group</span> <span class="op">~</span> <span class="va">agegp</span> <span class="op">+</span> <span class="va">alcgp</span> <span class="op">+</span> <span class="va">tobgp</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot the odds ratio plot with customised title</span></span>
+<span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">'Likelihood of developing oesophageal cancer'</span><span class="op">)</span></span></code></pre></div>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-12-1.png" width="864"></p>
+<p><code>plot_or</code> recognises the use of labels and uses these in
+preference to variable names wherever available.</p>
+<p>Using variable labels makes plots easier to read and more accessible,
+and is especially useful where you want to include the chart in reports
+or publications.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
