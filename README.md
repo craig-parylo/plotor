@@ -4,6 +4,11 @@
 # plotor <a href="https://craig-parylo.github.io/plotor/"><img src="man/figures/logo.png" alt="plotor website" align="right" height="138"/></a>
 
 <!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org/package=plotor)
+[![Codecov test
+coverage](https://codecov.io/gh/craig-parylo/plotor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/craig-parylo/plotor?branch=main)
 <!-- badges: end -->
 
 The goal of plotor is to generate Odds Ratio plots from logistic
