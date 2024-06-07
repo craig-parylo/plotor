@@ -21,8 +21,6 @@ Imports:
     forcats,
     ggplot2,
     glue,
-    here,
-    labelled,
     purrr,
     scales,
     stats,
@@ -33,6 +31,7 @@ Suggests:
     AER,
     datasets,
     knitr,
+    labelled,
     rmarkdown
 VignetteBuilder: knitr
 URL: https://github.com/craig-parylo/plotor, https://craig-parylo.github.io/plotor/
