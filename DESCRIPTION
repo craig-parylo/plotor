@@ -28,7 +28,6 @@ Imports:
     tidyselect
 RoxygenNote: 7.3.1
 Suggests: 
-    AER,
     datasets,
     knitr,
     labelled,
