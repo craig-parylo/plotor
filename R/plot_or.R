@@ -196,7 +196,7 @@ prepare_df_for_plotting <- function(df) {
 plot_odds_ratio <- function(df, model) {
 
   # get the name of the outcome variable - will be used in the plot title
-  model_outcome_var = model$formula[[2]]
+  model_outcome_var = model$formula[[2]] |> as.character()
   model_outcome_label = sapply(model$data[model_outcome_var], function(x){attr(x,"label")})[[1]]
   model_outcome = coalesce(model_outcome_label, model_outcome_var |> as.character())
 
