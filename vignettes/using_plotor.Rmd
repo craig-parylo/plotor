@@ -27,7 +27,7 @@ library(forcats)
 library(ggplot2)
 ```
 
-`plotor` is designed to produce Odds-Ratio plots from a given logistic regression model as produced using the general linear model (glm) package.
+`plotor` produces Odds-Ratio plots from a given logistic regression model, as produced using the general linear model (`glm`) package.
 
 ## Installing plotor
 
@@ -46,9 +46,9 @@ install.packages("plotor")
 
 ## Example 1 - using the Titanic survivors data set
 
-In this example we will explore the likelihood of surviving the Titanic disaster based on passenger economic status (class), sex, and age group.
+Let's start by exploring the likelihood of surviving the Titanic disaster based on passenger economic status (class), sex, and age group.
 
-Start with getting the data from the `datasets` package.
+Get and prepare [data](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/Titanic.html) from the `datasets` package.
 
 ```{r}
 df <- datasets::Titanic |> 
@@ -106,27 +106,47 @@ lr |>
 
 Finally, we can plot the Odds Ratio of survival using the `plot_or` function.
 
-```{r warning=FALSE, fig.width=9, fig.height=4, fig.format='png'}
+```{r warning=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
 # using plot_or
 plot_or(glm_model_results = lr)
 ```
 
+This plot makes it clear that:
+
+-   Children were 2.89 times more likely to survive than Adults,
+
+-   Passengers in `2nd`, `3rd` class as well as `Crew` were all less likely to survive than those in `1st` class,
+
+-   Women were 11.25 times more likely to survive than men.
+
+#### Note on plot features
+
+The primary components of an Odds-Ratio plot are dots, whiskers and the line of no effect.
+
+The dot represents the point estimate for the Odds-Ratio, which indicates how much more likely the event is than the comparator event.
+
+The width of the whiskers represents the 95% Confidence Interval, a range of values the point estimate (the dot) is likely to fall within if the study were to be repeated, with a probability of 95%.
+
+The line of no effect is set at a value of 1. Events whose confidence intervals touch or cross this line are considered to show no difference in likelihood than the comparator event.
+
+The size of the dots is proportional to the number of observations. In the above, the size of the `Adult` square is much larger than the `Child` square, because there were 20 times more adults on the ship than children. This feature can help contextualise the findings from OR plots.
+
 ### Change base font size
 
-To increase the size of the font you can extend the returned plot using the `theme` function from `ggplot2`. Here we set the base size of all fonts in the plot to size 16.
+To increase the size of the font you can extend the returned plot using the [theme](https://ggplot2.tidyverse.org/reference/theme.html) function from `ggplot2`. Here we set the base size of all fonts in the plot to size 16.
 
-```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='png'}
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='png', fig.retina=TRUE}
 plot_or(glm_model_results = lr) + 
   theme(text = element_text(size = 16))
 ```
 
 ### Specify the breaks
 
-Odds Ratio (OR) plots produced by `plotor` are displayed using a log10 x axis.
+Odds Ratio (OR) plots produced by `plotor` are displayed using a log10 x-axis.
 
-By default ten breaks are shown, however, this can be altered by extending the `scale_x_log10` function from `ggplot2`. Here we provide a manual list of breaks to use:
+By default ten breaks are shown, however, this can be altered by extending the [`scale_x_log10`](https://ggplot2.tidyverse.org/reference/scale_continuous.html) function from `ggplot2`. Here we provide a manual list of breaks to use:
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
 plot_or(glm_model_results = lr) + 
   scale_x_log10(breaks = c(0.1, 0.5, 1, 5, 10))
 ```
@@ -141,9 +161,9 @@ There are three types of colours used for the dots and whiskers in the OR plot, 
 
 -   `Not significant` refers to dots where their results do not indicate a significant finding because their confidence intervals touch or cross the line of no effect.
 
-The colours for these points can be changed by extending the output using `scale_colour_manual` function from `ggplot2` with a named vector specifying colour values for the three types of colours:
+The colours for these points can be changed by extending the output using [`scale_colour_manual`](https://ggplot2.tidyverse.org/reference/scale_manual.html) function from `ggplot2` with a named vector specifying colour values for the three types of colours:
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
 plot_or(glm_model_results = lr) +
   scale_colour_manual(values = c(
     'Significant' = '#44bd32',
@@ -156,9 +176,9 @@ plot_or(glm_model_results = lr) +
 
 `plotor` uses the dependent variable as the title of the plot by default with a subtitle indicating this it is an Odds Ratio plot with a 95% confidence interval.
 
-The plot can be customised with your own title, subtitle and add a caption by extending the `labs` function of `ggplot2`.
+The plot can be customised with your own title, subtitle and add a caption by extending the [`labs`](https://ggplot2.tidyverse.org/reference/labs.html) function of `ggplot2`.
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
 plot_or(glm_model_results = lr) +
   labs(
     title = 'Passenger survival from the Titanic disaster',
@@ -169,7 +189,7 @@ plot_or(glm_model_results = lr) +
 
 ## Example 2 - using the Smoking, Alcohol and Oesophageal Cancer data set
 
-This data set comes from a case-control study of oesophageal cancer Ile-et-Vilaine, France. It contains three explanatory variables:
+This [data](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/esoph.html) set comes from a case-control study of oesophageal cancer in Ile-et-Vilaine, France. In addition to the outcome variable, `Group`, identifying who is a case (developed cancer) or a control (disease free), it contains three explanatory variables:
 
 -   `agegp` - the age group of each participant,
 
@@ -207,7 +227,7 @@ df |> glimpse()
 
 Next we carry out the logistic regression and then plot the results.
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png', fig.retina=TRUE}
 # conduct the logistic regression
 lr <- glm(
   data = df,
@@ -240,7 +260,8 @@ library(labelled)
 var_labels <- list(
   agegp = 'Age group',
   alcgp = 'Alcohol consumption',
-  tobgp = 'Tobacco consumption'
+  tobgp = 'Tobacco consumption',
+  Group = 'Developing oesophageal cancer'
 )
 
 # label the variables in our data
@@ -252,7 +273,7 @@ labelled::look_for(df)
 
 Analyse the data using logistic regression as before and plot the result.
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png'}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png', fig.retina=TRUE}
 # conduct the logistic regression
 lr <- glm(
   data = df,
@@ -260,9 +281,8 @@ lr <- glm(
   formula = Group ~ agegp + alcgp + tobgp
 )
 
-# plot the odds ratio plot with customised title
-plot_or(lr) +
-  labs(title = 'Likelihood of developing oesophageal cancer')
+# plot the odds ratio plot using variable labels
+plot_or(lr)
 ```
 
 `plot_or` recognises the use of labels and uses these in preference to variable names wherever available.
