@@ -96,9 +96,9 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/" class="external-link">broom</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
-<p><code>plotor</code> is designed to produce Odds-Ratio plots from a
-given logistic regression model as produced using the general linear
-model (glm) package.</p>
+<p><code>plotor</code> produces Odds-Ratio plots from a given logistic
+regression model, as produced using the general linear model
+(<code>glm</code>) package.</p>
 <div class="section level2">
 <h2 id="installing-plotor">Installing plotor<a class="anchor" aria-label="anchor" href="#installing-plotor"></a>
 </h2>
@@ -114,11 +114,11 @@ model (glm) package.</p>
 <div class="section level2">
 <h2 id="example-1---using-the-titanic-survivors-data-set">Example 1 - using the Titanic survivors data set<a class="anchor" aria-label="anchor" href="#example-1---using-the-titanic-survivors-data-set"></a>
 </h2>
-<p>In this example we will explore the likelihood of surviving the
-Titanic disaster based on passenger economic status (class), sex, and
-age group.</p>
-<p>Start with getting the data from the <code>datasets</code>
-package.</p>
+<p>Let’s start by exploring the likelihood of surviving the Titanic
+disaster based on passenger economic status (class), sex, and age
+group.</p>
+<p>Get and prepare <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/Titanic.html" class="external-link">data</a>
+from the <code>datasets</code> package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/Titanic.html" class="external-link">Titanic</a></span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -193,31 +193,61 @@ sex and age group. For this we use the Generalised Linear Model function
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># using plot_or</span></span>
 <span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-4-1.png" width="864"></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-4-1.png"><!-- --></p>
+<p>This plot makes it clear that:</p>
+<ul>
+<li><p>Children were 2.89 times more likely to survive than
+Adults,</p></li>
+<li><p>Passengers in <code>2nd</code>, <code>3rd</code> class as well as
+<code>Crew</code> were all less likely to survive than those in
+<code>1st</code> class,</p></li>
+<li><p>Women were 11.25 times more likely to survive than men.</p></li>
+</ul>
+<div class="section level4">
+<h4 id="note-on-plot-features">Note on plot features<a class="anchor" aria-label="anchor" href="#note-on-plot-features"></a>
+</h4>
+<p>The primary components of an Odds-Ratio plot are dots, whiskers and
+the line of no effect.</p>
+<p>The dot represents the point estimate for the Odds-Ratio, which
+indicates how much more likely the event is than the comparator
+event.</p>
+<p>The width of the whiskers represents the 95% Confidence Interval, a
+range of values the point estimate (the dot) is likely to fall within if
+the study were to be repeated, with a probability of 95%.</p>
+<p>The line of no effect is set at a value of 1. Events whose confidence
+intervals touch or cross this line are considered to show no difference
+in likelihood than the comparator event.</p>
+<p>The size of the dots is proportional to the number of observations.
+In the above, the size of the <code>Adult</code> square is much larger
+than the <code>Child</code> square, because there were 20 times more
+adults on the ship than children. This feature can help contextualise
+the findings from OR plots.</p>
+</div>
 <div class="section level3">
 <h3 id="change-base-font-size">Change base font size<a class="anchor" aria-label="anchor" href="#change-base-font-size"></a>
 </h3>
 <p>To increase the size of the font you can extend the returned plot
-using the <code>theme</code> function from <code>ggplot2</code>. Here we
-set the base size of all fonts in the plot to size 16.</p>
+using the <a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a>
+function from <code>ggplot2</code>. Here we set the base size of all
+fonts in the plot to size 16.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-5-1.png" width="864"></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-5-1.png"><!-- --></p>
 </div>
 <div class="section level3">
 <h3 id="specify-the-breaks">Specify the breaks<a class="anchor" aria-label="anchor" href="#specify-the-breaks"></a>
 </h3>
 <p>Odds Ratio (OR) plots produced by <code>plotor</code> are displayed
-using a log10 x axis.</p>
+using a log10 x-axis.</p>
 <p>By default ten breaks are shown, however, this can be altered by
-extending the <code>scale_x_log10</code> function from
-<code>ggplot2</code>. Here we provide a manual list of breaks to
-use:</p>
+extending the <a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link"><code>scale_x_log10</code></a>
+function from <code>ggplot2</code>. Here we provide a manual list of
+breaks to use:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-6-1.png" width="864"></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-6-1.png"><!-- --></p>
 </div>
 <div class="section level3">
 <h3 id="change-the-dot-and-whisker-colours">Change the dot and whisker colours<a class="anchor" aria-label="anchor" href="#change-the-dot-and-whisker-colours"></a>
@@ -235,9 +265,9 @@ do not indicate a significant finding because their confidence intervals
 touch or cross the line of no effect.</p></li>
 </ul>
 <p>The colours for these points can be changed by extending the output
-using <code>scale_colour_manual</code> function from
-<code>ggplot2</code> with a named vector specifying colour values for
-the three types of colours:</p>
+using <a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link"><code>scale_colour_manual</code></a>
+function from <code>ggplot2</code> with a named vector specifying colour
+values for the three types of colours:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -245,7 +275,7 @@ the three types of colours:</p>
 <span>    <span class="st">'Comparator'</span> <span class="op">=</span> <span class="st">'#8c7ae6'</span>,</span>
 <span>    <span class="st">'Not significant'</span> <span class="op">=</span> <span class="st">'#e84118'</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-7-1.png" width="864"></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-7-1.png"><!-- --></p>
 </div>
 <div class="section level3">
 <h3 id="change-the-title-subtitle-and-add-a-caption">Change the title, subtitle and add a caption<a class="anchor" aria-label="anchor" href="#change-the-title-subtitle-and-add-a-caption"></a>
@@ -254,8 +284,8 @@ the three types of colours:</p>
 plot by default with a subtitle indicating this it is an Odds Ratio plot
 with a 95% confidence interval.</p>
 <p>The plot can be customised with your own title, subtitle and add a
-caption by extending the <code>labs</code> function of
-<code>ggplot2</code>.</p>
+caption by extending the <a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link"><code>labs</code></a>
+function of <code>ggplot2</code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
@@ -263,15 +293,18 @@ caption by extending the <code>labs</code> function of
 <span>    subtitle <span class="op">=</span> <span class="st">'Odds Ratio of survival by Class, Age and Gender'</span>,</span>
 <span>    caption <span class="op">=</span> <span class="st">'Data source: Dawson, Robert J. MacG. (1995), The ‘Unusual Episode’ Data Revisited. Journal of Statistics Education, 3. doi:10.1080/10691898.1995.11910499'</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-8-1.png" width="864"></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-8-1.png"><!-- --></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="example-2---using-the-smoking-alcohol-and-oesophageal-cancer-data-set">Example 2 - using the Smoking, Alcohol and Oesophageal Cancer data
 set<a class="anchor" aria-label="anchor" href="#example-2---using-the-smoking-alcohol-and-oesophageal-cancer-data-set"></a>
 </h2>
-<p>This data set comes from a case-control study of oesophageal cancer
-Ile-et-Vilaine, France. It contains three explanatory variables:</p>
+<p>This <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/esoph.html" class="external-link">data</a>
+set comes from a case-control study of oesophageal cancer in
+Ile-et-Vilaine, France. In addition to the outcome variable,
+<code>Group</code>, identifying who is a case (developed cancer) or a
+control (disease free), it contains three explanatory variables:</p>
 <ul>
 <li><p><code>agegp</code> - the age group of each participant,</p></li>
 <li><p><code>alcgp</code> - the alcohol consumption of each participant,
@@ -324,7 +357,7 @@ results.</p>
 <span><span class="co"># plot the odds ratio plot with customised title</span></span>
 <span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">'Likelihood of developing oesophageal cancer'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-10-1.png" width="864"></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-10-1.png"><!-- --></p>
 <p>From this we can see there is a strong link between age and
 likelihood of cancer. Compared with those in the <code>25-34</code>
 years group there is a statistically significant increased likelihood of
@@ -364,7 +397,8 @@ package to label our data before analysing and plotting it.</p>
 <span><span class="va">var_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  agegp <span class="op">=</span> <span class="st">'Age group'</span>,</span>
 <span>  alcgp <span class="op">=</span> <span class="st">'Alcohol consumption'</span>,</span>
-<span>  tobgp <span class="op">=</span> <span class="st">'Tobacco consumption'</span></span>
+<span>  tobgp <span class="op">=</span> <span class="st">'Tobacco consumption'</span>,</span>
+<span>  Group <span class="op">=</span> <span class="st">'Developing oesophageal cancer'</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># label the variables in our data</span></span>
@@ -372,23 +406,23 @@ package to label our data before analysing and plotting it.</p>
 <span></span>
 <span><span class="co"># preview the data with labels appplied </span></span>
 <span><span class="fu">labelled</span><span class="fu">::</span><span class="fu"><a href="https://larmarange.github.io/labelled/reference/look_for.html" class="external-link">look_for</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  pos variable label               col_type missing values   </span></span>
-<span><span class="co">#&gt;  1   agegp    Age group           fct      0       25-34    </span></span>
-<span><span class="co">#&gt;                                                    35-44    </span></span>
-<span><span class="co">#&gt;                                                    45-54    </span></span>
-<span><span class="co">#&gt;                                                    55-64    </span></span>
-<span><span class="co">#&gt;                                                    65-74    </span></span>
-<span><span class="co">#&gt;                                                    75+      </span></span>
-<span><span class="co">#&gt;  2   alcgp    Alcohol consumption fct      0       0-39g/day</span></span>
-<span><span class="co">#&gt;                                                    40-79    </span></span>
-<span><span class="co">#&gt;                                                    80-119   </span></span>
-<span><span class="co">#&gt;                                                    120+     </span></span>
-<span><span class="co">#&gt;  3   tobgp    Tobacco consumption fct      0       0-9g/day </span></span>
-<span><span class="co">#&gt;                                                    10-19    </span></span>
-<span><span class="co">#&gt;                                                    20-29    </span></span>
-<span><span class="co">#&gt;                                                    30+      </span></span>
-<span><span class="co">#&gt;  4   Group    —                   fct      0       Control  </span></span>
-<span><span class="co">#&gt;                                                    Case</span></span></code></pre></div>
+<span><span class="co">#&gt;  pos variable label                         col_type missing values   </span></span>
+<span><span class="co">#&gt;  1   agegp    Age group                     fct      0       25-34    </span></span>
+<span><span class="co">#&gt;                                                              35-44    </span></span>
+<span><span class="co">#&gt;                                                              45-54    </span></span>
+<span><span class="co">#&gt;                                                              55-64    </span></span>
+<span><span class="co">#&gt;                                                              65-74    </span></span>
+<span><span class="co">#&gt;                                                              75+      </span></span>
+<span><span class="co">#&gt;  2   alcgp    Alcohol consumption           fct      0       0-39g/day</span></span>
+<span><span class="co">#&gt;                                                              40-79    </span></span>
+<span><span class="co">#&gt;                                                              80-119   </span></span>
+<span><span class="co">#&gt;                                                              120+     </span></span>
+<span><span class="co">#&gt;  3   tobgp    Tobacco consumption           fct      0       0-9g/day </span></span>
+<span><span class="co">#&gt;                                                              10-19    </span></span>
+<span><span class="co">#&gt;                                                              20-29    </span></span>
+<span><span class="co">#&gt;                                                              30+      </span></span>
+<span><span class="co">#&gt;  4   Group    Developing oesophageal cancer fct      0       Control  </span></span>
+<span><span class="co">#&gt;                                                              Case</span></span></code></pre></div>
 <p>Analyse the data using logistic regression as before and plot the
 result.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -399,10 +433,9 @@ result.</p>
 <span>  formula <span class="op">=</span> <span class="va">Group</span> <span class="op">~</span> <span class="va">agegp</span> <span class="op">+</span> <span class="va">alcgp</span> <span class="op">+</span> <span class="va">tobgp</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># plot the odds ratio plot with customised title</span></span>
-<span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">'Likelihood of developing oesophageal cancer'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-12-1.png" width="864"></p>
+<span><span class="co"># plot the odds ratio plot using variable labels</span></span>
+<span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span></span></code></pre></div>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-12-1.png"><!-- --></p>
 <p><code>plot_or</code> recognises the use of labels and uses these in
 preference to variable names wherever available.</p>
 <p>Using variable labels makes plots easier to read and more accessible,
