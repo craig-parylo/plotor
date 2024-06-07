@@ -17,7 +17,6 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     broom,
-    datasets,
     dplyr,
     forcats,
     ggplot2,
@@ -29,6 +28,9 @@ Imports:
     stats,
     tidyr,
     tidyselect
+Suggests:
+    AER,
+    datasets
 RoxygenNote: 7.3.1
 Suggests: 
     knitr,
