@@ -362,5 +362,3 @@ The variables most likely to increase likelihood of a successful application are
 -   The applicants annual income - an increase of \$10k per year increases the likelihood of acceptance by 1.27 times (a 27% increase),
 
 -   The number of active credit accounts - each additional account increases the likelihood of acceptance by 1.15 times (a 15% increase).
-
-These findings make sense as the
