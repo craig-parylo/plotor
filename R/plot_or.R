@@ -196,10 +196,13 @@ prepare_df_for_plotting <- function(df) {
 plot_odds_ratio <- function(df, model) {
 
   # get the name of the outcome variable - will be used in the plot title
-  model_outcome = model$formula[[2]]
+  model_outcome_var = model$formula[[2]]
+  model_outcome_label = sapply(model$data[model_outcome_var], function(x){attr(x,"label")})[[1]]
+  model_outcome = coalesce(model_outcome_label, model_outcome_var |> as.character())
 
   # plot the OR plot using ggplot2
   df |>
+    dplyr::arrange(desc(estimate)) |>
     dplyr::group_by(group) |>
     ggplot2::ggplot(ggplot2::aes(y = label_or, x = estimate, colour = significance)) +
     ggplot2::facet_grid(
