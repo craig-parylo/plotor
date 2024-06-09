@@ -1,3 +1,19 @@
+# Set global variables ----
+# set variables to avoid issue with dplyr and 'no visible global function definition for ...'
+utils::globalVariables(
+  base::c(
+    # count_rows_by_variable
+    'group', 'level', 'rows', 'term',
+
+    # plot_odds_ratio
+    'label_or', 'significance', 'rows_scale', 'conf.high', 'conf.low',
+    'comparator', 'estimate',
+
+    # use_var_labels
+    'label'
+  )
+)
+
 #' Plot OR
 #'
 #' Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
@@ -50,7 +66,7 @@ plot_or <- function(glm_model_results) {
   df <- df |>
     dplyr::left_join(
       y = model_or,
-      by = c('term')
+      by = base::c('term')
     )
 
   # prepare the data for plotting
@@ -196,13 +212,13 @@ prepare_df_for_plotting <- function(df) {
 plot_odds_ratio <- function(df, model) {
 
   # get the name of the outcome variable - will be used in the plot title
-  model_outcome_var = model$formula[[2]] |> as.character()
-  model_outcome_label = sapply(model$data[model_outcome_var], function(x){attr(x,"label")})[[1]]
-  model_outcome = coalesce(model_outcome_label, model_outcome_var |> as.character())
+  model_outcome_var = model$formula[[2]] |> base::as.character()
+  model_outcome_label = base::sapply(model$data[model_outcome_var], function(x){base::attr(x,"label")})[[1]]
+  model_outcome = dplyr::coalesce(model_outcome_label, model_outcome_var |> base::as.character())
 
   # plot the OR plot using ggplot2
   df |>
-    dplyr::arrange(desc(estimate)) |>
+    dplyr::arrange(dplyr::desc(estimate)) |>
     dplyr::group_by(group) |>
     ggplot2::ggplot(ggplot2::aes(y = label_or, x = estimate, colour = significance)) +
     ggplot2::facet_grid(
@@ -280,23 +296,23 @@ use_var_labels <- function(df, lr) {
   df_model <- lr$data
 
   # get the variable labels as a list
-  vars_labels = sapply(df_model, function(x){attr(x,"label")})
+  vars_labels = base::sapply(df_model, function(x){base::attr(x,"label")})
 
   # convert to a tibble and handle any missing labels
-  vars_labels = tibble(
-    group = names(vars_labels),
-    label = vars_labels |> as.character()
+  vars_labels = dplyr::tibble(
+    group = base::names(vars_labels),
+    label = vars_labels |> base::as.character()
   ) |>
-    mutate(label = label |> na_if(y = 'NULL'))
+    dplyr::mutate(label = label |> dplyr::na_if(y = 'NULL'))
 
   # left join the labels to the df, change group to match the label (where available)
   df <- df |>
-    left_join(
+    dplyr::left_join(
       y = vars_labels,
       by = 'group'
     ) |>
-    mutate(group = coalesce(label, group)) |>
-    select(-label)
+    dplyr::mutate(group = dplyr::coalesce(label, group)) |>
+    dplyr::select(-label)
 
   return(df)
 
