@@ -18,20 +18,20 @@ LazyData: true
 Imports: 
     broom,
     dplyr,
-    forcats,
     ggplot2,
     glue,
     purrr,
     scales,
     stats,
-    tidyr,
     tidyselect
 RoxygenNote: 7.3.1
 Suggests: 
     datasets,
+    forcats,
     knitr,
     labelled,
-    rmarkdown
+    rmarkdown,
+    tidyr
 VignetteBuilder: knitr
 URL: https://github.com/craig-parylo/plotor, https://craig-parylo.github.io/plotor/
 BugReports: https://github.com/craig-parylo/plotor/issues
