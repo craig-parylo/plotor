@@ -109,7 +109,7 @@ count_rows_by_variable <- function(df, var_name) {
 #'
 #' Returns a summary of the number of rows per variable used in the model.
 #'
-#' @param model_results
+#' @param model_results Results from a GLM binomial model results
 #'
 #' @return Tibble summary of rows per variable used in the model
 #' @import dplyr
