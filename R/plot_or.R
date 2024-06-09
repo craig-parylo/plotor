@@ -24,7 +24,6 @@ utils::globalVariables(
 #' @export
 #' @import dplyr
 #' @import broom
-#' @import here
 #' @examples
 #' # libraries
 #' library(plotor)
