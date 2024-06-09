@@ -7,7 +7,7 @@
 summarise_rows_per_variable_in_model(model_results)
 }
 \arguments{
-\item{model_results}{}
+\item{model_results}{Results from a GLM binomial model results}
 }
 \value{
 Tibble summary of rows per variable used in the model
