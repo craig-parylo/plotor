@@ -1,6 +1,6 @@
 Package: plotor
 Type: Package
-Title: Produces an Odds Ratio Plot from a GLM Model
+Title: Produces an Odds Ratio Plot from a logistic regression model
 Version: 0.3.0
 Authors@R:
   person(
@@ -11,7 +11,7 @@ Authors@R:
   )
 Maintainer: Craig Parylo <craig.parylo2@nhs.net>
 Description: Produces an Odds Ratio (OR) plot to visualise the result of a logistic regression analysis.
-    Provide it with a model produced by glm binomial regression and it will convert the estimates to odds ratios with a 95% confidence interval and plot the results using 'ggplot2'.
+    Provide it with a model produced by `glm` for a binomial regression and it will convert the estimates to odds ratios with a 95% confidence interval and plot the results using 'ggplot2'.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -24,6 +24,7 @@ Imports:
     scales,
     stats,
     tidyselect
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Suggests: 
     datasets,
@@ -31,7 +32,9 @@ Suggests:
     knitr,
     labelled,
     rmarkdown,
+    testthat (>= 3.0.0),
     tidyr
 VignetteBuilder: knitr
 URL: https://github.com/craig-parylo/plotor, https://craig-parylo.github.io/plotor/
 BugReports: https://github.com/craig-parylo/plotor/issues
+Config/testthat/edition: 3
