@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,14 +100,7 @@
 <p>In addition to <code>plotor</code> the packages we will use include <code>dplyr</code>, <code>tidyr</code> and <code>forcats</code> for general data wrangling, the <code>stats</code> package to conduct the logistic regression followed by <code>broom</code> to tidy the output and convert the results to Odds Ratios and confidence intervals, then <code>ggplot2</code> to visualise the plot.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/craig-parylo/plotor" class="external-link">plotor</a></span><span class="op">)</span>      <span class="co"># generates Odds Ratio plots</span></span>
-<span><span class="co">#&gt; Warning: replacing previous import 'purrr::discard' by 'scales::discard' when</span></span>
-<span><span class="co">#&gt; loading 'plotor'</span></span>
-<span><span class="co">#&gt; Warning: replacing previous import 'dplyr::lag' by 'stats::lag' when loading</span></span>
-<span><span class="co">#&gt; 'plotor'</span></span>
-<span><span class="co">#&gt; Warning: replacing previous import 'dplyr::filter' by 'stats::filter' when</span></span>
-<span><span class="co">#&gt; loading 'plotor'</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">datasets</span><span class="op">)</span>    <span class="co"># source of example data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">datasets</span><span class="op">)</span>    <span class="co"># source of example data</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>       <span class="co"># data wrangling</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>       <span class="co"># data wrangling - uncounting aggregated data</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span>     <span class="co"># data wrangling - handling factor variables</span></span>
@@ -115,7 +108,7 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/" class="external-link">broom</a></span><span class="op">)</span>       <span class="co"># tidying glm model and producing OR and CI</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>     <span class="co"># data visualisation</span></span></code></pre></div>
 <p>Start with getting the data from the datasets package.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/Titanic.html" class="external-link">Titanic</a></span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># convert counts to observations</span></span>
@@ -146,7 +139,7 @@
 <li><p>the family as ‘binomial’, and</p></li>
 <li><p>the formula as survival being a function of <code>Class</code>, <code>Sex</code> and <code>Age</code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># conduct a logistic regression of survival against the other variables</span></span>
 <span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">df</span>, </span>
@@ -154,7 +147,7 @@
 <span>  formula <span class="op">=</span> <span class="va">Survived</span> <span class="op">~</span> <span class="va">Class</span> <span class="op">+</span> <span class="va">Sex</span> <span class="op">+</span> <span class="va">Age</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p>Finally, we can plot the Odds Ratio of survival using the <code>plot_or</code> function.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># using plot_or </span></span>
 <span><span class="fu"><a href="reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.svg" width="100%"></p>
