@@ -26,8 +26,6 @@ utils::globalVariables(
 #'
 #' More details and examples are found on the website: <https://craig-parylo.github.io/plotor/index.html>
 #' @export
-#' @import dplyr
-#' @import broom
 #' @examples
 #' # libraries
 #' library(plotor)
@@ -99,8 +97,6 @@ plot_or <- function(glm_model_results) {
 #' Tibble summarising the number of rows of data in `df` for the variable `var_name`.
 #' The class of the returned object is `tbl_df`, `tbl` and `data.frame`.
 #'
-#' @import dplyr
-#' @import tidyselect
 #' @noRd
 count_rows_by_variable <- function(df, var_name) {
 
@@ -134,10 +130,6 @@ count_rows_by_variable <- function(df, var_name) {
 #' @param model_results Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
 #'
 #' @return Tibble summary of rows per variable used in the model
-#' @import dplyr
-#' @import stats
-#' @import purrr
-#' @import scales
 #' @noRd
 summarise_rows_per_variable_in_model <- function(model_results) {
 
@@ -211,10 +203,6 @@ prepare_df_for_plotting <- function(df) {
 #'
 #' @param df Tibble of data containing a pre-prepared OR object
 #' @param model Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
-#'
-#' @import dplyr
-#' @import ggplot2
-#' @import glue
 #'
 #' @return ggplot2 plot
 #' @noRd
