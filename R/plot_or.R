@@ -18,9 +18,13 @@ utils::globalVariables(
 #'
 #' Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
 #'
-#' @param glm_model_results Results from a GLM binomial model results
+#' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #'
-#' @return ggplot2-produced visualisation
+#' @return `plotor` returns an object of class `gg` and `ggplot`
+#' @seealso
+#' See vignette('using_plotor', package = 'plotor') for more details on use.
+#'
+#' More details and examples are found on the website: <https://craig-parylo.github.io/plotor/index.html>
 #' @export
 #' @import dplyr
 #' @import broom
@@ -91,16 +95,19 @@ plot_or <- function(glm_model_results) {
 #' @param df Tibble of data
 #' @param var_name String name of the variable to count
 #'
-#' @return Tibble summarising the number of rows of data in var in total if var is numeric or by each level if var is a character
+#' @return
+#' Tibble summarising the number of rows of data in `df` for the variable `var_name`.
+#' The class of the returned object is `tbl_df`, `tbl` and `data.frame`.
+#'
 #' @import dplyr
 #' @import tidyselect
+#' @noRd
 count_rows_by_variable <- function(df, var_name) {
 
   # prep
   var = base::as.symbol(var_name)
 
   var_temp <- df |>
-    #dplyr::select(tidyselect::any_of(var)) |>
     dplyr::select(tidyselect::all_of(var)) |>
     dplyr::pull()
 
@@ -124,13 +131,14 @@ count_rows_by_variable <- function(df, var_name) {
 #'
 #' Returns a summary of the number of rows per variable used in the model.
 #'
-#' @param model_results Results from a GLM binomial model results
+#' @param model_results Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
 #'
 #' @return Tibble summary of rows per variable used in the model
 #' @import dplyr
 #' @import stats
 #' @import purrr
 #' @import scales
+#' @noRd
 summarise_rows_per_variable_in_model <- function(model_results) {
 
   # get the data from the model object
@@ -156,6 +164,7 @@ summarise_rows_per_variable_in_model <- function(model_results) {
 #' @param df Tibble of data combining OR estimates and counts of rows per variables
 #'
 #' @return Tibble of data expanded with variables to aid plotting
+#' @noRd
 prepare_df_for_plotting <- function(df) {
 
   df <- df |>
@@ -201,13 +210,14 @@ prepare_df_for_plotting <- function(df) {
 #' The plot is faceted on variables with sub-levels shown where the variable is a factor.
 #'
 #' @param df Tibble of data containing a pre-prepared OR object
-#' @param model A glm logistic regression model
+#' @param model Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
 #'
 #' @import dplyr
 #' @import ggplot2
 #' @import glue
 #'
 #' @return ggplot2 plot
+#' @noRd
 plot_odds_ratio <- function(df, model) {
 
   # get the name of the outcome variable - will be used in the plot title
@@ -266,13 +276,15 @@ plot_odds_ratio <- function(df, model) {
 
 #' Labeller for groups
 #'
-#' A custom labeller function for use in the OR plot.
+#' A custom labeller function for use in the odds-ratio plot.
 #'
-#' It ensures factor groups are listed for the first instance of each level and as empty strings for any subsequent level. It is intended to reduce the visual clutter in the OR plot.
+#' The function ensures factor groups are listed for the first instance of each level and as empty strings for any subsequent level. It is intended to reduce the visual clutter in the odds-ratio plot.
 #'
 #' @param group Character vector of groups
 #' @param level Character vector of factor levels
 #'
+#' @return Character vectors of labels for both group and level
+#' @noRd
 label_groups <- function(group, level) {
   dplyr::case_when(
     dplyr::row_number(group) == 1 ~ group,
@@ -285,10 +297,11 @@ label_groups <- function(group, level) {
 #'
 #' Where variables have been given a label attribute then the label is used in the plot
 #'
-#' @param df Tibble of data expanded with variables to aid plotting - as outputted from `prepare_df_for_plotting`
-#' @param lr Results from a GLM binomial model results
+#' @param df Tibble of data expanded with variables to aid plotting - as outputted from [prepare_df_for_plotting()]
+#' @param lr Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
 #'
 #' @return Tibble of data with group labels used where available
+#' @noRd
 use_var_labels <- function(df, lr) {
 
   # get the data from lr
