@@ -43,15 +43,6 @@ and convert the results to Odds Ratios and confidence intervals, then
 
 ``` r
 library(plotor)      # generates Odds Ratio plots
-#> Warning: replacing previous import 'purrr::discard' by 'scales::discard' when
-#> loading 'plotor'
-#> Warning: replacing previous import 'dplyr::lag' by 'stats::lag' when loading
-#> 'plotor'
-#> Warning: replacing previous import 'dplyr::filter' by 'stats::filter' when
-#> loading 'plotor'
-```
-
-``` r
 library(datasets)    # source of example data
 library(dplyr)       # data wrangling
 library(tidyr)       # data wrangling - uncounting aggregated data
