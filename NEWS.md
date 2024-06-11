@@ -1,3 +1,5 @@
+# plotor 0.4.0
+
 # plotor 0.3.0
 
 # plotor 0.2.0
