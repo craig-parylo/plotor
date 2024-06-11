@@ -7,10 +7,10 @@
 plot_or(glm_model_results)
 }
 \arguments{
-\item{glm_model_results}{Results from a GLM binomial model results}
+\item{glm_model_results}{Results from a binomial Generalised Linear Model (GLM), as produced by \code{\link[stats:glm]{stats::glm()}}.}
 }
 \value{
-ggplot2-produced visualisation
+\code{plotor} returns an object of class \code{gg} and \code{ggplot}
 }
 \description{
 Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
@@ -43,4 +43,9 @@ lr <- glm(
 
 # produce the Odds Ratio plot
 plot_or(lr)
+}
+\seealso{
+See vignette('using_plotor', package = 'plotor') for more details on use.
+
+More details and examples are found on the website: \url{https://craig-parylo.github.io/plotor/index.html}
 }
