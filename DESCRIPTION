@@ -10,8 +10,11 @@ Authors@R:
     comment = c(ORCID = '0000-0003-4297-7808')
   )
 Maintainer: Craig Parylo <craig.parylo2@nhs.net>
-Description: Produces an Odds Ratio (OR) Plot to visualise the result of a logistic regression analysis.
-    Provide it with a model produced by `glm` for a binomial regression and it will convert the estimates to odds ratios with a 95% confidence interval and plot the results using 'ggplot2'.
+Description: Produces an Odds Ratio (OR) Plot to visualise the result of a 
+    logistic regression analysis.
+    Provide it with a binomial regression model produced by 'glm()' and it will 
+    convert the estimates to odds ratios with a 95% confidence interval and 
+    plot the results using 'ggplot2'.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
