@@ -1,10 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   using_plotor: using_plotor.html
-last_built: 2024-06-17T11:10Z
+last_built: 2024-07-22T14:03Z
 urls:
   reference: https://craig-parylo.github.io/plotor/reference
   article: https://craig-parylo.github.io/plotor/articles
-
