@@ -214,11 +214,6 @@ plot_odds_ratio <- function(df, model) {
   model_outcome_label = base::sapply(model$data[model_outcome_var], function(x){base::attr(x,"label")})[[1]]
   model_outcome = dplyr::coalesce(model_outcome_label, model_outcome_var |> base::as.character())
 
-  # convert the group as a factor - levels defined per model argument order
-  df <- df |>
-    dplyr::mutate(group = group |> forcats::fct(levels = labels(terms(model)))) |>
-    dplyr::arrange(group, level, dplyr::desc(estimate))
-
   # plot the OR plot using ggplot2
   df |>
     #dplyr::group_by(group) |>
@@ -309,6 +304,11 @@ use_var_labels <- function(df, lr) {
     label = vars_labels |> base::as.character()
   ) |>
     dplyr::mutate(label = label |> dplyr::na_if(y = 'NULL'))
+
+  # convert the group as a factor - levels defined per model argument order
+  df <- df |>
+    dplyr::mutate(group = group |> forcats::fct(levels = labels(terms(lr)))) |>
+    dplyr::arrange(group, level, dplyr::desc(estimate))
 
   # left join the labels to the df, change group to match the label (where available)
   df <- df |>
