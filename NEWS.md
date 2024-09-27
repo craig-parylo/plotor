@@ -1,10 +1,7 @@
 # plotor 0.5.0
 
-# plotor 0.4.0
-
-# plotor 0.3.0
-
-# plotor 0.2.0
+* Odds Ratio plots now respect the order of terms as they are typed in the 
+`glm()` formula
 
 # plotor 0.1.0
 
