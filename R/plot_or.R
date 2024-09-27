@@ -76,6 +76,7 @@ plot_or <- function(glm_model_results) {
   # use labels where provided
   df <- use_var_labels(df = df, lr = glm_model_results)
 
+
   # plot the results
   p <- plot_odds_ratio(df = df, model = glm_model_results)
 
@@ -213,10 +214,14 @@ plot_odds_ratio <- function(df, model) {
   model_outcome_label = base::sapply(model$data[model_outcome_var], function(x){base::attr(x,"label")})[[1]]
   model_outcome = dplyr::coalesce(model_outcome_label, model_outcome_var |> base::as.character())
 
+  # convert the group as a factor - levels defined per model argument order
+  df <- df |>
+    dplyr::mutate(group = group |> forcats::fct(levels = labels(terms(model)))) |>
+    dplyr::arrange(group, level, dplyr::desc(estimate))
+
   # plot the OR plot using ggplot2
   df |>
-    dplyr::arrange(dplyr::desc(estimate)) |>
-    dplyr::group_by(group) |>
+    #dplyr::group_by(group) |>
     ggplot2::ggplot(ggplot2::aes(y = label_or, x = estimate, colour = significance)) +
     ggplot2::facet_grid(
       rows = dplyr::vars(group, level),
@@ -275,8 +280,8 @@ plot_odds_ratio <- function(df, model) {
 #' @noRd
 label_groups <- function(group, level) {
   dplyr::case_when(
-    dplyr::row_number(group) == 1 ~ group,
-    !group == dplyr::lag(group) ~ group,
+    is.na(dplyr::lag(group)) ~ group,
+    group != dplyr::lag(group) ~ group,
     .default = ''
   )
 }
