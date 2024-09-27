@@ -10,7 +10,7 @@ utils::globalVariables(
     'comparator', 'estimate',
 
     # use_var_labels
-    'label'
+    'label', 'terms'
   )
 )
 
