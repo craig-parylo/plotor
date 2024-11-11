@@ -7,8 +7,6 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org/package=plotor)
-[![Codecov test
-coverage](https://codecov.io/gh/craig-parylo/plotor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/craig-parylo/plotor?branch=main)
 [![](https://cranlogs.r-pkg.org/badges/plotor)](https://cran.r-project.org/package=plotor)
 <!-- badges: end -->
 
