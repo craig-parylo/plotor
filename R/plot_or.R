@@ -227,12 +227,19 @@ plot_odds_ratio <- function(df, model) {
     ) +
     ggplot2::geom_vline(xintercept = 1, linetype = 'dotted') +
     # plot the OR with 95% CI
-    ggplot2::geom_point(ggplot2::aes(size = rows_scale), shape = 15) +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmax = conf.high, xmin = conf.low), height = 1/5) +
-    # plot the comparator levels
     ggplot2::geom_point(
-      ggplot2::aes(y = label_or, x = comparator, colour = significance, size = rows_scale),
-      shape = 15
+      # replace any NA `estimate` and `rows_scale` with nominal to avoid warnings about missing values
+      data = df |>
+        dplyr::mutate(
+          estimate = dplyr::coalesce(estimate, 1),
+          rows_scale = dplyr::coalesce(rows_scale, 0)
+      ),
+      ggplot2::aes(size = rows_scale), shape = 15
+    ) +
+    ggplot2::geom_errorbarh(
+      # remove any confidence estimates with NA values
+      data = df |> dplyr::filter(!is.na(conf.high), !is.na(conf.low)),
+      ggplot2::aes(xmax = conf.high, xmin = conf.low), height = 1/5
     ) +
     ggplot2::scale_x_log10(n.breaks = 10) +
     ggplot2::theme_minimal() +
