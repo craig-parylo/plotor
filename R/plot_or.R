@@ -76,7 +76,6 @@ plot_or <- function(glm_model_results) {
   # use labels where provided
   df <- use_var_labels(df = df, lr = glm_model_results)
 
-
   # plot the results
   p <- plot_odds_ratio(df = df, model = glm_model_results)
 
@@ -210,20 +209,30 @@ prepare_df_for_plotting <- function(df) {
 plot_odds_ratio <- function(df, model) {
 
   # get the name of the outcome variable - will be used in the plot title
-  model_outcome_var = model$formula[[2]] |> base::as.character()
-  model_outcome_label = base::sapply(model$data[model_outcome_var], function(x){base::attr(x,"label")})[[1]]
-  model_outcome = dplyr::coalesce(model_outcome_label, model_outcome_var |> base::as.character())
+  model_outcome_var <-
+    model$formula[[2]] |>
+    base::as.character()
+  model_outcome_label <-
+    base::sapply(
+      model$data[model_outcome_var],
+      function(x){base::attr(x,"label")}
+    )[[1]]
+  model_outcome <-
+    dplyr::coalesce(
+      model_outcome_label,
+      model_outcome_var |> base::as.character()
+    )
 
   # plot the OR plot using ggplot2
   df |>
     #dplyr::group_by(group) |>
     ggplot2::ggplot(ggplot2::aes(y = label_or, x = estimate, colour = significance)) +
     ggplot2::facet_grid(
-      rows = dplyr::vars(group, level),
+      rows = dplyr::vars(label, level),
       scales = 'free_y',
       space = 'free_y',
       switch = 'y',
-      labeller = ggplot2::labeller(group = label_groups)
+      labeller = ggplot2::labeller(label = label_groups, .multi_line = TRUE)
     ) +
     ggplot2::geom_vline(xintercept = 1, linetype = 'dotted') +
     # plot the OR with 95% CI
@@ -305,27 +314,33 @@ use_var_labels <- function(df, lr) {
   # get the variable labels as a list
   vars_labels = base::sapply(df_model, function(x){base::attr(x,"label")})
 
-  # convert to a tibble and handle any missing labels
-  vars_labels = dplyr::tibble(
-    group = base::names(vars_labels),
-    label = vars_labels |> base::as.character()
-  ) |>
-    dplyr::mutate(label = label |> dplyr::na_if(y = 'NULL'))
+  # create a tibble of correctly ordered group variable and labels
+  df_vars_labels <-
+    dplyr::tibble(
+    # define group based on the variable labels
+    group = base::names(vars_labels) |> # set 'group' to be the names of the variable
+      factor(levels = labels(terms(lr))), # set levels to suit glm's model terms
+    # capture the descriptive labels
+    label = vars_labels |>
+      base::as.character() |> # need character for next step
+      dplyr::na_if(y = 'NULL') |> # if there are no labels then set as NA
+      dplyr::coalesce(group) |> # replace NA with group name
+      stringr::str_wrap(width = 15) |> # wrap longer length labels
+      forcats::fct() |> # convert all to a factor
+      forcats::fct_reorder(as.numeric(group), .na_rm = TRUE) # order to suit the group
+  )
 
-  # convert the group as a factor - levels defined per model argument order
-  df <- df |>
-    dplyr::mutate(group = group |> forcats::fct(levels = labels(terms(lr)))) |>
-    dplyr::arrange(group, level, dplyr::desc(estimate))
-
-  # left join the labels to the df, change group to match the label (where available)
-  df <- df |>
-    dplyr::left_join(
-      y = vars_labels,
-      by = 'group'
+  # right join the df to df_vars_labels to integrate the new factors in the df
+  # NB, right join to exclude labels for the outcome variable
+  df_return <-
+    df_vars_labels |>
+    dplyr::right_join(
+      y = df |>
+        dplyr::rename(group_old = group),
+      by = dplyr::join_by(group == group_old)
     ) |>
-    dplyr::mutate(group = dplyr::coalesce(label, group)) |>
-    dplyr::select(-label)
+    dplyr::arrange(label, level)
 
-  return(df)
+  return(df_return)
 
 }
