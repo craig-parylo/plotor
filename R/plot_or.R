@@ -1,19 +1,3 @@
-# Set global variables ----
-# set variables to avoid issue with dplyr and 'no visible global function definition for ...'
-utils::globalVariables(
-  base::c(
-    # count_rows_by_variable
-    'group', 'level', 'rows', 'term',
-
-    # plot_odds_ratio
-    'label_or', 'significance', 'rows_scale', 'conf.high', 'conf.low',
-    'comparator', 'estimate',
-
-    # use_var_labels
-    'label', 'terms'
-  )
-)
-
 #' Plot OR
 #'
 #' Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
@@ -55,7 +39,6 @@ utils::globalVariables(
 #' # produce the Odds Ratio plot
 #' plot_or(lr)
 plot_or <- function(glm_model_results) {
-
   # get the data from the model object
   df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
 
@@ -65,10 +48,7 @@ plot_or <- function(glm_model_results) {
 
   # add the odds ratio and CIs to the summary dataframe
   df <- df |>
-    dplyr::left_join(
-      y = model_or,
-      by = base::c('term')
-    )
+    dplyr::left_join(y = model_or, by = base::c('term'))
 
   # prepare the data for plotting
   df <- prepare_df_for_plotting(df = df)
@@ -99,7 +79,6 @@ plot_or <- function(glm_model_results) {
 #'
 #' @noRd
 count_rows_by_variable <- function(df, var_name) {
-
   # prep
   var = base::as.symbol(var_name)
 
@@ -108,18 +87,21 @@ count_rows_by_variable <- function(df, var_name) {
     dplyr::pull()
 
   # calculate rows - split if categorical
-  if(is.numeric(var_temp)) {
+  if (is.numeric(var_temp)) {
     df |>
       dplyr::filter(!is.na(var_name)) |>
       dplyr::summarise(rows = dplyr::n()) |>
-      dplyr::mutate(group = var_name, level = var_name, term = var_name) |>
-      dplyr::select(term, group, level, rows)
+      dplyr::mutate(group = var_name,
+                    level = var_name,
+                    term = var_name) |>
+      dplyr::select(.data$term, .data$group, .data$level, .data$rows)
   } else {
     df |>
       dplyr::summarise(rows = dplyr::n(), .by = var) |>
       dplyr::rename(level = var) |>
-      dplyr::mutate(group = var_name, term = base::paste0(group, level)) |>
-      dplyr::select(term, group, level, rows)
+      dplyr::mutate(group = var_name,
+                    term = base::paste0(.data$group, .data$level)) |>
+      dplyr::select(.data$term, .data$group, .data$level, .data$rows)
   }
 }
 
@@ -132,7 +114,6 @@ count_rows_by_variable <- function(df, var_name) {
 #' @return Tibble summary of rows per variable used in the model
 #' @noRd
 summarise_rows_per_variable_in_model <- function(model_results) {
-
   # get the data from the model object
   model_data <- model_results$model |> dplyr::as_tibble()
 
@@ -145,7 +126,7 @@ summarise_rows_per_variable_in_model <- function(model_results) {
   df <- model_vars |>
     purrr::map_dfr(\(.x) count_rows_by_variable(df = model_data, var_name = .x)) |>
     # rescale rows (will be used to set the size of the dot in the plot)
-    dplyr::mutate(rows_scale = rows |> scales::rescale(to = c(1, 5)))
+    dplyr::mutate(rows_scale = .data$rows |> scales::rescale(to = c(1, 5)))
 
   # return the table summary
   return(df)
@@ -158,10 +139,8 @@ summarise_rows_per_variable_in_model <- function(model_results) {
 #' @return Tibble of data expanded with variables to aid plotting
 #' @noRd
 prepare_df_for_plotting <- function(df) {
-
   df <- df |>
     dplyr::mutate(
-
       # flag records which do not cross the line of no effect
       significance = dplyr::case_when(
         base::is.na(estimate) ~ 'Comparator',
@@ -171,9 +150,7 @@ prepare_df_for_plotting <- function(df) {
       ),
 
       # set all comparator groups at one as a baseline
-      comparator = dplyr::case_when(
-        base::is.na(estimate) ~ 1
-      ),
+      comparator = dplyr::case_when(base::is.na(estimate) ~ 1),
 
       # probability label - helper for the below 'label_or' step
       p_label = dplyr::case_when(
@@ -186,9 +163,12 @@ prepare_df_for_plotting <- function(df) {
       label_or = dplyr::case_when(
         base::is.na(estimate) ~ glue::glue('{group} (comparator)'),
         .default = glue::glue(
-          '{round(estimate, digits = 2)} ', # OR estimate
-          '({round(conf.low, digits = 2)}-', # lower CI
-          '{round(conf.high, digits = 2)}, ', # upper CI
+          '{round(estimate, digits = 2)} ',
+          # OR estimate
+          '({round(conf.low, digits = 2)}-',
+          # lower CI
+          '{round(conf.high, digits = 2)}, ',
+          # upper CI
           '{p_label})' # probability
         )
       )
@@ -207,28 +187,27 @@ prepare_df_for_plotting <- function(df) {
 #' @return ggplot2 plot
 #' @noRd
 plot_odds_ratio <- function(df, model) {
-
   # get the name of the outcome variable - will be used in the plot title
   model_outcome_var <-
     model$formula[[2]] |>
     base::as.character()
   model_outcome_label <-
-    base::sapply(
-      model$data[model_outcome_var],
-      function(x){base::attr(x,"label")}
-    )[[1]]
+    base::sapply(model$data[model_outcome_var], function(x) {
+      base::attr(x, "label")
+    })[[1]]
   model_outcome <-
-    dplyr::coalesce(
-      model_outcome_label,
-      model_outcome_var |> base::as.character()
-    )
+    dplyr::coalesce(model_outcome_label,
+                    model_outcome_var |> base::as.character())
 
   # plot the OR plot using ggplot2
   df |>
-    #dplyr::group_by(group) |>
-    ggplot2::ggplot(ggplot2::aes(y = label_or, x = estimate, colour = significance)) +
+    ggplot2::ggplot(ggplot2::aes(
+      y = .data$label_or,
+      x = .data$estimate,
+      colour = .data$significance
+    )) +
     ggplot2::facet_grid(
-      rows = dplyr::vars(label, level),
+      rows = dplyr::vars(.data$label, .data$level),
       scales = 'free_y',
       space = 'free_y',
       switch = 'y',
@@ -240,15 +219,17 @@ plot_odds_ratio <- function(df, model) {
       # replace any NA `estimate` and `rows_scale` with nominal to avoid warnings about missing values
       data = df |>
         dplyr::mutate(
-          estimate = dplyr::coalesce(estimate, 1),
-          rows_scale = dplyr::coalesce(rows_scale, 0)
-      ),
-      ggplot2::aes(size = rows_scale), shape = 15
+          estimate = dplyr::coalesce(.data$estimate, 1),
+          rows_scale = dplyr::coalesce(.data$rows_scale, 0)
+        ),
+      ggplot2::aes(size = .data$rows_scale),
+      shape = 15
     ) +
     ggplot2::geom_errorbarh(
       # remove any confidence estimates with NA values
-      data = df |> dplyr::filter(!is.na(conf.high), !is.na(conf.low)),
-      ggplot2::aes(xmax = conf.high, xmin = conf.low), height = 1/5
+      data = df |> dplyr::filter(!is.na(.data$conf.high), !is.na(.data$conf.low)),
+      ggplot2::aes(xmax = .data$conf.high, xmin = .data$conf.low),
+      height = 1 / 5
     ) +
     ggplot2::scale_x_log10(n.breaks = 10) +
     ggplot2::theme_minimal() +
@@ -264,17 +245,23 @@ plot_odds_ratio <- function(df, model) {
       # handle groups
       panel.spacing = ggplot2::unit(0, 'lines'),
       strip.placement = 'outside',
-      strip.text.y.left = ggplot2::element_text(angle = 0, hjust = 1, vjust = 0.5)
+      strip.text.y.left = ggplot2::element_text(
+        angle = 0,
+        hjust = 1,
+        vjust = 0.5
+      )
     ) +
     ggplot2::labs(
       title = glue::glue('{model_outcome}'),
       subtitle = 'Odds Ratio (OR) plot with 95% Confidence Interval (CI)',
       x = 'Odds ratio (95% CI, log scale)'
     ) +
-    ggplot2::scale_colour_manual(values = c(
-      'Significant' = '#192a56',
-      'Comparator' = '#718093',
-      'Not significant' = '#487eb0')
+    ggplot2::scale_colour_manual(
+      values = c(
+        'Significant' = '#192a56',
+        'Comparator' = '#718093',
+        'Not significant' = '#487eb0'
+      )
     )
 }
 
@@ -290,11 +277,9 @@ plot_odds_ratio <- function(df, model) {
 #' @return Character vectors of labels for both group and level
 #' @noRd
 label_groups <- function(group, level) {
-  dplyr::case_when(
-    is.na(dplyr::lag(group)) ~ group,
-    group != dplyr::lag(group) ~ group,
-    .default = ''
-  )
+  dplyr::case_when(is.na(dplyr::lag(group)) ~ group,
+                   group != dplyr::lag(group) ~ group,
+                   .default = '')
 }
 
 #' Use Variable Labels
@@ -307,28 +292,30 @@ label_groups <- function(group, level) {
 #' @return Tibble of data with group labels used where available
 #' @noRd
 use_var_labels <- function(df, lr) {
-
   # get the data from lr
   df_model <- lr$data
 
   # get the variable labels as a list
-  vars_labels = base::sapply(df_model, function(x){base::attr(x,"label")})
+  vars_labels = base::sapply(df_model, function(x) {
+    base::attr(x, "label")
+  })
 
   # create a tibble of correctly ordered group variable and labels
   df_vars_labels <-
     dplyr::tibble(
-    # define group based on the variable labels
-    group = base::names(vars_labels) |> # set 'group' to be the names of the variable
-      factor(levels = labels(terms(lr))), # set levels to suit glm's model terms
-    # capture the descriptive labels
-    label = vars_labels |>
-      base::as.character() |> # need character for next step
-      dplyr::na_if(y = 'NULL') |> # if there are no labels then set as NA
-      dplyr::coalesce(group) |> # replace NA with group name
-      stringr::str_wrap(width = 15) |> # wrap longer length labels
-      forcats::fct() |> # convert all to a factor
-      forcats::fct_reorder(as.numeric(group), .na_rm = TRUE) # order to suit the group
-  )
+      # define group based on the variable labels
+      group = base::names(vars_labels) |> # set 'group' to be the names of the variable
+        factor(levels = labels(terms(lr))),
+      # set levels to suit glm's model terms
+      # capture the descriptive labels
+      label = vars_labels |>
+        base::as.character() |> # need character for next step
+        dplyr::na_if(y = 'NULL') |> # if there are no labels then set as NA
+        dplyr::coalesce(.data$group) |> # replace NA with group name
+        stringr::str_wrap(width = 15) |> # wrap longer length labels
+        forcats::fct() |> # convert all to a factor
+        forcats::fct_reorder(as.numeric(.data$group), .na_rm = TRUE) # order to suit the group
+    )
 
   # right join the df to df_vars_labels to integrate the new factors in the df
   # NB, right join to exclude labels for the outcome variable
@@ -336,10 +323,10 @@ use_var_labels <- function(df, lr) {
     df_vars_labels |>
     dplyr::right_join(
       y = df |>
-        dplyr::rename(group_old = group),
-      by = dplyr::join_by(group == group_old)
+        dplyr::rename(group_old = .data$group),
+      by = dplyr::join_by('group' == 'group_old')
     ) |>
-    dplyr::arrange(label, level)
+    dplyr::arrange(.data$label, .data$level)
 
   return(df_return)
 

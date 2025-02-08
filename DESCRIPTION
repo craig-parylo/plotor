@@ -25,6 +25,7 @@ Imports:
     ggplot2,
     glue,
     purrr,
+    rlang,
     scales,
     stats,
     stringr,
