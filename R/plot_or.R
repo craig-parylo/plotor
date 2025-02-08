@@ -41,9 +41,22 @@
 #' plot_or(lr)
 plot_or <- function(glm_model_results, conf_level = 0.95) {
 
+  # data and input checks ----
+  # check the model is logistic regression
+  if (!validate_glm_model(glm_model_results)) {
+    glm_family <- glm_model_results$family$family
+    cli::cli_abort(
+      message = c(
+        "{.arg glm_model_results} must be a {.pkg glm} object of 'binomial' family.",
+        "You've supplied a '{glm_family}' model."
+      )
+    )
+  }
+
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
 
+  # main ----
   # get the data from the model object
   df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
 
@@ -378,3 +391,20 @@ validate_conf_level_input <- function(conf_level) {
 
   return(conf_level_new)
 }
+
+#' Validate the `{glm}` model
+#'
+#' Check whether the glm model object is the product of logistic regression.
+#'
+#' @param glm_model Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()]
+#'
+#' @returns boolean (TRUE = logistic regression, FALSE = other model)
+validate_glm_model <- function(glm_model) {
+  response <- (
+    class(glm_model)[1] == 'glm' & # must be a glm class object
+      glm_model$family$family == 'binomial' & # must be a binomial model
+      glm_model$family$link == 'logit' # must use logit link
+  )
+  return(response)
+}
+
