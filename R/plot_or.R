@@ -3,6 +3,7 @@
 #' Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
 #'
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
 #'
 #' @return `plotor` returns an object of class `gg` and `ggplot`
 #' @seealso
@@ -38,13 +39,17 @@
 #'
 #' # produce the Odds Ratio plot
 #' plot_or(lr)
-plot_or <- function(glm_model_results) {
+plot_or <- function(glm_model_results, conf_level = 0.95) {
+
+  # limit conf_level to between 0.001 and 0.999
+  conf_level <- validate_conf_level_input(conf_level)
+
   # get the data from the model object
   df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
 
   # get odds ratio and confidence intervals
   model_or <- glm_model_results |>
-    broom::tidy(exponentiate = T, conf.int = T)
+    broom::tidy(exponentiate = T, conf.int = T, conf.level = conf_level)
 
   # add the odds ratio and CIs to the summary dataframe
   df <- df |>
@@ -57,7 +62,7 @@ plot_or <- function(glm_model_results) {
   df <- use_var_labels(df = df, lr = glm_model_results)
 
   # plot the results
-  p <- plot_odds_ratio(df = df, model = glm_model_results)
+  p <- plot_odds_ratio(df = df, model = glm_model_results, conf_level = conf_level)
 
   return(p)
 }
@@ -183,10 +188,11 @@ prepare_df_for_plotting <- function(df) {
 #'
 #' @param df Tibble of data containing a pre-prepared OR object
 #' @param model Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
+#' @param conf_level Numeric value below 1 indicating the confidence level used when producing the Confidence Interval
 #'
 #' @return ggplot2 plot
 #' @noRd
-plot_odds_ratio <- function(df, model) {
+plot_odds_ratio <- function(df, model, conf_level) {
   # get the name of the outcome variable - will be used in the plot title
   model_outcome_var <-
     model$formula[[2]] |>
@@ -198,6 +204,9 @@ plot_odds_ratio <- function(df, model) {
   model_outcome <-
     dplyr::coalesce(model_outcome_label,
                     model_outcome_var |> base::as.character())
+
+  # get the confidence level as string
+  str_conf_level <- glue::glue('{conf_level * 100}%')
 
   # plot the OR plot using ggplot2
   df |>
@@ -253,8 +262,8 @@ plot_odds_ratio <- function(df, model) {
     ) +
     ggplot2::labs(
       title = glue::glue('{model_outcome}'),
-      subtitle = 'Odds Ratio (OR) plot with 95% Confidence Interval (CI)',
-      x = 'Odds ratio (95% CI, log scale)'
+      subtitle = glue::glue('Odds Ratio (OR) plot with {str_conf_level} Confidence Interval (CI)'),
+      x = glue::glue('Odds ratio ({str_conf_level} CI, log scale)')
     ) +
     ggplot2::scale_colour_manual(
       values = c(
@@ -330,4 +339,42 @@ use_var_labels <- function(df, lr) {
 
   return(df_return)
 
+}
+
+#' Validate confidence level input
+#'
+#' Checks the parameter for the confidence level is within accepted limits.
+#' For example a value of 1 (to be 100% confident) is not possible to calculate,
+#' so this function checks the input against upper and lower limits and adjusts
+#' the value to sit within accepted limits.
+#'
+#' @param conf_level Numeric input from the user
+#'
+#' @returns Numeric value between upper and lower limits
+#' @noRd
+validate_conf_level_input <- function(conf_level) {
+  # set limits
+  ci_min <- 0.001
+  ci_max <- 0.999
+
+  # set a message if the input breaches our limits
+  ci_message <-
+    dplyr::case_when(
+      conf_level <= ci_min ~ glue::glue(
+        "`conf_level = {conf_level}` is below the minimum accepted value, setting to {ci_min} instead"
+      ),
+      conf_level >= ci_max ~ glue::glue(
+        "`conf_level = {conf_level}` is above the maximum accepted value, setting to {ci_max} instead"
+      )
+    )
+
+  # if message is not NA then display it
+  if (!is.na(ci_message)) {
+    cli::cli_alert_info(ci_message)
+  }
+
+  # re-set the conf_level to an accepted value
+  conf_level_new <- min(ci_max, max(ci_min, conf_level))
+
+  return(conf_level_new)
 }
