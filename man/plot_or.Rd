@@ -4,10 +4,12 @@
 \alias{plot_or}
 \title{Plot OR}
 \usage{
-plot_or(glm_model_results)
+plot_or(glm_model_results, conf_level = 0.95)
 }
 \arguments{
 \item{glm_model_results}{Results from a binomial Generalised Linear Model (GLM), as produced by \code{\link[stats:glm]{stats::glm()}}.}
+
+\item{conf_level}{Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.}
 }
 \value{
 \code{plotor} returns an object of class \code{gg} and \code{ggplot}
