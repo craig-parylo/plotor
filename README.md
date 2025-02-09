@@ -7,7 +7,10 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org/package=plotor)
+[![Codecov test
+coverage](https://codecov.io/gh/craig-parylo/plotor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/craig-parylo/plotor?branch=main)
 [![](https://cranlogs.r-pkg.org/badges/plotor)](https://cran.r-project.org/package=plotor)
+
 <!-- badges: end -->
 
 The goal of plotor is to generate Odds Ratio plots from logistic
@@ -111,7 +114,7 @@ function.
 plot_or(glm_model_results = lr)
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.svg" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 This plot makes it clear that:
 
