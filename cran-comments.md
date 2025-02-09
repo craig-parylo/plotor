@@ -1,5 +1,9 @@
 ## R CMD check results
+Duration: 1m 37.6s
 
-0 errors | 0 warnings | 1 note
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 
-* This is a new release.
+## revdepcheck results
+OK: 0
+BROKEN: 0
+Total time: <1 min

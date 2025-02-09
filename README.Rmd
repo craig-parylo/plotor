@@ -20,9 +20,12 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org/package=plotor)
-[![Codecov test coverage](https://codecov.io/gh/craig-parylo/plotor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/craig-parylo/plotor?branch=main)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org/package=plotor)
+[![Codecov test
+coverage](https://codecov.io/gh/craig-parylo/plotor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/craig-parylo/plotor?branch=main)
 [![](https://cranlogs.r-pkg.org/badges/plotor)](https://cran.r-project.org/package=plotor)
+
 <!-- badges: end -->
 
 The goal of plotor is to generate Odds Ratio plots from logistic
@@ -122,7 +125,7 @@ lr <- glm(
 Finally, we can plot the Odds Ratio of survival using the `plot_or`
 function.
 
-```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='svg'}
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='png', fig.retina=2}
 # using plot_or 
 plot_or(glm_model_results = lr)
 ```
