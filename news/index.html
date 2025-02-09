@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,12 +36,18 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.2" id="plotor-052">plotor 0.5.2<a class="anchor" aria-label="anchor" href="#plotor-052"></a></h2>
+<ul><li><p><code><a href="../reference/plot_or.html">plot_or()</a></code> now respects the order of covariates in the formula when plotting (<a href="https://github.com/craig-parylo/plotor/issues/15" class="external-link">#15</a>).</p></li>
+<li><p><code><a href="../reference/plot_or.html">plot_or()</a></code> handles missing information to avoid {ggplot2} related warning messages (<a href="https://github.com/craig-parylo/plotor/issues/11" class="external-link">#11</a>).</p></li>
+<li><p><code><a href="../reference/plot_or.html">plot_or()</a></code> accepts customised confidence limits, e.g. 99%, used when calculating the confidence intervals (<a href="https://github.com/craig-parylo/plotor/issues/19" class="external-link">#19</a>).</p></li>
+<li><p><code><a href="../reference/plot_or.html">plot_or()</a></code> conducts checks on inputs - ensuring the {glm} model is a logistic regression (family = ‘binomial’ and link = ‘logit’) and validates the confidence limit to be within the range 0.001 to 0.999 (<a href="https://github.com/craig-parylo/plotor/issues/22" class="external-link">#22</a>, <a href="https://github.com/craig-parylo/plotor/issues/19" class="external-link">#19</a>).</p></li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="plotor-051">plotor 0.5.1<a class="anchor" aria-label="anchor" href="#plotor-051"></a></h2><p class="text-muted">CRAN release: 2024-09-27</p>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="plotor-050">plotor 0.5.0<a class="anchor" aria-label="anchor" href="#plotor-050"></a></h2>
-<ul><li>Odds Ratio plots now respect the order of terms as they are typed in the <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> formula</li>
-</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="plotor-010">plotor 0.1.0<a class="anchor" aria-label="anchor" href="#plotor-010"></a></h2>
 <ul><li>Initial CRAN submission.</li>
