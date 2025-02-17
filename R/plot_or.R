@@ -133,7 +133,7 @@ table_or <- function(glm_model_results, conf_level = 0.95, output = 'tibble') {
       'term', 'rows_scale', 'label_or', 'group', 'p_label'
     ))) |>
     # work out the rate of 'outcome'
-    dplyr::mutate(outcome_rate = outcome / rows) |>
+    dplyr::mutate(outcome_rate = .data$outcome / .data$rows) |>
     dplyr::relocate(.data$outcome_rate, .after = .data$outcome)
 
   # decide what object to return
@@ -626,9 +626,9 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
     df |>
     # log the OR and CI for plotting
     dplyr::mutate(
-      plot_or = log(estimate),
-      plot_ci_l = log(conf.low),
-      plot_ci_u = log(conf.high)
+      plot_or = log(.data$estimate),
+      plot_ci_l = log(.data$conf.low),
+      plot_ci_u = log(.data$conf.high)
     ) |>
     # prepare for tabulation
     gt::gt(row_group_as_column = TRUE) |>
