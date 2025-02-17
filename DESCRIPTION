@@ -25,6 +25,8 @@ Imports:
     forcats,
     ggplot2,
     glue,
+    gt,
+    gtExtras,
     purrr,
     rlang,
     scales,
