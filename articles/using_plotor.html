@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Using plotor</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/craig-parylo/plotor/blob/v0.5.2/vignettes/using_plotor.Rmd" class="external-link"><code>vignettes/using_plotor.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/craig-parylo/plotor/blob/main/vignettes/using_plotor.Rmd" class="external-link"><code>vignettes/using_plotor.Rmd</code></a></small>
       <div class="d-none name"><code>using_plotor.Rmd</code></div>
     </div>
 
@@ -170,7 +170,7 @@ sex and age group. For this we use the Generalised Linear Model function
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># using plot_or</span></span>
 <span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-4-1.png"><!-- --></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-4-1.png" width="864"></p>
 <p>This plot makes it clear that:</p>
 <ul>
 <li><p>Children were 2.89 times more likely to survive than
@@ -188,9 +188,9 @@ the line of no effect.</p>
 <p>The dot represents the point estimate for the Odds-Ratio, which
 indicates how much more likely the event is than the comparator
 event.</p>
-<p>The width of the whiskers represents the 95% Confidence Interval, a
-range of values the point estimate (the dot) is likely to fall within if
-the study were to be repeated, with a probability of 95%.</p>
+<p>The width of the whiskers represents the Confidence Interval, a range
+of values the point estimate (the dot) is likely to fall within if the
+study were to be repeated, most often with a probability of 95%.</p>
 <p>The line of no effect is set at a value of 1. Events whose confidence
 intervals touch or cross this line are considered to show no difference
 in likelihood than the comparator event.</p>
@@ -210,7 +210,7 @@ fonts in the plot to size 16.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-5-1.png"><!-- --></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-5-1.png" width="864"></p>
 </div>
 <div class="section level3">
 <h3 id="specify-the-breaks">Specify the breaks<a class="anchor" aria-label="anchor" href="#specify-the-breaks"></a>
@@ -224,7 +224,33 @@ breaks to use:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-6-1.png"><!-- --></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-6-1.png" width="864"></p>
+</div>
+<div class="section level3">
+<h3 id="change-the-confidence-level">Change the confidence level<a class="anchor" aria-label="anchor" href="#change-the-confidence-level"></a>
+</h3>
+<p>Confidence Intervals are calculated using a percentage confidence,
+called the <em>Confidence Level</em>, which sometimes range from 80% to
+99% but 95% is most commonly-used.</p>
+<p>The default in {plotor} is 95% but from version 0.5.3 onward you can
+change this by specifying a <code>conf_level</code> parameter in your
+<code><a href="../reference/plot_or.html">plot_or()</a></code> call. Here we set the Confidence Level to 99% for
+the Titanic data set:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span>, conf_level <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-7-1.png" width="864"></p>
+<p>Notice how the whiskers have grown slightly? This is because we
+wished to be <em>more</em> confident (an additional 4% on top of the 95%
+we used previously) that the Confidence Interval covers all values the
+Odds Ratio estimate could take if we were to repeat this experiment
+multiple times. Thus the Confidence Interval was increased to match our
+expected <em>Confidence Level</em>.</p>
+<p>In this example the increased length of the resulting Confidence
+intervals still do not cross the dotted line and so do not affect our
+conclusions that <code>1st</code> class passengers were more likely to
+survive than all other classes of people, <code>Women</code> were more
+likely to survive than <code>Men</code> and <code>Children</code> were
+more likely to survive than <code>Adults</code>.</p>
 </div>
 <div class="section level3">
 <h3 id="change-the-dot-and-whisker-colours">Change the dot and whisker colours<a class="anchor" aria-label="anchor" href="#change-the-dot-and-whisker-colours"></a>
@@ -245,14 +271,14 @@ touch or cross the line of no effect.</p></li>
 using <a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link"><code>scale_colour_manual</code></a>
 function from <code>ggplot2</code> with a named vector specifying colour
 values for the three types of colours:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">'Significant'</span> <span class="op">=</span> <span class="st">'#44bd32'</span>,</span>
 <span>    <span class="st">'Comparator'</span> <span class="op">=</span> <span class="st">'#8c7ae6'</span>,</span>
 <span>    <span class="st">'Not significant'</span> <span class="op">=</span> <span class="st">'#e84118'</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-7-1.png"><!-- --></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-8-1.png" width="864"></p>
 </div>
 <div class="section level3">
 <h3 id="change-the-title-subtitle-and-add-a-caption">Change the title, subtitle and add a caption<a class="anchor" aria-label="anchor" href="#change-the-title-subtitle-and-add-a-caption"></a>
@@ -263,14 +289,14 @@ with a 95% confidence interval.</p>
 <p>The plot can be customised with your own title, subtitle and add a
 caption by extending the <a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link"><code>labs</code></a>
 function of <code>ggplot2</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">'Passenger survival from the Titanic disaster'</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">'Odds Ratio of survival by Class, Age and Gender'</span>,</span>
 <span>    caption <span class="op">=</span> <span class="st">'Data source: Dawson, Robert J. MacG. (1995), The ‘Unusual Episode’ Data Revisited. Journal of Statistics Education, 3. doi:10.1080/10691898.1995.11910499'</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-8-1.png"><!-- --></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-9-1.png" width="864"></p>
 </div>
 </div>
 <div class="section level2">
@@ -291,7 +317,7 @@ measured in grams per day.</p></li>
 </ul>
 <p>To look at the likelihood of a participant to develop oesophageal
 cancer we can perform logistic regression against these variables.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/esoph.html" class="external-link">esoph</a></span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># convert aggregated data to tidy observational data</span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span></span>
@@ -323,7 +349,7 @@ cancer we can perform logistic regression against these variables.</p>
 <span><span class="co">#&gt; $ Group <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Control, Control, Control, Control, Control, Control, Control, C…</span></span></code></pre></div>
 <p>Next we carry out the logistic regression and then plot the
 results.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># conduct the logistic regression</span></span>
 <span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">df</span>,</span>
@@ -334,7 +360,7 @@ results.</p>
 <span><span class="co"># plot the odds ratio plot with customised title</span></span>
 <span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">'Likelihood of developing oesophageal cancer'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-10-1.png"><!-- --></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-11-1.png" width="864"></p>
 <p>From this we can see there is a strong link between age and
 likelihood of cancer. Compared with those in the <code>25-34</code>
 years group there is a statistically significant increased likelihood of
@@ -366,7 +392,7 @@ user-friendly label than the name of the variable,
 <p>There are some amazing packages designed to help label your data. In
 the below example we use the <a href="https://larmarange.github.io/labelled/" class="external-link"><code>labelled</code></a>
 package to label our data before analysing and plotting it.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># library to apply labels to data</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
 <span></span>
@@ -402,7 +428,7 @@ package to label our data before analysing and plotting it.</p>
 <span><span class="co">#&gt;                                                              Case</span></span></code></pre></div>
 <p>Analyse the data using logistic regression as before and plot the
 result.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># conduct the logistic regression</span></span>
 <span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">df</span>,</span>
@@ -412,12 +438,966 @@ result.</p>
 <span></span>
 <span><span class="co"># plot the odds ratio plot using variable labels</span></span>
 <span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span></span></code></pre></div>
-<p><img src="using_plotor_files/figure-html/unnamed-chunk-12-1.png"><!-- --></p>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-13-1.png" width="864"></p>
 <p><code>plot_or</code> recognises the use of labels and uses these in
 preference to variable names wherever available.</p>
 <p>Using variable labels makes plots easier to read and more accessible,
 and is especially useful where you want to include the chart in reports
 or publications.</p>
+</div>
+<div class="section level3">
+<h3 id="control-covariate-order">Control covariate order<a class="anchor" aria-label="anchor" href="#control-covariate-order"></a>
+</h3>
+<p>Sometimes it can be useful to control the ordering of covariates in
+the plots. This can be done to group similar variables together, such as
+demographics, or arrange the covariates in a more pleasing order.</p>
+<p>For example, imagine we wish to display our tobacco consumption Odds
+Ratios at the top of the plot because this is the main focus of our
+study and wish to draw attention to these findings. The age group can be
+put at the bottom of the plot.</p>
+<p>As of version 0.5.2 onwards <a href="https://github.com/craig-parylo/plotor" class="external-link">plotor</a> facilitates this
+need by respecting the order in which the covariates are listed in the
+model.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># conduct the logistic regression with tobacco listed first in the 'formula'</span></span>
+<span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">'binomial'</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">Group</span> <span class="op">~</span> <span class="va">tobgp</span> <span class="op">+</span> <span class="va">alcgp</span> <span class="op">+</span> <span class="va">agegp</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot the odds ratio plot using variable labels</span></span>
+<span><span class="fu"><a href="../reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">lr</span><span class="op">)</span></span></code></pre></div>
+<p><img src="using_plotor_files/figure-html/unnamed-chunk-14-1.png" width="864"></p>
+<p>We now have tobacco as the first covariate on the y-axis and age
+group as the last covariate.</p>
+</div>
+<div class="section level3">
+<h3 id="summarise-in-a-table">Summarise in a table<a class="anchor" aria-label="anchor" href="#summarise-in-a-table"></a>
+</h3>
+<p>Odds Ratio plots are often accompanied by summary tables in academic
+papers. These tables provide details not always visible from the plot,
+such as the number of observations in each category and the conversion
+rate from the base population to those with the outcome of interest.</p>
+<p>From version 0.5.3 <a href="https://github.com/craig-parylo/plotor" class="external-link">plotor</a> can produce these summary
+tables using the new function <code><a href="../reference/table_or.html">table_or()</a></code> as either a
+<code>tibble</code> or a publication-ready <a href="https://gt.rstudio.com" class="external-link">gt</a> table.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/table_or.html">table_or</a></span><span class="op">(</span><span class="va">lr</span>, output <span class="op">=</span> <span class="st">'tibble'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 14 × 14</span></span></span>
+<span><span class="co">#&gt;    label     level  rows outcome outcome_rate class estimate std.error statistic</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> <span style="color: #949494;">"</span>Tobacco… 0-9g…   525      78      0.149   fact…    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> <span style="color: #949494;">"</span>Tobacco… 10-19   236      58      0.246   fact…     1.55     0.228      1.92</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="color: #949494;">"</span>Tobacco… 20-29   132      33      0.25    fact…     1.67     0.273      1.88</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="color: #949494;">"</span>Tobacco… 30+      82      31      0.378   fact…     5.16     0.344      4.77</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="color: #949494;">"</span>Alcohol… 0-39…   415      29      0.069<span style="text-decoration: underline;">9</span>  fact…    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="color: #949494;">"</span>Alcohol… 40-79   355      75      0.211   fact…     4.20     0.250      5.74</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="color: #949494;">"</span>Alcohol… 80-1…   138      51      0.370   fact…     7.25     0.285      6.96</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="color: #949494;">"</span>Alcohol… 120+     67      45      0.672   fact…    36.7      0.385      9.36</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="color: #949494;">"</span>Age gro… 25-34   116       1      0.008<span style="text-decoration: underline;">62</span> fact…    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="color: #949494;">"</span>Age gro… 35-44   199       9      0.045<span style="text-decoration: underline;">2</span>  fact…     7.25     1.10       1.79</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> <span style="color: #949494;">"</span>Age gro… 45-54   213      46      0.216   fact…    43.7      1.07       3.54</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> <span style="color: #949494;">"</span>Age gro… 55-64   242      76      0.314   fact…    76.3      1.06       4.07</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> <span style="color: #949494;">"</span>Age gro… 65-74   161      55      0.342   fact…   134.       1.08       4.55</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> <span style="color: #949494;">"</span>Age gro… 75+      44      13      0.295   fact…   125.       1.12       4.30</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: p.value &lt;dbl&gt;, conf.low &lt;dbl&gt;, conf.high &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   significance &lt;chr&gt;, comparator &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>The tibble contains details</p>
+<ul>
+<li><p><code>label</code> containing the name or label for the
+variables,</p></li>
+<li><p><code>level</code> describing the contents of categorical
+variables,</p></li>
+<li><p><code>rows</code> enumerating the number of observations relevant
+to each category level,</p></li>
+<li><p><code>outcome</code> enumerating the number of observations which
+resulted in the outcome of interest,</p></li>
+<li><p><code>outcome_rate</code> showing the conversion from
+<code>rows</code> to <code>outcome</code>,</p></li>
+<li><p><code>class</code> describing the data class for the
+variable,</p></li>
+<li><p><code>estimate</code> is the Odds Ratio point estimate,</p></li>
+<li><p><code>std.error</code> is the standard error for the Odds
+Ratio,</p></li>
+<li><p><code>p.value</code> is the probability of producing the Odds
+Ratio estimate by chance,</p></li>
+<li><p><code>conf.low</code> is the lower confidence interval,</p></li>
+<li><p><code>conf.high</code> is the upper confidence interval,</p></li>
+<li><p><code>significance</code> is a description of whether the Odds
+Ratio is statistically significant, with reference to the confidence
+interval,</p></li>
+</ul>
+<p>The tibble format means this information can be re-used in custom
+tables and visualisations.</p>
+<p>Specify <code>output = 'gt'</code> to get a publication-quality html
+table made using the <a href="https://gt.rstudio.com" class="external-link">gt</a> package.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/table_or.html">table_or</a></span><span class="op">(</span><span class="va">lr</span>, output <span class="op">=</span> <span class="st">'gt'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_options.html" class="external-link">tab_options</a></span><span class="op">(</span>container.width <span class="op">=</span> <span class="fl">1100</span><span class="op">)</span></span></code></pre></div>
+<div id="mwlefoodfi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:1100px;height:auto;">
+<style>#mwlefoodfi table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#mwlefoodfi thead, #mwlefoodfi tbody, #mwlefoodfi tfoot, #mwlefoodfi tr, #mwlefoodfi td, #mwlefoodfi th {
+  border-style: none;
+}
+
+#mwlefoodfi p {
+  margin: 0;
+  padding: 0;
+}
+
+#mwlefoodfi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#mwlefoodfi .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#mwlefoodfi .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#mwlefoodfi .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#mwlefoodfi .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#mwlefoodfi .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#mwlefoodfi .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#mwlefoodfi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#mwlefoodfi .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#mwlefoodfi .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#mwlefoodfi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#mwlefoodfi .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#mwlefoodfi .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#mwlefoodfi .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#mwlefoodfi .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwlefoodfi .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#mwlefoodfi .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#mwlefoodfi .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#mwlefoodfi .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwlefoodfi .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#mwlefoodfi .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwlefoodfi .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#mwlefoodfi .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwlefoodfi .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mwlefoodfi .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwlefoodfi .gt_left {
+  text-align: left;
+}
+
+#mwlefoodfi .gt_center {
+  text-align: center;
+}
+
+#mwlefoodfi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#mwlefoodfi .gt_font_normal {
+  font-weight: normal;
+}
+
+#mwlefoodfi .gt_font_bold {
+  font-weight: bold;
+}
+
+#mwlefoodfi .gt_font_italic {
+  font-style: italic;
+}
+
+#mwlefoodfi .gt_super {
+  font-size: 65%;
+}
+
+#mwlefoodfi .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#mwlefoodfi .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#mwlefoodfi .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#mwlefoodfi .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#mwlefoodfi .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#mwlefoodfi .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#mwlefoodfi .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#mwlefoodfi .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#mwlefoodfi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading">
+<td colspan="13" class="gt_heading gt_title gt_font_normal" style><span class="gt_from_md">Developing oesophageal cancer</span></td>
+    </tr>
+<tr class="gt_heading">
+<td colspan="13" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style><span class="gt_from_md">Odds Ratio summary table with 95% Confidence Interval</span></td>
+    </tr>
+<tr class="gt_col_headings gt_spanner_row">
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="a::stub"></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="Characteristic">
+        <div class="gt_column_spanner">Characteristic<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span>
+</div>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="or">
+        <div class="gt_column_spanner">Odds Ratio (OR)<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span>
+</div>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="ci">
+        <div class="gt_column_spanner">95% Confidence Interval (CI)<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span>
+</div>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="2" colspan="1" scope="col" id="plot_or">OR Plot</th>
+    </tr>
+<tr class="gt_col_headings">
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="level">Level</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="rows">N</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="outcome">n</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="outcome_rate">Rate</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="class">Class</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="estimate">OR</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="std.error">SE</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="p.value">p</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="conf.low">Lower</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="conf.high">Upper</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="significance">Significance</th>
+    </tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="gt_row_group_first">
+<td headers="Tobacco
+consumption stub_1_1 stub_1" rowspan="4" class="gt_row gt_left gt_stub_row_group">Tobacco
+consumption</td>
+<td headers="Tobacco
+consumption stub_1_1 level" class="gt_row gt_center">0-9g/day</td>
+<td headers="Tobacco
+consumption stub_1_1 rows" class="gt_row gt_right">525</td>
+<td headers="Tobacco
+consumption stub_1_1 outcome" class="gt_row gt_right">78</td>
+<td headers="Tobacco
+consumption stub_1_1 outcome_rate" class="gt_row gt_right">14.86%</td>
+<td headers="Tobacco
+consumption stub_1_1 class" class="gt_row gt_left">factor</td>
+<td headers="Tobacco
+consumption stub_1_1 estimate" class="gt_row gt_right">—</td>
+<td headers="Tobacco
+consumption stub_1_1 std.error" class="gt_row gt_right">—</td>
+<td headers="Tobacco
+consumption stub_1_1 p.value" class="gt_row gt_right">—</td>
+<td headers="Tobacco
+consumption stub_1_1 conf.low" class="gt_row gt_right">—</td>
+<td headers="Tobacco
+consumption stub_1_1 conf.high" class="gt_row gt_right">—</td>
+<td headers="Tobacco
+consumption stub_1_1 significance" class="gt_row gt_left">Comparator</td>
+<td headers="Tobacco
+consumption stub_1_1 plot_or" class="gt_row gt_center"> </td>
+</tr>
+<tr>
+<td headers="Tobacco
+consumption level_2 level" class="gt_row gt_center">10-19</td>
+<td headers="Tobacco
+consumption level_2 rows" class="gt_row gt_right">236</td>
+<td headers="Tobacco
+consumption level_2 outcome" class="gt_row gt_right">58</td>
+<td headers="Tobacco
+consumption level_2 outcome_rate" class="gt_row gt_right">24.58%</td>
+<td headers="Tobacco
+consumption level_2 class" class="gt_row gt_left">factor</td>
+<td headers="Tobacco
+consumption level_2 estimate" class="gt_row gt_right">1.550</td>
+<td headers="Tobacco
+consumption level_2 std.error" class="gt_row gt_right">0.2283</td>
+<td headers="Tobacco
+consumption level_2 p.value" class="gt_row gt_right">5.50 × 10<sup style="font-size: 65%;">−2</sup>
+</td>
+<td headers="Tobacco
+consumption level_2 conf.low" class="gt_row gt_right">0.9885</td>
+<td headers="Tobacco
+consumption level_2 conf.high" class="gt_row gt_right">2.423</td>
+<td headers="Tobacco
+consumption level_2 significance" class="gt_row gt_left">Not significant</td>
+<td headers="Tobacco
+consumption level_2 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="15.68" y1="8.66" x2="26.69" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="21.20" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="26.02,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,6.69 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.63,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,5.55 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 26.02,6.69 " style="stroke-width: 0.00;"></polygon><text x="26.63" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">1</text><polygon points="15.74,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,6.69 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 16.34,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,5.55 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 15.74,6.69 " style="stroke-width: 0.00;"></polygon><text x="15.74" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Tobacco
+consumption level_3 level" class="gt_row gt_center">20-29</td>
+<td headers="Tobacco
+consumption level_3 rows" class="gt_row gt_right">132</td>
+<td headers="Tobacco
+consumption level_3 outcome" class="gt_row gt_right">33</td>
+<td headers="Tobacco
+consumption level_3 outcome_rate" class="gt_row gt_right">25%</td>
+<td headers="Tobacco
+consumption level_3 class" class="gt_row gt_left">factor</td>
+<td headers="Tobacco
+consumption level_3 estimate" class="gt_row gt_right">1.670</td>
+<td headers="Tobacco
+consumption level_3 std.error" class="gt_row gt_right">0.2730</td>
+<td headers="Tobacco
+consumption level_3 p.value" class="gt_row gt_right">6.04 × 10<sup style="font-size: 65%;">−2</sup>
+</td>
+<td headers="Tobacco
+consumption level_3 conf.low" class="gt_row gt_right">0.9714</td>
+<td headers="Tobacco
+consumption level_3 conf.high" class="gt_row gt_right">2.839</td>
+<td headers="Tobacco
+consumption level_3 significance" class="gt_row gt_left">Not significant</td>
+<td headers="Tobacco
+consumption level_3 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="15.46" y1="8.66" x2="28.64" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="22.11" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="27.97,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,6.69 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 28.57,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,5.55 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 27.97,6.69 " style="stroke-width: 0.00;"></polygon><text x="28.57" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">1</text><polygon points="15.52,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,6.69 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 16.13,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,5.55 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 15.52,6.69 " style="stroke-width: 0.00;"></polygon><text x="15.52" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Tobacco
+consumption level_4 level" class="gt_row gt_center">30+</td>
+<td headers="Tobacco
+consumption level_4 rows" class="gt_row gt_right">82</td>
+<td headers="Tobacco
+consumption level_4 outcome" class="gt_row gt_right">31</td>
+<td headers="Tobacco
+consumption level_4 outcome_rate" class="gt_row gt_right">37.8%</td>
+<td headers="Tobacco
+consumption level_4 class" class="gt_row gt_left">factor</td>
+<td headers="Tobacco
+consumption level_4 estimate" class="gt_row gt_right">5.160</td>
+<td headers="Tobacco
+consumption level_4 std.error" class="gt_row gt_right">0.3441</td>
+<td headers="Tobacco
+consumption level_4 p.value" class="gt_row gt_right">1.85 × 10<sup style="font-size: 65%;">−6</sup>
+</td>
+<td headers="Tobacco
+consumption level_4 conf.low" class="gt_row gt_right">2.631</td>
+<td headers="Tobacco
+consumption level_4 conf.high" class="gt_row gt_right">10.18</td>
+<td headers="Tobacco
+consumption level_4 significance" class="gt_row gt_left">Significant</td>
+<td headers="Tobacco
+consumption level_4 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="27.70" y1="8.66" x2="44.32" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="35.97" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="43.65,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,6.69 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 44.26,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,5.55 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 43.65,6.69 " style="stroke-width: 0.00;"></polygon><text x="44.26" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">2</text><polygon points="27.76,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,6.69 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 28.36,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,5.55 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 27.76,6.69 " style="stroke-width: 0.00;"></polygon><text x="27.76" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">1</text></g></svg>
+</td>
+</tr>
+<tr class="gt_row_group_first">
+<td headers="Alcohol
+consumption stub_1_5 stub_1" rowspan="4" class="gt_row gt_left gt_stub_row_group">Alcohol
+consumption</td>
+<td headers="Alcohol
+consumption stub_1_5 level" class="gt_row gt_center">0-39g/day</td>
+<td headers="Alcohol
+consumption stub_1_5 rows" class="gt_row gt_right">415</td>
+<td headers="Alcohol
+consumption stub_1_5 outcome" class="gt_row gt_right">29</td>
+<td headers="Alcohol
+consumption stub_1_5 outcome_rate" class="gt_row gt_right">6.99%</td>
+<td headers="Alcohol
+consumption stub_1_5 class" class="gt_row gt_left">factor</td>
+<td headers="Alcohol
+consumption stub_1_5 estimate" class="gt_row gt_right">—</td>
+<td headers="Alcohol
+consumption stub_1_5 std.error" class="gt_row gt_right">—</td>
+<td headers="Alcohol
+consumption stub_1_5 p.value" class="gt_row gt_right">—</td>
+<td headers="Alcohol
+consumption stub_1_5 conf.low" class="gt_row gt_right">—</td>
+<td headers="Alcohol
+consumption stub_1_5 conf.high" class="gt_row gt_right">—</td>
+<td headers="Alcohol
+consumption stub_1_5 significance" class="gt_row gt_left">Comparator</td>
+<td headers="Alcohol
+consumption stub_1_5 plot_or" class="gt_row gt_center"> </td>
+</tr>
+<tr>
+<td headers="Alcohol
+consumption level_6 level" class="gt_row gt_center">40-79</td>
+<td headers="Alcohol
+consumption level_6 rows" class="gt_row gt_right">355</td>
+<td headers="Alcohol
+consumption level_6 outcome" class="gt_row gt_right">75</td>
+<td headers="Alcohol
+consumption level_6 outcome_rate" class="gt_row gt_right">21.13%</td>
+<td headers="Alcohol
+consumption level_6 class" class="gt_row gt_left">factor</td>
+<td headers="Alcohol
+consumption level_6 estimate" class="gt_row gt_right">4.198</td>
+<td headers="Alcohol
+consumption level_6 std.error" class="gt_row gt_right">0.2501</td>
+<td headers="Alcohol
+consumption level_6 p.value" class="gt_row gt_right">9.63 × 10<sup style="font-size: 65%;">−9</sup>
+</td>
+<td headers="Alcohol
+consumption level_6 conf.low" class="gt_row gt_right">2.600</td>
+<td headers="Alcohol
+consumption level_6 conf.high" class="gt_row gt_right">6.948</td>
+<td headers="Alcohol
+consumption level_6 significance" class="gt_row gt_left">Significant</td>
+<td headers="Alcohol
+consumption level_6 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="27.55" y1="8.66" x2="39.63" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="33.44" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="38.96,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,6.69 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 39.57,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,5.55 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 38.96,6.69 " style="stroke-width: 0.00;"></polygon><text x="39.57" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">2</text><polygon points="27.61,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,6.69 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 28.22,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,5.55 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 27.61,6.69 " style="stroke-width: 0.00;"></polygon><text x="27.61" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">1</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Alcohol
+consumption level_7 level" class="gt_row gt_center">80-119</td>
+<td headers="Alcohol
+consumption level_7 rows" class="gt_row gt_right">138</td>
+<td headers="Alcohol
+consumption level_7 outcome" class="gt_row gt_right">51</td>
+<td headers="Alcohol
+consumption level_7 outcome_rate" class="gt_row gt_right">36.96%</td>
+<td headers="Alcohol
+consumption level_7 class" class="gt_row gt_left">factor</td>
+<td headers="Alcohol
+consumption level_7 estimate" class="gt_row gt_right">7.248</td>
+<td headers="Alcohol
+consumption level_7 std.error" class="gt_row gt_right">0.2848</td>
+<td headers="Alcohol
+consumption level_7 p.value" class="gt_row gt_right">3.51 × 10<sup style="font-size: 65%;">−12</sup>
+</td>
+<td headers="Alcohol
+consumption level_7 conf.low" class="gt_row gt_right">4.183</td>
+<td headers="Alcohol
+consumption level_7 conf.high" class="gt_row gt_right">12.81</td>
+<td headers="Alcohol
+consumption level_7 significance" class="gt_row gt_left">Significant</td>
+<td headers="Alcohol
+consumption level_7 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="33.39" y1="8.66" x2="47.14" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="40.15" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="46.47,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,6.69 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 47.08,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,5.55 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 46.47,6.69 " style="stroke-width: 0.00;"></polygon><text x="47.08" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">3</text><polygon points="33.46,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,6.69 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 34.06,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,5.55 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 33.46,6.69 " style="stroke-width: 0.00;"></polygon><text x="33.46" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">1</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Alcohol
+consumption level_8 level" class="gt_row gt_center">120+</td>
+<td headers="Alcohol
+consumption level_8 rows" class="gt_row gt_right">67</td>
+<td headers="Alcohol
+consumption level_8 outcome" class="gt_row gt_right">45</td>
+<td headers="Alcohol
+consumption level_8 outcome_rate" class="gt_row gt_right">67.16%</td>
+<td headers="Alcohol
+consumption level_8 class" class="gt_row gt_left">factor</td>
+<td headers="Alcohol
+consumption level_8 estimate" class="gt_row gt_right">36.70</td>
+<td headers="Alcohol
+consumption level_8 std.error" class="gt_row gt_right">0.3850</td>
+<td headers="Alcohol
+consumption level_8 p.value" class="gt_row gt_right">8.19 × 10<sup style="font-size: 65%;">−21</sup>
+</td>
+<td headers="Alcohol
+consumption level_8 conf.low" class="gt_row gt_right">17.68</td>
+<td headers="Alcohol
+consumption level_8 conf.high" class="gt_row gt_right">80.36</td>
+<td headers="Alcohol
+consumption level_8 significance" class="gt_row gt_left">Significant</td>
+<td headers="Alcohol
+consumption level_8 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="51.09" y1="8.66" x2="69.69" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="60.07" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="69.03,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,6.69 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.63,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,5.55 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 69.03,6.69 " style="stroke-width: 0.00;"></polygon><text x="69.63" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">4</text><polygon points="51.15,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,6.69 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.76,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,5.55 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 51.15,6.69 " style="stroke-width: 0.00;"></polygon><text x="51.15" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">3</text></g></svg>
+</td>
+</tr>
+<tr class="gt_row_group_first">
+<td headers="Age group stub_1_9 stub_1" rowspan="6" class="gt_row gt_left gt_stub_row_group">Age group</td>
+<td headers="Age group stub_1_9 level" class="gt_row gt_center">25-34</td>
+<td headers="Age group stub_1_9 rows" class="gt_row gt_right">116</td>
+<td headers="Age group stub_1_9 outcome" class="gt_row gt_right">1</td>
+<td headers="Age group stub_1_9 outcome_rate" class="gt_row gt_right">0.86%</td>
+<td headers="Age group stub_1_9 class" class="gt_row gt_left">factor</td>
+<td headers="Age group stub_1_9 estimate" class="gt_row gt_right">—</td>
+<td headers="Age group stub_1_9 std.error" class="gt_row gt_right">—</td>
+<td headers="Age group stub_1_9 p.value" class="gt_row gt_right">—</td>
+<td headers="Age group stub_1_9 conf.low" class="gt_row gt_right">—</td>
+<td headers="Age group stub_1_9 conf.high" class="gt_row gt_right">—</td>
+<td headers="Age group stub_1_9 significance" class="gt_row gt_left">Comparator</td>
+<td headers="Age group stub_1_9 plot_or" class="gt_row gt_center"> </td>
+</tr>
+<tr>
+<td headers="Age group level_10 level" class="gt_row gt_center">35-44</td>
+<td headers="Age group level_10 rows" class="gt_row gt_right">199</td>
+<td headers="Age group level_10 outcome" class="gt_row gt_right">9</td>
+<td headers="Age group level_10 outcome_rate" class="gt_row gt_right">4.52%</td>
+<td headers="Age group level_10 class" class="gt_row gt_left">factor</td>
+<td headers="Age group level_10 estimate" class="gt_row gt_right">7.249</td>
+<td headers="Age group level_10 std.error" class="gt_row gt_right">1.104</td>
+<td headers="Age group level_10 p.value" class="gt_row gt_right">7.27 × 10<sup style="font-size: 65%;">−2</sup>
+</td>
+<td headers="Age group level_10 conf.low" class="gt_row gt_right">1.202</td>
+<td headers="Age group level_10 conf.high" class="gt_row gt_right">141.0</td>
+<td headers="Age group level_10 significance" class="gt_row gt_left">Significant</td>
+<td headers="Age group level_10 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="18.08" y1="8.66" x2="76.60" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="40.15" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="75.94,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,6.69 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 76.54,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,5.55 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 75.94,6.69 " style="stroke-width: 0.00;"></polygon><text x="76.54" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">5</text><polygon points="18.14,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,6.69 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.75,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,5.55 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 18.14,6.69 " style="stroke-width: 0.00;"></polygon><text x="18.14" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Age group level_11 level" class="gt_row gt_center">45-54</td>
+<td headers="Age group level_11 rows" class="gt_row gt_right">213</td>
+<td headers="Age group level_11 outcome" class="gt_row gt_right">46</td>
+<td headers="Age group level_11 outcome_rate" class="gt_row gt_right">21.6%</td>
+<td headers="Age group level_11 class" class="gt_row gt_left">factor</td>
+<td headers="Age group level_11 estimate" class="gt_row gt_right">43.65</td>
+<td headers="Age group level_11 std.error" class="gt_row gt_right">1.068</td>
+<td headers="Age group level_11 p.value" class="gt_row gt_right">4.06 × 10<sup style="font-size: 65%;">−4</sup>
+</td>
+<td headers="Age group level_11 conf.low" class="gt_row gt_right">8.204</td>
+<td headers="Age group level_11 conf.high" class="gt_row gt_right">820.4</td>
+<td headers="Age group level_11 significance" class="gt_row gt_left">Significant</td>
+<td headers="Age group level_11 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="41.67" y1="8.66" x2="98.23" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="62.20" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="97.56,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,6.69 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 98.17,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,5.55 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 97.56,6.69 " style="stroke-width: 0.00;"></polygon><text x="98.17" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">7</text><polygon points="41.73,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,6.69 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 42.33,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,5.55 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 41.73,6.69 " style="stroke-width: 0.00;"></polygon><text x="41.73" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">2</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Age group level_12 level" class="gt_row gt_center">55-64</td>
+<td headers="Age group level_12 rows" class="gt_row gt_right">242</td>
+<td headers="Age group level_12 outcome" class="gt_row gt_right">76</td>
+<td headers="Age group level_12 outcome_rate" class="gt_row gt_right">31.4%</td>
+<td headers="Age group level_12 class" class="gt_row gt_left">factor</td>
+<td headers="Age group level_12 estimate" class="gt_row gt_right">76.34</td>
+<td headers="Age group level_12 std.error" class="gt_row gt_right">1.065</td>
+<td headers="Age group level_12 p.value" class="gt_row gt_right">4.68 × 10<sup style="font-size: 65%;">−5</sup>
+</td>
+<td headers="Age group level_12 conf.low" class="gt_row gt_right">14.50</td>
+<td headers="Age group level_12 conf.high" class="gt_row gt_right">1,431</td>
+<td headers="Age group level_12 significance" class="gt_row gt_left">Significant</td>
+<td headers="Age group level_12 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="48.66" y1="8.66" x2="105.06" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="69.06" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="104.39,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,6.69 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 105.00,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,5.55 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 104.39,6.69 " style="stroke-width: 0.00;"></polygon><text x="105.00" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">7</text><polygon points="48.72,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,6.69 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 49.32,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,5.55 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 48.72,6.69 " style="stroke-width: 0.00;"></polygon><text x="48.72" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">3</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Age group level_13 level" class="gt_row gt_center">65-74</td>
+<td headers="Age group level_13 rows" class="gt_row gt_right">161</td>
+<td headers="Age group level_13 outcome" class="gt_row gt_right">55</td>
+<td headers="Age group level_13 outcome_rate" class="gt_row gt_right">34.16%</td>
+<td headers="Age group level_13 class" class="gt_row gt_left">factor</td>
+<td headers="Age group level_13 estimate" class="gt_row gt_right">133.8</td>
+<td headers="Age group level_13 std.error" class="gt_row gt_right">1.076</td>
+<td headers="Age group level_13 p.value" class="gt_row gt_right">5.38 × 10<sup style="font-size: 65%;">−6</sup>
+</td>
+<td headers="Age group level_13 conf.low" class="gt_row gt_right">24.66</td>
+<td headers="Age group level_13 conf.high" class="gt_row gt_right">2,538</td>
+<td headers="Age group level_13 significance" class="gt_row gt_left">Significant</td>
+<td headers="Age group level_13 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="55.18" y1="8.66" x2="112.10" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="75.96" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="111.43,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,6.69 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 112.04,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,5.55 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 111.43,6.69 " style="stroke-width: 0.00;"></polygon><text x="112.04" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">8</text><polygon points="55.24,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,6.69 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.85,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,5.55 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 55.24,6.69 " style="stroke-width: 0.00;"></polygon><text x="55.24" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">3</text></g></svg>
+</td>
+</tr>
+<tr>
+<td headers="Age group level_14 level" class="gt_row gt_center">75+</td>
+<td headers="Age group level_14 rows" class="gt_row gt_right">44</td>
+<td headers="Age group level_14 outcome" class="gt_row gt_right">13</td>
+<td headers="Age group level_14 outcome_rate" class="gt_row gt_right">29.55%</td>
+<td headers="Age group level_14 class" class="gt_row gt_left">factor</td>
+<td headers="Age group level_14 estimate" class="gt_row gt_right">124.8</td>
+<td headers="Age group level_14 std.error" class="gt_row gt_right">1.121</td>
+<td headers="Age group level_14 p.value" class="gt_row gt_right">1.67 × 10<sup style="font-size: 65%;">−5</sup>
+</td>
+<td headers="Age group level_14 conf.low" class="gt_row gt_right">20.07</td>
+<td headers="Age group level_14 conf.high" class="gt_row gt_right">2,478</td>
+<td headers="Age group level_14 significance" class="gt_row gt_left">Significant</td>
+<td headers="Age group level_14 plot_or" class="gt_row gt_center">
+<?xml version='1.0' encoding='UTF-8' ?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="svglite" width="127.56pt" height="14.17pt" viewbox="0 0 127.56 14.17"><defs><style type="text/css"><![CDATA[    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {      fill: none;      stroke: #000000;      stroke-linecap: round;      stroke-linejoin: round;      stroke-miterlimit: 10.00;    }    .svglite text {      white-space: pre;    }  ]]></style></defs><rect width="100%" height="100%" style="stroke: none; fill: none;"></rect><defs><clippath id="cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw=="><rect x="0.00" y="0.00" width="127.56" height="14.17"></rect></clippath></defs><g clip-path="url(#cpMC4wMHwxMjcuNTZ8MC4wMHwxNC4xNw==)"><text x="15.82" y="11.43" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">0</text><line x1="15.82" y1="14.17" x2="15.82" y2="0.0000000000000018" style="stroke-width: 1.07; stroke-linecap: butt;"></line><line x1="52.66" y1="8.66" x2="111.80" y2="8.66" style="stroke-width: 2.13; stroke: #BEBEBE; stroke-opacity: 0.75;"></line><circle cx="75.10" cy="8.66" r="2.67" style="stroke-width: 1.06; stroke: #FFFFFF; fill: #000000;"></circle><polygon points="111.14,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,6.69 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.74,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,5.55 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 111.14,6.69 " style="stroke-width: 0.00;"></polygon><text x="111.74" y="6.48" text-anchor="end" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">8</text><polygon points="52.72,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,6.69 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 53.32,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,5.55 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 52.72,6.69 " style="stroke-width: 0.00;"></polygon><text x="52.72" y="6.48" style='font-size: 0.00px; font-weight: bold; font-family: "Nimbus Mono PS";' textlength="0.60px" lengthadjust="spacingAndGlyphs">3</text></g></svg>
+</td>
+</tr>
+</tbody>
+<tfoot class="gt_footnotes">
+<tr>
+<td class="gt_footnote" colspan="13">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> <span class="gt_from_md"><strong>Characteristics</strong> are the explanatory variables in the logistic regression analysis. For categorical variables the first characteristic is designated as a reference against which the others are compared. For numeric variables the results indicate a change per single unit increase.
+<p><em>Level</em> - the name or the description of the explanatory variable.</p>
+<p><em>N</em> - the number of observations examined.</p>
+<p><em>n</em> - the number of observations resulting in the outcome of interest.</p>
+<p><em>Rate</em> - the proportion of observations resulting in the outcome of interest (n / N).</p>
+<p><em>Class</em> - description of the data type.</p></span>
+</td>
+    </tr>
+<tr>
+<td class="gt_footnote" colspan="13">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span> <span class="gt_from_md"><strong>Odds Ratios</strong> estimate the relative <em>odds</em> of an outcome with reference to the <em>Characteristic</em>. For categorical data the first level is the reference against which the odds of other levels are compared. Numerical characteristics indicate the change in <em>OR</em> for each additional increase of one unit in the variable.
+<p><em>OR</em> - The Odds Ratio point estimate - values below 1 indicate an inverse relationship whereas values above 1 indicate a positive relationship. Values shown to 4 significant figures.</p>
+<p><em>SE</em> - Standard Error of the point estimate. Values shown to 4 significant figures.</p>
+<p><em>p</em> - The p-value estimate based on the residual Chi-squared statistic.</p></span>
+</td>
+    </tr>
+<tr>
+<td class="gt_footnote" colspan="13">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span> <span class="gt_from_md"><strong>Confidence Interval</strong> - the range of values likely to contain the <em>OR</em> in 95% of cases if this study were to be repeated multiple times. If the <em>CI</em> touches or crosses the value 1 then it is unlikely the <em>Characteristic</em> is significantly associated with the outcome.
+<p><em>Lower</em> &amp; <em>Upper</em> - The range of values comprising the <em>CI</em>, shown to 4 significant figures.</p>
+<p><em>Significance</em> - The statistical significance indicated by the <em>CI</em>, <em>Significant</em> where the <em>CI</em> does not touch or cross the value 1.</p></span>
+</td>
+    </tr>
+</tfoot>
+</table>
+</div>
+<p>The main features of this table include:</p>
+<ul>
+<li><p>number formatting such as thousands separators for counts and
+rounding to the nearest four significant figures to prevent precision
+clutter,</p></li>
+<li><p>footnotes explaining each section and providing a key to the
+column headings,</p></li>
+<li><p>title defaulting to the outcome variable and subtitle providing a
+description of what the table contains, these can be changed by
+extending {gt} functions.</p></li>
+<li><p>a simple OR plot to give a sense of the distributions of Odds
+Ratio estimates.</p></li>
+</ul>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
