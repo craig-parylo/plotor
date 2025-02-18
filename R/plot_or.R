@@ -1,3 +1,5 @@
+# Exported functions -----------------------------------------------------------
+
 #' Plot OR
 #'
 #' Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
@@ -5,7 +7,7 @@
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
 #'
-#' @return `plotor` returns an object of class `gg` and `ggplot`
+#' @return an object of class `gg` and `ggplot`
 #' @seealso
 #' See vignette('using_plotor', package = 'plotor') for more details on use.
 #'
@@ -43,36 +45,17 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
 
   # data and input checks ----
   # check the model is logistic regression
-  if (!validate_glm_model(glm_model_results)) {
-    glm_family <- glm_model_results$family$family
-    cli::cli_abort(
-      message = c(
-        "{.arg glm_model_results} must be a {.pkg glm} object of 'binomial' family.",
-        "You've supplied a '{glm_family}' model."
-      )
-    )
-  }
+  glm_model <- validate_glm_model(glm_model_results)
 
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
 
   # main ----
-  # get the data from the model object
-  df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
 
-  # get odds ratio and confidence intervals
-  model_or <- glm_model_results |>
-    broom::tidy(exponentiate = T, conf.int = T, conf.level = conf_level)
+  # get summary of the data and results
+  df <- get_summary_table(glm_model_results = glm_model_results, conf_level = conf_level)
 
-  # add the odds ratio and CIs to the summary dataframe
-  df <- df |>
-    dplyr::left_join(y = model_or, by = base::c('term'))
 
-  # prepare the data for plotting
-  df <- prepare_df_for_plotting(df = df)
-
-  # use labels where provided
-  df <- use_var_labels(df = df, lr = glm_model_results)
 
   # plot the results
   p <- plot_odds_ratio(df = df, model = glm_model_results, conf_level = conf_level)
@@ -80,6 +63,97 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
   return(p)
 }
 
+#' Table OR
+#'
+#' Produces a formatted table showing the outputs from the Odds Ratio analysis.
+#'
+#' Includes details on the characteristics of the covariates, such as:
+#' * the number of observations for each characteristic,
+#' * the number of observations resulting in the outcome of interest,
+#' * the conversion rate of outcome by the number of observations,
+#'
+#' Details are calculated showing the:
+#' * estimated Odds Ratio, standard error and p-value,
+#' * calculated confidence interval for the confidence level,
+#'
+#' Also included is a visualisation of the OR plot to provide an at-a-glance
+#' view of the model results.
+#'
+#' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
+#' @param output String description of the output type. Default = 'tibble'. Options include 'tibble' and 'gt'.
+#'
+#' @returns object returned depends on `output` parameter - output = 'tibble' returns an object of "tbl_df", "tbl", "data.frame" class, whilst output = 'gt' returns an object of class "gt_tbl" and "list".
+#' @export
+#'
+#' @examples
+#' # get some data
+#' df <- datasets::Titanic |>
+#'   dplyr::as_tibble() |>
+#'   # convert aggregated counts to individual observations
+#'   dplyr::filter(n > 0) |>
+#'   tidyr::uncount(weights = n) |>
+#'   # convert character variables to factors
+#'   dplyr::mutate(dplyr::across(dplyr::where(is.character), as.factor))
+#'
+#' # perform logistic regression using `glm`
+#' lr <- stats::glm(
+#'   data = df,
+#'   family = 'binomial',
+#'   formula = Survived ~ Class + Sex + Age
+#' )
+#'
+#' # produce the Odds Ratio table, first as a tibble then as gt object
+#' table_or(lr)
+#' table_or(lr, output = 'gt')
+table_or <- function(glm_model_results, conf_level = 0.95, output = 'tibble') {
+
+  # data and input checks ----
+  # check the model is logistic regression
+  glm_model <- validate_glm_model(glm_model_results)
+
+  # limit conf_level to between 0.001 and 0.999
+  conf_level <- validate_conf_level_input(conf_level)
+
+  # limit output to acceptable types and raise an error if not
+  output_valid <- validate_output_table_input(output)
+
+  # main ----
+  # get summary of rows and estimate OR
+  df <- get_summary_table(glm_model_results = glm_model_results, conf_level = conf_level)
+
+  # get the outcome variable
+  str_outcome <- get_outcome_variable_name(model = glm_model_results)
+
+  # prepare for output
+  df <-
+    df |>
+    # remove variables which aren't necessary for table views
+    dplyr::select(!dplyr::any_of(c(
+      'term', 'rows_scale', 'label_or', 'group', 'p_label'
+    ))) |>
+    # work out the rate of 'outcome'
+    dplyr::mutate(outcome_rate = .data$outcome / .data$rows) |>
+    dplyr::relocate(.data$outcome_rate, .after = .data$outcome)
+
+  # decide what object to return
+  obj_return <-
+    switch(output,
+      # output a tibble
+      'tibble' = {df},
+
+      # output a gt-formatted table
+      'gt' = {
+        df |>
+          dplyr::group_by(.data$label) |>
+          output_gt(conf_level = conf_level, title = str_outcome)
+        }
+    )
+
+  return(obj_return)
+}
+
+# Internal functions -----------------------------------------------------------
 #' Count Rows by Variable
 #'
 #' Takes a tibble of data and a string name of a variable in the tibble and returns a count of rows.
@@ -96,31 +170,54 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
 #' The class of the returned object is `tbl_df`, `tbl` and `data.frame`.
 #'
 #' @noRd
-count_rows_by_variable <- function(df, var_name) {
+count_rows_by_variable <- function(df, var_name, outcome_name) {
   # prep
   var = base::as.symbol(var_name)
+  outcome = base::as.symbol(outcome_name)
+
+  # determine the outcome of interest
+  outcome_num <- df[[outcome_name]] |> stats::na.omit() |> as.numeric() |> max(na.rm = TRUE)
+  outcome_txt <- levels(df[[outcome_name]])[outcome_num]
 
   var_temp <- df |>
     dplyr::select(tidyselect::all_of(var)) |>
     dplyr::pull()
 
   # calculate rows - split if categorical
-  if (is.numeric(var_temp)) {
+  df <-
+    if (is.numeric(var_temp)) {
+      df |>
+        dplyr::filter(!is.na(var_name)) |>
+        dplyr::summarise(rows = dplyr::n(),
+                         outcome = sum({{outcome}} == outcome_txt)) |>
+        dplyr::mutate(group = var_name,
+                      level = var_name,
+                      term = var_name) |>
+        dplyr::select(.data$term,
+                      .data$group,
+                      .data$level,
+                      .data$rows,
+                      .data$outcome)
+    } else {
+      df |>
+        dplyr::mutate(outcome = sum({{outcome}} == outcome_txt), .by = {{var}}) |>
+        dplyr::summarise(rows = dplyr::n(), .by = c(var, outcome)) |>
+        dplyr::rename(level = var) |>
+        dplyr::mutate(group = var_name,
+                      term = base::paste0(.data$group, .data$level)) |>
+        dplyr::select(.data$term,
+                      .data$group,
+                      .data$level,
+                      .data$rows,
+                      .data$outcome)
+    }
+
+  # add the class of the variable
+  df <-
     df |>
-      dplyr::filter(!is.na(var_name)) |>
-      dplyr::summarise(rows = dplyr::n()) |>
-      dplyr::mutate(group = var_name,
-                    level = var_name,
-                    term = var_name) |>
-      dplyr::select(.data$term, .data$group, .data$level, .data$rows)
-  } else {
-    df |>
-      dplyr::summarise(rows = dplyr::n(), .by = var) |>
-      dplyr::rename(level = var) |>
-      dplyr::mutate(group = var_name,
-                    term = base::paste0(.data$group, .data$level)) |>
-      dplyr::select(.data$term, .data$group, .data$level, .data$rows)
-  }
+    dplyr::mutate(class = class(var_temp))
+
+  return(df)
 }
 
 #' Get Summary of Rows per Variable in Model
@@ -138,13 +235,28 @@ summarise_rows_per_variable_in_model <- function(model_results) {
   # get the model variables
   model_vars = base::all.vars(stats::formula(model_results)[-2])
 
+  # get the outcome variable
+  model_outcome = base::all.vars(stats::formula(model_results))[1]
+
   # get a summary of all model vars (will be used as the spine of the data)
   # this is important because the first value of factors is used as the baseline
   # in the OR analysis and can be missed in the glm summary.
-  df <- model_vars |>
-    purrr::map_dfr(\(.x) count_rows_by_variable(df = model_data, var_name = .x)) |>
+  df <-
+    model_vars |>
+    purrr::map_dfr(\(.x) count_rows_by_variable(
+      df = model_data,
+      var_name = .x,
+      outcome_name = model_outcome
+    )) |>
     # rescale rows (will be used to set the size of the dot in the plot)
-    dplyr::mutate(rows_scale = .data$rows |> scales::rescale(to = c(1, 5)))
+    #dplyr::mutate(rows_scale = .data$rows |> scales::rescale(to = c(1, 5)))
+    dplyr::mutate(
+      rows_scale = dplyr::case_when(
+          .data$class == 'numeric' ~ 1,
+          .default = .data$rows |>
+            scales::rescale(to = c(1, 5))
+        )
+    )
 
   # return the table summary
   return(df)
@@ -207,16 +319,18 @@ prepare_df_for_plotting <- function(df) {
 #' @noRd
 plot_odds_ratio <- function(df, model, conf_level) {
   # get the name of the outcome variable - will be used in the plot title
-  model_outcome_var <-
-    model$formula[[2]] |>
-    base::as.character()
-  model_outcome_label <-
-    base::sapply(model$data[model_outcome_var], function(x) {
-      base::attr(x, "label")
-    })[[1]]
-  model_outcome <-
-    dplyr::coalesce(model_outcome_label,
-                    model_outcome_var |> base::as.character())
+  # model_outcome_var <-
+  #   model$formula[[2]] |>
+  #   base::as.character()
+  # model_outcome_label <-
+  #   base::sapply(model$data[model_outcome_var], function(x) {
+  #     base::attr(x, "label")
+  #   })[[1]]
+  # model_outcome <-
+  #   dplyr::coalesce(model_outcome_label,
+  #                   model_outcome_var |> base::as.character())
+
+  model_outcome <- get_outcome_variable_name(model = model)
 
   # get the confidence level as string
   str_conf_level <- glue::glue('{conf_level * 100}%')
@@ -238,7 +352,8 @@ plot_odds_ratio <- function(df, model, conf_level) {
     ggplot2::geom_vline(xintercept = 1, linetype = 'dotted') +
     # plot the OR with 95% CI
     ggplot2::geom_point(
-      # replace any NA `estimate` and `rows_scale` with nominal to avoid warnings about missing values
+      # replace any NA `estimate` and `rows_scale` with nominal to
+      # avoid warnings about missing values
       data = df |>
         dplyr::mutate(
           estimate = dplyr::coalesce(.data$estimate, 1),
@@ -253,7 +368,7 @@ plot_odds_ratio <- function(df, model, conf_level) {
       ggplot2::aes(xmax = .data$conf.high, xmin = .data$conf.low),
       height = 1 / 5
     ) +
-    ggplot2::scale_x_log10(n.breaks = 10) +
+    ggplot2::scale_x_log10(n.breaks = 10, labels = scales::comma) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       # position the title to the far left
@@ -354,6 +469,7 @@ use_var_labels <- function(df, lr) {
 
 }
 
+## validation funcs -----
 #' Validate confidence level input
 #'
 #' Checks the parameter for the confidence level is within accepted limits.
@@ -399,12 +515,250 @@ validate_conf_level_input <- function(conf_level) {
 #' @param glm_model Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()]
 #'
 #' @returns boolean (TRUE = logistic regression, FALSE = other model)
+#' @noRd
 validate_glm_model <- function(glm_model) {
+
+  # find the response to the validation
   response <- (
     class(glm_model)[1] == 'glm' & # must be a glm class object
       glm_model$family$family == 'binomial' & # must be a binomial model
       glm_model$family$link == 'logit' # must use logit link
   )
+
+  # if fail validation then message the user
+  if (!response) {
+    glm_family <- glm_model$family$family
+    cli::cli_abort(
+      message = c(
+        "{.arg glm_model_results} must be a {.pkg glm} object of {.val binomial} family.",
+        "You've supplied a {.val {glm_family}} family model."
+      )
+    )
+  }
+
   return(response)
 }
 
+#' Validate the 'output' parameter
+#'
+#' Check the requested 'output' matches one of the accepted 'output' types.
+#'
+#' @param output String description of the output type. Default = 'tibble'. Options include 'tibble' and 'gt'.
+#'
+#' @returns Boolean indicating whether the 'output' parameter is valid
+#' @noRd
+validate_output_table_input <- function(output) {
+
+  # specify accepted output types
+  accepted_outputs <- c('tibble', 'gt')
+
+  # do some basic input cleaning
+  output <- output |> trimws() |> tolower()
+
+  # record the result of the check
+  result <- output %in% accepted_outputs
+
+  # message the user if any issues
+  if (!result) {
+    cli::cli_abort(
+      message = c(
+        "{.arg output} must be one of {.or {.val {accepted_outputs}}}.",
+        "You've requested an output of {.val {output}}."
+      )
+    )
+  }
+
+  return(result)
+}
+
+## output tables ----
+
+#' Get a table summarising the model results
+#'
+#' Get a summary table showing the number of rows in each group and of those
+#' who and a 'success' outcome. Then combine with details such as the OR
+#' estimate and confidence interval.
+#'
+#' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
+#'
+#' @returns Tibble providing a summary of the logistic regression model.
+#' @noRd
+get_summary_table <- function(glm_model_results, conf_level) {
+  # get the data from the model object
+  df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
+
+  # get odds ratio and confidence intervals
+  model_or <- glm_model_results |>
+    broom::tidy(exponentiate = T,
+                conf.int = T,
+                conf.level = conf_level)
+
+  # add the odds ratio and CIs to the summary dataframe
+  df <- df |>
+    dplyr::left_join(y = model_or, by = base::c('term'))
+
+  # use variable labels
+  df <- use_var_labels(df = df, lr = glm_model_results)
+
+  # prepare the data for plotting
+  df <- prepare_df_for_plotting(df = df)
+
+  # return the df
+  return(df)
+}
+
+#' Output tibble as {gt}
+#'
+#' Outputs a publication-quality summary OR table with {gt} formatting.
+#'
+#' @param df Tibble of summary data produced by `table_or()`
+#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
+#'
+#' @returns {gt}
+#' @noRd
+output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
+
+  # get the outcome
+
+  # produce the gt table
+  tab_gt <-
+    df |>
+    # log the OR and CI for plotting
+    dplyr::mutate(
+      plot_or = log(.data$estimate),
+      plot_ci_l = log(.data$conf.low),
+      plot_ci_u = log(.data$conf.high)
+    ) |>
+    # prepare for tabulation
+    gt::gt(row_group_as_column = TRUE) |>
+    # column labels
+    gt::cols_label(
+      label = 'Variable',
+      level = 'Level',
+      rows = 'N',
+      outcome = 'n',
+      outcome_rate = 'Rate',
+      class = 'Class',
+      estimate = 'OR',
+      std.error = 'SE',
+      p.value = 'p',
+      conf.low = 'Lower',
+      conf.high = 'Upper',
+      significance = 'Significance',
+      plot_or = 'OR Plot'
+    ) |>
+    # column formats
+    gt::fmt_integer(
+      columns = c(.data$rows, .data$outcome),
+      use_seps = TRUE
+    ) |>
+    gt::fmt_percent(
+      columns = c(.data$outcome_rate),
+      decimals = 2,
+      drop_trailing_zeros = TRUE
+    ) |>
+    gt::fmt_number(
+      columns = c(.data$estimate, .data$std.error, .data$conf.low, .data$conf.high),
+      n_sigfig = 4
+    ) |>
+    gt::fmt_scientific(
+      columns = c(.data$p.value),
+      n_sigfig = 3
+    ) |>
+    # spanners
+    gt::tab_spanner(
+      label = 'Characteristic',
+      columns = c(.data$label:.data$class)
+    ) |>
+    gt::tab_spanner(
+      label = 'Odds Ratio (OR)',
+      columns = c(.data$estimate, .data$std.error, .data$statistic, .data$p.value),
+      id = 'or'
+    ) |>
+    gt::tab_spanner(
+      label = glue::glue('{conf_level * 100}% Confidence Interval (CI)'),
+      columns = c(.data$conf.low, .data$conf.high, .data$significance),
+      id = 'ci'
+    ) |>
+    # reference value rows
+    gt::sub_missing() |>
+    # hide columns that don't need displaying
+    gt::cols_hide(columns = c(
+      .data$comparator,
+      .data$statistic,
+      .data$plot_ci_l,
+      .data$plot_ci_u
+    )) |>
+    # add titles
+    gt::tab_header(
+      title = gt::md(glue::glue("{title}")),
+      subtitle = gt::md(glue::glue("Odds Ratio summary table with {conf_level * 100}% Confidence Interval"))
+    ) |>
+    # add footnotes
+    gt::tab_footnote(
+      locations = gt::cells_column_spanners('Characteristic'),
+      footnote = gt::md("**Characteristics** are the explanatory variables in the logistic regression analysis. For categorical variables the first characteristic is designated as a reference against which the others are compared. For numeric variables the results indicate a change per single unit increase.\n\n
+*Level* - the name or the description of the explanatory variable.\n\n
+*N* - the number of observations examined.\n\n
+*n* - the number of observations resulting in the outcome of interest.\n\n
+*Rate* - the proportion of observations resulting in the outcome of interest (n / N).\n\n
+*Class* - description of the data type.")
+    ) |>
+    gt::tab_footnote(
+      locations = gt::cells_column_spanners('or'),
+      footnote = gt::md("**Odds Ratios** estimate the relative *odds* of an outcome with reference to the *Characteristic*. For categorical data the first level is the reference against which the odds of other levels are compared. Numerical characteristics indicate the change in *OR* for each additional increase of one unit in the variable.\n\n
+*OR* - The Odds Ratio point estimate - values below 1 indicate an inverse relationship whereas values above 1 indicate a positive relationship. Values shown to 4 significant figures.\n\n
+*SE* - Standard Error of the point estimate. Values shown to 4 significant figures.\n\n
+*p* - The p-value estimate based on the residual Chi-squared statistic.")
+    ) |>
+    gt::tab_footnote(
+      locations = gt::cells_column_spanners('ci'),
+      footnote = gt::md(glue::glue("**Confidence Interval** - the range of values likely to contain the *OR* in {conf_level * 100}% of cases if this study were to be repeated multiple times. If the *CI* touches or crosses the value 1 then it is unlikely the *Characteristic* is significantly associated with the outcome.\n\n
+*Lower* & *Upper* - The range of values comprising the *CI*, shown to 4 significant figures.\n\n
+*Significance* - The statistical significance indicated by the *CI*, *Significant* where the *CI* does not touch or cross the value 1.
+      "))
+    ) |>
+    # add an OR plot to visualise the results
+    gtExtras::gt_plt_conf_int(
+      column = .data$plot_or,
+      ci_columns = c(.data$plot_ci_l, .data$plot_ci_u),
+      ref_line = 0,
+      text_size = 0
+    ) |>
+    gt::cols_align(
+      columns = .data$plot_or,
+      align = 'center'
+    )
+
+}
+
+
+#' Get the outcome of interest
+#'
+#' Returns a string description of the outcome of interest in the model.
+#'
+#' @param model Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#'
+#' @returns String
+#' @noRd
+get_outcome_variable_name <- function(model) {
+
+  # get the name of the outcome variable from the model formula
+  model_outcome_var <-
+    model$formula[[2]] |>
+    base::as.character()
+
+  # get any label associated with this outcome variable
+  model_outcome_label <-
+    base::sapply(model$data[model_outcome_var], function(x) {
+      base::attr(x, "label")
+    })[[1]]
+
+  # return either the label or variable name
+  model_outcome <-
+    dplyr::coalesce(model_outcome_label,
+                    model_outcome_var |> base::as.character())
+
+  return(model_outcome)
+}

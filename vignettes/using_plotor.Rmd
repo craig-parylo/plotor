@@ -106,7 +106,7 @@ lr |>
 
 Finally, we can plot the Odds Ratio of survival using the `plot_or` function.
 
-```{r warning=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
+```{r warning=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=2}
 # using plot_or
 plot_or(glm_model_results = lr)
 ```
@@ -125,7 +125,7 @@ The primary components of an Odds-Ratio plot are dots, whiskers and the line of 
 
 The dot represents the point estimate for the Odds-Ratio, which indicates how much more likely the event is than the comparator event.
 
-The width of the whiskers represents the 95% Confidence Interval, a range of values the point estimate (the dot) is likely to fall within if the study were to be repeated, with a probability of 95%.
+The width of the whiskers represents the Confidence Interval, a range of values the point estimate (the dot) is likely to fall within if the study were to be repeated, most often with a probability of 95%.
 
 The line of no effect is set at a value of 1. Events whose confidence intervals touch or cross this line are considered to show no difference in likelihood than the comparator event.
 
@@ -135,7 +135,7 @@ The size of the dots is proportional to the number of observations. In the above
 
 To increase the size of the font you can extend the returned plot using the [theme](https://ggplot2.tidyverse.org/reference/theme.html) function from `ggplot2`. Here we set the base size of all fonts in the plot to size 16.
 
-```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='png', fig.retina=TRUE}
+```{r warning=FALSE, fig.width=9, fig.height=6, fig.format='png', fig.retina=2}
 plot_or(glm_model_results = lr) + 
   theme(text = element_text(size = 16))
 ```
@@ -146,10 +146,24 @@ Odds Ratio (OR) plots produced by `plotor` are displayed using a log10 x-axis.
 
 By default ten breaks are shown, however, this can be altered by extending the [`scale_x_log10`](https://ggplot2.tidyverse.org/reference/scale_continuous.html) function from `ggplot2`. Here we provide a manual list of breaks to use:
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=2}
 plot_or(glm_model_results = lr) + 
   scale_x_log10(breaks = c(0.1, 0.5, 1, 5, 10))
 ```
+
+### Change the confidence level
+
+Confidence Intervals are calculated using a percentage confidence, called the *Confidence Level*, which sometimes range from 80% to 99% but 95% is most commonly-used.
+
+The default in {plotor} is 95% but from version 0.5.3 onward you can change this by specifying a `conf_level` parameter in your `plot_or()` call. Here we set the Confidence Level to 99% for the Titanic data set:
+
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=2}
+plot_or(glm_model_results = lr, conf_level = 0.99)
+```
+
+Notice how the whiskers have grown slightly? This is because we wished to be *more* confident (an additional 4% on top of the 95% we used previously) that the Confidence Interval covers all values the Odds Ratio estimate could take if we were to repeat this experiment multiple times. Thus the Confidence Interval was increased to match our expected *Confidence Level*.
+
+In this example the increased length of the resulting Confidence intervals still do not cross the dotted line and so do not affect our conclusions that `1st` class passengers were more likely to survive than all other classes of people, `Women` were more likely to survive than `Men` and `Children` were more likely to survive than `Adults`.
 
 ### Change the dot and whisker colours
 
@@ -163,7 +177,7 @@ There are three types of colours used for the dots and whiskers in the OR plot, 
 
 The colours for these points can be changed by extending the output using [`scale_colour_manual`](https://ggplot2.tidyverse.org/reference/scale_manual.html) function from `ggplot2` with a named vector specifying colour values for the three types of colours:
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=2}
 plot_or(glm_model_results = lr) +
   scale_colour_manual(values = c(
     'Significant' = '#44bd32',
@@ -178,7 +192,7 @@ plot_or(glm_model_results = lr) +
 
 The plot can be customised with your own title, subtitle and add a caption by extending the [`labs`](https://ggplot2.tidyverse.org/reference/labs.html) function of `ggplot2`.
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=TRUE}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=4, fig.format='png', fig.retina=2}
 plot_or(glm_model_results = lr) +
   labs(
     title = 'Passenger survival from the Titanic disaster',
@@ -227,7 +241,7 @@ df |> glimpse()
 
 Next we carry out the logistic regression and then plot the results.
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png', fig.retina=TRUE}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png', fig.retina=2}
 # conduct the logistic regression
 lr <- glm(
   data = df,
@@ -273,7 +287,7 @@ labelled::look_for(df)
 
 Analyse the data using logistic regression as before and plot the result.
 
-```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png', fig.retina=TRUE}
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png', fig.retina=2}
 # conduct the logistic regression
 lr <- glm(
   data = df,
@@ -288,3 +302,80 @@ plot_or(lr)
 `plot_or` recognises the use of labels and uses these in preference to variable names wherever available.
 
 Using variable labels makes plots easier to read and more accessible, and is especially useful where you want to include the chart in reports or publications.
+
+### Control covariate order
+
+Sometimes it can be useful to control the ordering of covariates in the plots. This can be done to group similar variables together, such as demographics, or arrange the covariates in a more pleasing order.
+
+For example, imagine we wish to display our tobacco consumption Odds Ratios at the top of the plot because this is the main focus of our study and wish to draw attention to these findings. The age group can be put at the bottom of the plot.
+
+As of version 0.5.2 onwards `{plotor}` facilitates this need by respecting the order in which the covariates are listed in the model.
+
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.format='png', fig.retina=2}
+# conduct the logistic regression with tobacco listed first in the 'formula'
+lr <- glm(
+  data = df,
+  family = 'binomial',
+  formula = Group ~ tobgp + alcgp + agegp
+)
+
+# plot the odds ratio plot using variable labels
+plot_or(lr)
+```
+
+We now have tobacco as the first covariate on the y-axis and age group as the last covariate.
+
+### Summarise in a table
+
+Odds Ratio plots are often accompanied by summary tables in academic papers. These tables provide details not always visible from the plot, such as the number of observations in each category and the conversion rate from the base population to those with the outcome of interest.
+
+From version 0.5.3 `{plotor}` can produce these summary tables using the new function `table_or()` as either a `tibble` or a publication-ready `{gt}` table.
+
+```{r}
+table_or(lr, output = 'tibble')
+```
+
+The tibble contains details
+
+-   `label` containing the name or label for the variables,
+
+-   `level` describing the contents of categorical variables,
+
+-   `rows` enumerating the number of observations relevant to each category level,
+
+-   `outcome` enumerating the number of observations which resulted in the outcome of interest,
+
+-   `outcome_rate` showing the conversion from `rows` to `outcome`,
+
+-   `class` describing the data class for the variable,
+
+-   `estimate` is the Odds Ratio point estimate,
+
+-   `std.error` is the standard error for the Odds Ratio,
+
+-   `p.value` is the probability of producing the Odds Ratio estimate by chance,
+
+-   `conf.low` is the lower confidence interval,
+
+-   `conf.high` is the upper confidence interval,
+
+-   `significance` is a description of whether the Odds Ratio is statistically significant, with reference to the confidence interval,
+
+The tibble format means this information can be re-used in custom tables and visualisations.
+
+Specify `output = 'gt'` to get a publication-quality html table made using the `{gt}` package.
+
+```{r}
+table_or(lr, output = 'gt') |> 
+  gt::tab_options(container.width = 1100)
+```
+
+The main features of this table include:
+
+-   number formatting such as thousands separators for counts and rounding to the nearest four significant figures to prevent precision clutter,
+
+-   footnotes explaining each section and providing a key to the column headings,
+
+-   title defaulting to the outcome variable and subtitle providing a description of what the table contains, these can be changed by extending {gt} functions.
+
+-   a simple OR plot to give a sense of the distributions of Odds Ratio estimates.

@@ -12,7 +12,7 @@ plot_or(glm_model_results, conf_level = 0.95)
 \item{conf_level}{Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.}
 }
 \value{
-\code{plotor} returns an object of class \code{gg} and \code{ggplot}
+an object of class \code{gg} and \code{ggplot}
 }
 \description{
 Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
