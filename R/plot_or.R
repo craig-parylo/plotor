@@ -134,7 +134,7 @@ table_or <- function(glm_model_results, conf_level = 0.95, output = 'tibble') {
     ))) |>
     # work out the rate of 'outcome'
     dplyr::mutate(outcome_rate = .data$outcome / .data$rows) |>
-    dplyr::relocate(.data$outcome_rate, .after = .data$outcome)
+    dplyr::relocate('outcome_rate', .after = 'outcome')
 
   # decide what object to return
   obj_return <-
@@ -188,28 +188,24 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
     if (is.numeric(var_temp)) {
       df |>
         dplyr::filter(!is.na(var_name)) |>
-        dplyr::summarise(rows = dplyr::n(),
-                         outcome = sum({{outcome}} == outcome_txt)) |>
+        dplyr::summarise(rows = dplyr::n(), outcome = sum({{outcome}} == outcome_txt)) |>
         dplyr::mutate(group = var_name,
                       level = var_name,
                       term = var_name) |>
-        dplyr::select(.data$term,
-                      .data$group,
-                      .data$level,
-                      .data$rows,
-                      .data$outcome)
+        dplyr::select(dplyr::any_of(c(
+          'term', 'group', 'level', 'rows', 'outcome'
+        )))
     } else {
       df |>
         dplyr::mutate(outcome = sum({{outcome}} == outcome_txt), .by = {{var}}) |>
-        dplyr::summarise(rows = dplyr::n(), .by = c(var, outcome)) |>
-        dplyr::rename(level = var) |>
+        #dplyr::summarise(rows = dplyr::n(), .by = c({{var}}, {{outcome}})) |>
+        dplyr::summarise(rows = dplyr::n(), .by = c({{var}}, 'outcome')) |>
+        dplyr::rename(level = {{var}}) |>
         dplyr::mutate(group = var_name,
                       term = base::paste0(.data$group, .data$level)) |>
-        dplyr::select(.data$term,
-                      .data$group,
-                      .data$level,
-                      .data$rows,
-                      .data$outcome)
+        dplyr::select(dplyr::any_of(c(
+          'term', 'group', 'level', 'rows', 'outcome'
+        )))
     }
 
   # add the class of the variable
@@ -319,17 +315,6 @@ prepare_df_for_plotting <- function(df) {
 #' @noRd
 plot_odds_ratio <- function(df, model, conf_level) {
   # get the name of the outcome variable - will be used in the plot title
-  # model_outcome_var <-
-  #   model$formula[[2]] |>
-  #   base::as.character()
-  # model_outcome_label <-
-  #   base::sapply(model$data[model_outcome_var], function(x) {
-  #     base::attr(x, "label")
-  #   })[[1]]
-  # model_outcome <-
-  #   dplyr::coalesce(model_outcome_label,
-  #                   model_outcome_var |> base::as.character())
-
   model_outcome <- get_outcome_variable_name(model = model)
 
   # get the confidence level as string
@@ -460,10 +445,10 @@ use_var_labels <- function(df, lr) {
     df_vars_labels |>
     dplyr::right_join(
       y = df |>
-        dplyr::rename(group_old = .data$group),
+        dplyr::rename(group_old = "group"),
       by = dplyr::join_by('group' == 'group_old')
     ) |>
-    dplyr::arrange(.data$label, .data$level)
+    dplyr::arrange('label', 'level')
 
   return(df_return)
 
