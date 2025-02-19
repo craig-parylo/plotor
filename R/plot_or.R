@@ -486,6 +486,22 @@ validate_conf_level_input <- function(conf_level) {
   ci_min <- 0.001
   ci_max <- 0.999
 
+  # handle inputs of multiple lengths
+  if (length(conf_level) > 1) {
+    cli::cli_abort(c(
+      "{.var conf_level} requires a single numeric value.",
+      "x" = "There are {?is/are} {length(conf_level)} element{?s} in the value you supplied."
+    ))
+  }
+
+  # handle non-numeric inputs
+  if (!is.numeric(conf_level)) {
+    cli::cli_abort(c(
+      "{.var conf_level} requires a numeric value.",
+      "x" = "The supplied value {.val {conf_level}} is a {.type conf_level} input."
+    ))
+  }
+
   # validate conf_level
   conf_level_new <- dplyr::case_when(
 
