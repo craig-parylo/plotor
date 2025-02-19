@@ -1,29 +1,39 @@
+# main functions ---------------------------------------------------------------
+testthat::test_that("plot_or() does not produce messages or warnings", {
+  testthat::expect_silent({
 
-# testthat::test_that("plotor output does not produce messages or warnings", {
-#   testthat::expect_silent({
-#
-#         df <- datasets::Titanic |>
-#           dplyr::as_tibble() |>
-#           dplyr::filter(n > 0) |>
-#           tidyr::uncount(weights = n) |>
-#           dplyr::mutate(
-#             Class = Class |>
-#               forcats::fct(levels = c('1st', '2nd', '3rd', 'Crew')),
-#             Sex = Sex |> forcats::fct_infreq(),
-#             Age = Age |> forcats::fct_infreq(),
-#             Survived = Survived |> forcats::fct(levels = c('No', 'Yes'))
-#           )
-#
-#         lr <- stats::glm(
-#           data = df,
-#           family = 'binomial',
-#           formula = Survived ~ Class + Sex + Age
-#         )
-#
-#         plotor::plot_or(lr)
-#
-#   })
-# })
+    # titanic lr model
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
+    plotor::plot_or(lr)
+
+    # diabetes lr model
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
+    plotor::plot_or(lr)
+
+    # infertility lr model
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
+    plotor::plot_or(lr)
+
+  })
+})
+
+testthat::test_that("table_or() does not produce messages or warnings", {
+  testthat::expect_silent({
+
+    # titanic lr model
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
+    plotor::table_or(lr)
+
+    # diabetes lr model
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
+    plotor::table_or(lr)
+
+    # infertility lr model
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
+    plotor::table_or(lr)
+
+  })
+})
 
 # validation functions ---------------------------------------------------------
 testthat::test_that("validate_conf_level_input() works as expected", {
