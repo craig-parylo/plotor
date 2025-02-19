@@ -486,24 +486,31 @@ validate_conf_level_input <- function(conf_level) {
   ci_min <- 0.001
   ci_max <- 0.999
 
-  # set a message if the input breaches our limits
-  ci_message <-
-    dplyr::case_when(
-      conf_level <= ci_min ~ glue::glue(
-        "`conf_level = {conf_level}` is below the minimum accepted value, setting to {ci_min} instead"
-      ),
-      conf_level >= ci_max ~ glue::glue(
-        "`conf_level = {conf_level}` is above the maximum accepted value, setting to {ci_max} instead"
-      )
+  # validate conf_level
+  conf_level_new <- dplyr::case_when(
+
+    # parse if given an integer version, e.g. 95 instead of 0.95
+    conf_level > 50 & conf_level < 100 ~ conf_level / 100,
+
+    # if otherwise outside limits then set to nearest limit
+    conf_level < ci_min | conf_level > ci_max ~ min(ci_max, max(ci_min, conf_level)),
+
+    # if all checks pass then return the input
+    .default = conf_level
+  )
+
+  # let the user know what is happening
+  if (conf_level < ci_min) {
+    cli::cli_alert_info(
+      "{.var conf_level} = {.val {conf_level}} is below the minimum accepted value.
+      Setting to {.val {conf_level_new}} instead."
     )
-
-  # if message is not NA then display it
-  if (!is.na(ci_message)) {
-    cli::cli_alert_info(ci_message)
+  } else if (conf_level > ci_max) {
+    cli::cli_alert_info(
+      "{.var conf_level} = {.val {conf_level}} is above the maximum accepted value.
+      Setting to {.val {conf_level_new}} instead."
+    )
   }
-
-  # re-set the conf_level to an accepted value
-  conf_level_new <- min(ci_max, max(ci_min, conf_level))
 
   return(conf_level_new)
 }
