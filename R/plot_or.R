@@ -729,8 +729,8 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
     ) |>
     # add an OR plot to visualise the results
     gtExtras::gt_plt_conf_int(
-      column = .data$plot_or,
-      ci_columns = c(.data$plot_ci_l, .data$plot_ci_u),
+      column = 'plot_or',
+      ci_columns = c('plot_ci_l', 'plot_ci_u'),
       ref_line = 0,
       text_size = 0
     ) |>
