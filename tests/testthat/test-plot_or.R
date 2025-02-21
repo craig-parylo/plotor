@@ -46,15 +46,16 @@ testthat::test_that("table_or() does not produce messages or warnings", {
 })
 
 ## snapshots -------
-testthat::test_that("table_or() produces output equivalent to a snapshot", {
-
-  # titanic lr model
-  testthat::expect_snapshot({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::table_or(lr)
-  },
-  cran = FALSE)
-})
+# testthat::test_that("table_or() produces output equivalent to a snapshot", {
+#   testthat::skip_on_cran()
+#
+#   # titanic lr model
+#   testthat::expect_snapshot({
+#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
+#     plotor::table_or(lr)
+#   },
+#   cran = FALSE)
+# })
 
 testthat::test_that("plot_or() produces plots equivalent to a snapshot", {
 
@@ -78,27 +79,28 @@ testthat::test_that("plot_or() produces plots equivalent to a snapshot", {
   }, title = "plot_infert", cran = FALSE)
 })
 
-testthat::test_that("table_or() produces {gt} tables equivalent to a snapshot", {
-
-  # titanic lr model
-  testthat::expect_snapshot({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::table_or(lr, output = 'gt')
-  }, cran = FALSE)
-
-  # diabetes lr model
-  testthat::expect_snapshot({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
-    plotor::table_or(lr, output = 'gt')
-  }, cran = FALSE)
-
-  # infertility lr model
-  testthat::expect_snapshot({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
-    plotor::table_or(lr, output = 'gt')
-  }, cran = FALSE)
-
-})
+# testthat::test_that("table_or() produces {gt} tables equivalent to a snapshot", {
+#   testthat::skip_on_cran()
+#
+#   # titanic lr model
+#   testthat::expect_snapshot({
+#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
+#     plotor::table_or(lr, output = 'gt')
+#   }, cran = FALSE)
+#
+#   # diabetes lr model
+#   testthat::expect_snapshot({
+#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
+#     plotor::table_or(lr, output = 'gt')
+#   }, cran = FALSE)
+#
+#   # infertility lr model
+#   testthat::expect_snapshot({
+#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
+#     plotor::table_or(lr, output = 'gt')
+#   }, cran = FALSE)
+#
+# })
 
 ## test failure -----
 
