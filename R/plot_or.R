@@ -45,7 +45,10 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
 
   # data and input checks ----
   # check the model is logistic regression
-  glm_model <- validate_glm_model(glm_model_results)
+  valid_glm_model <- validate_glm_model(glm_model_results)
+
+  # check logistic regression assumptions
+  valid_assumptions <- check_assumptions(glm = glm_model_results, details = FALSE)
 
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
@@ -54,8 +57,6 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
 
   # get summary of the data and results
   df <- get_summary_table(glm_model_results = glm_model_results, conf_level = conf_level)
-
-
 
   # plot the results
   p <- plot_odds_ratio(df = df, model = glm_model_results, conf_level = conf_level)
@@ -110,7 +111,10 @@ table_or <- function(glm_model_results, conf_level = 0.95, output = 'tibble') {
 
   # data and input checks ----
   # check the model is logistic regression
-  glm_model <- validate_glm_model(glm_model_results)
+  valid_glm_model <- validate_glm_model(glm_model_results)
+
+  # check logistic regression assumptions
+  valid_assumptions <- check_assumptions(glm = glm_model_results, details = FALSE)
 
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
@@ -616,7 +620,7 @@ get_summary_table <- function(glm_model_results, conf_level) {
   return(df)
 }
 
-#' Output tibble as {gt}
+#' Output tibble as `gt`
 #'
 #' Outputs a publication-quality summary OR table with {gt} formatting.
 #'
@@ -750,7 +754,7 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
 #'
 #' @returns String
 #' @noRd
-get_outcome_variable_name <- function(model) {
+get_outcome_variable_name <- function(model, return_var_name = FALSE) {
 
   # get the name of the outcome variable from the model formula
   model_outcome_var <-
@@ -768,5 +772,116 @@ get_outcome_variable_name <- function(model) {
     dplyr::coalesce(model_outcome_label,
                     model_outcome_var |> base::as.character())
 
-  return(model_outcome)
+  # return the variable name if requested
+  if (return_var_name) {
+    return(model_outcome_var)
+  } else {
+    return(model_outcome)
+  }
+
+}
+
+
+## assumptions funcs -----------------------------------------------------------
+
+#' Check assumptions
+#'
+#' Checks whether the supplied `glm` model satisfies assumptions of a binary
+#' logistic regression model.
+#'
+#' The assumptions tested are:
+#' * the outcome variable is binary encoded,
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#'
+#' @returns Named list indicating the results of each assumption
+#' @noRd
+check_assumptions <- function(glm, details = FALSE) {
+
+  # check assumptions
+  list_return <- list(
+    assume_binary = assumption_binary_outcome(glm = glm, details = details)
+  )
+
+  # aborting assumptions
+  if (list_return$assume_binary != TRUE) {
+    cli::cli_abort("Assumptions required for logistic regression are not met.")
+  }
+
+  return(list_return)
+
+}
+
+
+#' Check binary outcome assumption
+#'
+#' This function checks whether the outcome variable is binary encoded.
+#'
+#' A key assumption for logistic regression is the outcome is binary encoded,
+#' i.e. 1 and 0, 'Yes' and 'No', 'Survived' and 'Died'. If this assumption is
+#' not satisfied the Odds Ratio results are affected.
+#'
+#' NB, `glm` automatically removes any records containing empty outcomes, such
+#' as NA or NULL, so this function does not need to check for these.
+#'
+#' An alert will be printed to the console where this assumption is not upheld.
+#' Optionally, additional context can be displayed where `details` = `TRUE`.
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#'
+#' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
+#' @noRd
+assumption_binary_outcome <- function(glm, details = FALSE) {
+
+  # data prep ---
+  # get the data
+  df <- glm$model
+
+  # get the outcome variable name and cast to symbol
+  str_outcome <- get_outcome_variable_name(model = glm, return_var_name = TRUE)
+  var_outcome <- base::as.symbol(str_outcome)
+
+  # assumption details ---
+
+  # count outcomes as a tibble
+  df_outcome_count <- df |> dplyr::count({{var_outcome}})
+
+  # what outcomes are included
+  outcome_levels <- df_outcome_count |> dplyr::pull({{var_outcome}})
+
+  # count how many levels are in the outcome
+  outcome_level_count <- length(outcome_levels)
+
+  # does the outcome have precisely two levels
+  result <- outcome_level_count == 2
+
+  # context details ---
+
+  # what is the data type of the outcome
+  outcome_class <- class(outcome_levels)
+
+  # alert the user if this assumption is not held
+  if (!result) {
+    cli::cli_alert_danger(
+      "Logistic regression requires a binary outcome variable."
+    )
+  }
+
+  # provide additional details if requested
+  if (!result & details) {
+    cli::cli_alert(
+      "Your outcome variable {.var {str_outcome}} has {outcome_level_count} level{?s}: {.val {outcome_levels}}.",
+      wrap = TRUE
+    )
+    cli::cli_alert(
+      "This alert is commonly caused by errant blank responses such as {.val NA}, {.val Blank} or {.val Unknown}. Check your model data to ensure only two outcome measures are included.",
+      wrap = TRUE
+    )
+  }
+
+  # return the result
+  return(result)
+
 }
