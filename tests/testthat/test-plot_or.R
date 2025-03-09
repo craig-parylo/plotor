@@ -15,12 +15,6 @@ testthat::test_that("plot_or() does not produce messages or warnings", {
     plotor::plot_or(lr)
   })
 
-  # infertility lr model
-  testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
-    plotor::plot_or(lr)
-  })
-
 })
 
 testthat::test_that("table_or() does not produce messages or warnings", {
@@ -34,12 +28,6 @@ testthat::test_that("table_or() does not produce messages or warnings", {
   # diabetes lr model
   testthat::expect_silent({
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
-    plotor::table_or(lr)
-  })
-
-  # infertility lr model
-  testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
     plotor::table_or(lr)
   })
 
@@ -72,11 +60,6 @@ testthat::test_that("plot_or() produces plots equivalent to a snapshot", {
     plotor::plot_or(lr)
   }, title = "plot_diabetes", cran = FALSE)
 
-  # infertility lr model
-  vdiffr::expect_doppelganger({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
-    plotor::plot_or(lr)
-  }, title = "plot_infert", cran = FALSE)
 })
 
 # testthat::test_that("table_or() produces {gt} tables equivalent to a snapshot", {
@@ -158,5 +141,35 @@ testthat::test_that("validate_conf_level_input() works as expected", {
   testthat::expect_message(plotor:::validate_conf_level_input(100))
   testthat::expect_message(plotor:::validate_conf_level_input(95))
   testthat::expect_message(plotor:::validate_conf_level_input(99))
+
+})
+
+testthat::test_that("assumption_binary_outcome() works as expected", {
+
+  # raise error for models with more than two outcome levels
+  testthat::expect_error({
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_triple_outcome.Rds'))
+    plotor::plot_or(lr)
+  })
+
+})
+
+testthat::test_that("assumption_no_multicollinearity() works as expected", {
+
+  # raise warning message for models with high correlations
+  testthat::expect_warning({
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_correlated_two.Rds'))
+    plotor::plot_or(lr)
+  })
+
+  testthat::expect_warning({
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_correlated_four.Rds'))
+    plotor::plot_or(lr)
+  })
+
+  testthat::expect_warning({
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
+    plotor::plot_or(lr)
+  })
 
 })
