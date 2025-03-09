@@ -801,7 +801,8 @@ check_assumptions <- function(glm, details = FALSE) {
 
   # check assumptions
   list_return <- list(
-    assume_binary = assumption_binary_outcome(glm = glm, details = details)
+    assume_binary = assumption_binary_outcome(glm = glm, details = details),
+    assume_independent = assumption_no_multicollinearity(glm = glm, details = details)
   )
 
   # aborting assumptions
@@ -862,6 +863,8 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
   # what is the data type of the outcome
   outcome_class <- class(outcome_levels)
 
+  # alert details ---
+
   # alert the user if this assumption is not held
   if (!result) {
     cli::cli_alert_danger(
@@ -884,4 +887,163 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
   # return the result
   return(result)
 
+}
+
+#' Check for multicollinearity
+#'
+#' This function checks for correlations between predictor variables and flags
+#' cases where this correlation is severe, as indicated by GVIF^(1/(2*Df)) of
+#' 5 or more.
+#'
+#' A key assumption for logistic regression is the predictor variables are
+#' independent of each other. Where predictor variables are correlated this
+#' can result in:
+#'
+#' * unstable estimates which are sensitive to small changes in the data,
+#' resulting in larger confidence intervals and unstable odds ratios,
+#'
+#' * inflated variance resulting in larger confidence intervals,
+#'
+#' * biased coefficients leading to incorrect conclusions about the relationship
+#' between predictors and the outcome,
+#'
+#' * separation issues, in which the model predicts probabilities of 0 or 1.
+#'
+#' An alert will be printed to the console where this assumption is not upheld.
+#' Optionally, additional context can be displayed where `details` = `TRUE`.
+#'
+#' # Measuring multicollinearity
+#'
+#' The `vif()` function from the {car} package will be used to work out a
+#' variance inflation factor (VIF) for numerical predictors and a measure based
+#' on generalised variance inflation factor (GVIF) for models involving a
+#' mixture of numerical and categorical predictors.
+#'
+#' For VIF a threshold of 5 will be used:
+#' * below 5: zero to moderate multicollinearity (no alert)
+#' * 5 or above: high multicollinearity (alert)
+#'
+#' Hair, J. F., Black, W. C., Babin, B. J., & Anderson, R. E. (2010). Multivariate data analysis. Prentice Hall.
+# Kutner, M. H., Nachtsheim, C. J., & Neter, J. (2005). Applied linear regression models. McGraw-Hill.
+#'
+#' For GVIF-based measures a threshold of 2 will be used:
+#' * below 2: zero to moderate multicollinearity (no alert)
+#' * 5 or above: high multicollinearity (alert)
+#'
+#' Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics. Journal of the American Statistical Association, 87(417), 178-183.
+#'
+#' Where a predictor is found to have an inflation measure at or above
+#' threshold then a warning will be raised alerting the user to the potential
+#' presence of correlation. This warning will not prevent the code from
+#' executing and producing the desired output.
+#'
+#' Any warning produced by this function is not prescriptive. The presence of
+#' a warning should be a sign to the user to *consider* their model and
+#' perform further investigations to satisfy themselves their model is correct.
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#'
+#' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
+#' @noRd
+assumption_no_multicollinearity <- function(glm, details = FALSE) {
+
+  # get the variance inflation factor (VIF) or
+  df_vif <- car::vif(glm) |>
+    tibble::as_tibble(rownames = 'predictor') |>
+    janitor::clean_names() |>
+    dplyr::rename(
+      dplyr::any_of(
+        c(
+          'vif' = 'value',
+          'gvif_scaled' = 'gvif_1_2_df'
+        )
+      )
+    ) |>
+    # get the square of any scaled gvif:
+    # https://stacyderuiter.github.io/s245-notes-bookdown/collinearity-and-multicollinearity.html
+    dplyr::mutate(
+      dplyr::across(
+        .cols = dplyr::any_of('gvif_scaled'),
+        .fns = \(.x) .x ^ 2,
+        .names = "{.col}_squared"
+      )
+    )
+
+  # set thresholds for each measure
+  var_thresholds <- c('GVIF^(1/(2*Df))^2' = 2, 'VIF' = 5)
+
+  # flag any predictors with above-threshold values
+  df_vif <-
+    df_vif |>
+    dplyr::mutate(
+      # models involving continuous predictors only
+      dplyr::across(
+        .cols = dplyr::any_of('vif'),
+        .fns = \(.x) dplyr::case_when(
+          .x >= var_thresholds['VIF'] ~ TRUE,
+          .default = FALSE
+        ),
+        .names = "above_threshold"
+      ),
+      # models involving categorical variables
+      dplyr::across(
+        .cols = dplyr::any_of('gvif_scaled_squared'),
+        .fns = \(.x) dplyr::case_when(
+          .x >= var_thresholds['GVIF^(1/(2*Df))^2'] ~ TRUE,
+          .default = FALSE
+        ),
+        .names = "above_threshold"
+      )
+    )
+
+  # assumption details ---
+
+  # are all predictors within threshold?
+  result <- any(df_vif$above_threshold, na.rm = TRUE) == FALSE
+
+  # context details ---
+
+  # what predictors are above threshold
+  correlated_predictors <- df_vif$predictor[df_vif$above_threshold == TRUE]
+
+  # how many are there
+  correlated_predictor_count <- length(correlated_predictors)
+
+  # what measure of inflation was used
+  var_measure <- dplyr::if_else(
+    condition =  'gvif_scaled_squared' %in% names(df_vif),
+    true = 'GVIF^(1/(2*Df))^2',
+    false = 'VIF'
+  )
+
+  # what values to they have
+  var_values <- df_vif |>
+    dplyr::filter(.data$above_threshold) |>
+    dplyr::pull(dplyr::any_of(c('vif', 'gvif_scaled_squared'))) |>
+    round(digits = 1)
+
+  # alert details ---
+
+  # alert the user if this assumption is not held
+  if (!result) {
+    cli::cli_warn(
+      "Signs of multicollinearity detected in {correlated_predictor_count} of your predictor variables."
+    )
+  }
+
+  # provide additional details if requested
+  if (!result & details) {
+    cli::cli_alert(
+      "{.var {correlated_predictors}} {?has/have} {var_measure} values of {.val {var_values}}.",
+      wrap = TRUE
+    )
+    cli::cli_alert(
+      "{var_measure} values equal to or greater than {.val {var_thresholds[var_measure]}} are indicative of correlation.",
+      wrap = TRUE
+    )
+  }
+
+  # return the result
+  return(result)
 }
