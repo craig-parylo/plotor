@@ -218,6 +218,54 @@ get_df_triple_outcome <- function() {
   return(df)
 }
 
+get_df_separated <- function() {
+
+  set.seed(123)
+  n <- 1000
+  df <- tibble::tibble(
+    # an outcome variable with 20:80 distribution of 'alive' vs 'died'
+    outcome = sample(0:1, size = 1000, replace = TRUE, prob = c(0.2,0.8)) |>
+      factor(levels = 0:1, labels = c('Alive', 'Died')),
+
+    # a separated numeric predictor variable
+    pred1 = dplyr::if_else(
+      condition = outcome == 'Alive',
+      true = sample(0:10, size = 1000, replace = TRUE),
+      false = sample(10:20, size = 1000, replace = TRUE)
+    ),
+
+    # a separated categorical predictor variable
+    pred2 = dplyr::if_else(
+      condition = outcome == 'Alive',
+      true = sample(0:2, size = 1000, replace = TRUE),
+      false = sample(1:3, size = 1000, replace = TRUE)
+    ) |>
+      factor(levels = 0:3, labels = c('North', 'South', 'East', 'West')),
+
+    # two randomly allocated predictors
+    pred3 = rpois(n = 1000, lambda = 10),
+
+    pred4 = sample(0:3, size = 1000, replace = TRUE) |>
+      factor(levels = 0:3, labels = c('red', 'green', 'yellow', 'blue')),
+  )
+
+  # create a list of variable = labels
+  var_labels <- list(
+    outcome = 'Survival status',
+    pred1 = 'Predictor 1 - Quasi-complete separation',
+    pred2 = 'Predictor 2 - Complete separation',
+    pred3 = 'Predictor 3',
+    pred4 = 'Predictor 4'
+  )
+
+  # apply the labels
+  labelled::var_label(df) <- var_labels
+
+  # return the result
+  return(df)
+
+}
+
 # Model functions --------------------------------------------------------------
 get_lr_titanic <- function() {
 
@@ -299,6 +347,15 @@ get_lr_correlated_four <- function() {
   )
 }
 
+get_lr_separated <- function() {
+  df <- get_df_separated()
+  lr <- stats::glm(
+    data = df,
+    formula = outcome ~ pred1 + pred2 + pred3 + pred4,
+    family = 'binomial'
+  )
+}
+
 # Get data ---------------------------------------------------------------------
 # df
 df_titanic <- get_df_titanic()
@@ -307,6 +364,7 @@ df_streptb <- get_df_streptb()
 df_diabetes <- get_df_diabetes()
 df_triple_outcome <- get_df_triple_outcome()
 df_correlated <- get_df_correlated()
+df_separated <- get_df_separated()
 
 # lr
 lr_titanic <- get_lr_titanic()
@@ -323,6 +381,9 @@ lr_triple_outcome <- get_lr_triple_outcome()
 # correlated
 lr_correlated_two <- get_lr_correlated_two()
 lr_correlated_four <- get_lr_correlated_four()
+
+# separated
+lr_separated <- get_lr_separated()
 
 # Save data --------------------------------------------------------------------
 # titanic
@@ -391,4 +452,14 @@ saveRDS(
 saveRDS(
   object = lr_correlated_four,
   file = testthat::test_path('test_data', 'lr_correlated_four.Rds')
+)
+
+# separated
+saveRDS(
+  object = df_separated,
+  file = testthat::test_path('test_data', 'df_separated.Rds')
+)
+saveRDS(
+  object = lr_separated,
+  file = testthat::test_path('test_data', 'lr_separated.Rds')
 )

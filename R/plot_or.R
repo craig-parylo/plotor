@@ -802,7 +802,8 @@ check_assumptions <- function(glm, details = FALSE) {
   # check assumptions
   list_return <- list(
     assume_binary = assumption_binary_outcome(glm = glm, details = details),
-    assume_independent = assumption_no_multicollinearity(glm = glm, details = details)
+    assume_independent = assumption_no_multicollinearity(glm = glm, details = details),
+    assume_no_separation = assumption_no_separation(glm = glm, details = details)
   )
 
   # aborting assumptions
@@ -867,7 +868,7 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
 
   # alert the user if this assumption is not held
   if (!result) {
-    cli::cli_alert_danger(
+    cli::cli_abort(
       "Logistic regression requires a binary outcome variable."
     )
   }
@@ -1034,6 +1035,10 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
 
   # provide additional details if requested
   if (!result & details) {
+    cli::cli_alert_warning(
+      "Signs of multicollinearity detected in {correlated_predictor_count} of your predictor variables.",
+      wrap = TRUE
+    )
     cli::cli_alert(
       "{.var {correlated_predictors}} {?has/have} {var_measure} values of {.val {var_values}}.",
       wrap = TRUE
@@ -1042,6 +1047,112 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
       "{var_measure} values equal to or greater than {.val {var_thresholds[var_measure]}} are indicative of correlation.",
       wrap = TRUE
     )
+  }
+
+  # return the result
+  return(result)
+}
+
+#' Check for separation
+#'
+#' This function checks for potential issues with separation.
+#'
+#' Complete or quasi-complete separation in logistic regression occurs when a
+#' predictor variable (or a combination of predictor variables) perfectly or
+#' almost perfectly predicts the outcome variable. This can lead to unstable
+#' estimates of the regression coefficients and standard errors, causing
+#' problems in model interpretation and inference.
+#'
+#' This function uses the {detectseparation} package to identify models with
+#' infinite maximum likelihood estimates.
+#'
+#' Where a predictor is found to have a potential issue with separation then a
+#' warning will be raised alerting the user. This warning will not prevent the
+#' code from executing and producing the desired output.
+#'
+#' Any warning produced by this function is not prescriptive. The presence of
+#' a warning should be a sign to the user to *consider* their model and
+#' perform further investigations to satisfy themselves their model is correct.
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#'
+#' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
+#' @noRd
+assumption_no_separation <- function(glm, details = FALSE) {
+
+  # get the model data
+  glm_df <- glm$model
+
+  # get the model formula
+  glm_fm <- glm$formula
+
+  # run the detect separation
+  glm_ds <- stats::glm(
+    data = glm_df,
+    formula = glm_fm,
+    family = "binomial",
+    method = detectseparation::detect_separation
+  )
+
+  # extract the outcome (TRUE = separation detected, otherwise FALSE)
+  separation <- glm_ds$outcome
+
+  # negate this to reflect whether assumption is upheld
+  result <- !separation
+
+  # identify which predictor variables are responsible for separation
+  if (separation) {
+
+    # get the predictor variables
+    var_predictors <- attr(glm$terms, "term")
+
+    # iterate over these and re-run to determine which affect separation result
+    var_separation <-
+      purrr::map_dfr(
+        .x = var_predictors,
+        .f = function(.predictor) {
+
+          # remove the predictor from the formula
+          glm_fm_test <- stats::update(glm_fm, paste("~ . -", .predictor))
+
+          # re-run the fit
+          glm_ds_test <- stats::update(object = glm_ds, formula. = glm_fm_test)
+
+          # return the result
+          tibble::tibble(
+            predictor = .predictor,
+            separation = glm_ds_test$outcome != glm_ds$outcome
+          )
+        }
+      )
+
+    # list the variables which are affecting separation result
+    var_separation_sig <-
+      var_separation |>
+      dplyr::filter(separation) |>
+      dplyr::pull("predictor")
+  }
+
+  # alert details ---
+
+  # alert the user if this assumption is not held
+  if (!result) {
+    cli::cli_warn(
+      "Signs of separation detected in {length(var_separation_sig)} of your predictor variables."
+    )
+  }
+
+  # provide additional details if requested
+  if (!result & details) {
+    cli::cli_alert_warning(
+      "Signs of separation detected in {length(var_separation_sig)} of your predictor variables."
+    )
+    cli::cli_alert(
+      "{.var {var_separation_sig}} {?is/are} associated with either complete or quasi-complete separation.",
+      wrap = TRUE
+    )
+    cli::cli_alert("The Odds Ratio estimates are likely to be unreliable.")
   }
 
   # return the result

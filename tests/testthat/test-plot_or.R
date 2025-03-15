@@ -1,7 +1,7 @@
 # main functions ---------------------------------------------------------------
 
 ## test successful ----
-testthat::test_that("plot_or() does not produce messages or warnings", {
+testthat::test_that("`plot_or()` does not produce messages or warnings", {
 
   # titanic lr model
   testthat::expect_silent({
@@ -17,7 +17,7 @@ testthat::test_that("plot_or() does not produce messages or warnings", {
 
 })
 
-testthat::test_that("table_or() does not produce messages or warnings", {
+testthat::test_that("`table_or()` does not produce messages or warnings", {
 
   # titanic lr model
   testthat::expect_silent({
@@ -45,7 +45,7 @@ testthat::test_that("table_or() does not produce messages or warnings", {
 #   cran = FALSE)
 # })
 
-testthat::test_that("plot_or() produces plots equivalent to a snapshot", {
+testthat::test_that("`plot_or()` produces plots equivalent to a snapshot", {
 
   # titanic lr model
   vdiffr::expect_doppelganger({
@@ -87,7 +87,7 @@ testthat::test_that("plot_or() produces plots equivalent to a snapshot", {
 
 ## test failure -----
 
-testthat::test_that("table_or() and plot_or() handle issues gracefully", {
+testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
 
   # not a binomial glm model
   testthat::expect_error({
@@ -118,7 +118,7 @@ testthat::test_that("table_or() and plot_or() handle issues gracefully", {
 })
 
 # validation functions ---------------------------------------------------------
-testthat::test_that("validate_conf_level_input() works as expected", {
+testthat::test_that("`validate_conf_level_input()` works as expected", {
 
   # inputs which are not single value and numeric
   testthat::expect_error(plotor:::validate_conf_level_input("0.95"))
@@ -144,7 +144,7 @@ testthat::test_that("validate_conf_level_input() works as expected", {
 
 })
 
-testthat::test_that("assumption_binary_outcome() works as expected", {
+testthat::test_that("`assumption_binary_outcome()` works as expected", {
 
   # raise error for models with more than two outcome levels
   testthat::expect_error({
@@ -154,7 +154,7 @@ testthat::test_that("assumption_binary_outcome() works as expected", {
 
 })
 
-testthat::test_that("assumption_no_multicollinearity() works as expected", {
+testthat::test_that("`assumption_no_multicollinearity()` works as expected", {
 
   # raise warning message for models with high correlations
   testthat::expect_warning({
@@ -170,6 +170,16 @@ testthat::test_that("assumption_no_multicollinearity() works as expected", {
   testthat::expect_warning({
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
     plotor::plot_or(lr)
+  })
+
+})
+
+testthat::test_that("`assumption_no_separation()` works as expected", {
+
+  # raise warning message for models with separation
+  testthat::expect_warning({
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_separated.Rds'))
+    plotor:::assumption_no_separation(lr)
   })
 
 })
