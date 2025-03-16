@@ -215,7 +215,7 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
   # add the class of the variable
   df <-
     df |>
-    dplyr::mutate(class = class(var_temp))
+    dplyr::mutate(class = paste(class(var_temp), collapse = " "))
 
   return(df)
 }
@@ -249,7 +249,6 @@ summarise_rows_per_variable_in_model <- function(model_results) {
       outcome_name = model_outcome
     )) |>
     # rescale rows (will be used to set the size of the dot in the plot)
-    #dplyr::mutate(rows_scale = .data$rows |> scales::rescale(to = c(1, 5)))
     dplyr::mutate(
       rows_scale = dplyr::case_when(
           .data$class == 'numeric' ~ 1,
