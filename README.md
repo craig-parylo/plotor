@@ -1,3 +1,5 @@
+README
+================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -7,8 +9,6 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org/package=plotor)
-[![Codecov test
-coverage](https://codecov.io/gh/craig-parylo/plotor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/craig-parylo/plotor?branch=main)
 [![](https://cranlogs.r-pkg.org/badges/plotor)](https://cran.r-project.org/package=plotor)
 
 <!-- badges: end -->
@@ -26,7 +26,8 @@ You can install the development version of plotor from
 devtools::install_github("craig-parylo/plotor")
 ```
 
-You can also install the latest released version from Cran with:
+You can also install the latest released version from
+[CRAN](https://cloud.r-project.org/web/packages/plotor/index.html) with:
 
 ``` r
 install.packages("plotor")
@@ -124,3 +125,123 @@ This plot makes it clear that:
   likely to survive than those in `1st` class,
 
 - Women were 11.25 times more likely to survive than men.
+
+## Table outputs
+
+While an odds ratio plot can effectively visualise the direction and
+magnitude of relationships, a table of results offers additional
+information such as the value of the odds ratio, p-values and confidence
+intervals.
+
+Use the `table_or()` function to return a tibble of details about our
+Titanic analysis:
+
+``` r
+# using table_or
+table_or(glm_model_results = lr)
+#> # A tibble: 8 × 14
+#>   label level   rows outcome outcome_rate class  estimate std.error statistic
+#>   <fct> <fct>  <int>   <int>        <dbl> <chr>     <dbl>     <dbl>     <dbl>
+#> 1 Class 3rd      706     178        0.252 factor    0.169     0.172    -10.4 
+#> 2 Class 1st      325     203        0.625 factor   NA        NA         NA   
+#> 3 Class 2nd      285     118        0.414 factor    0.361     0.196     -5.19
+#> 4 Class Crew     885     212        0.240 factor    0.424     0.157     -5.45
+#> 5 Sex   Male    1731     367        0.212 factor   NA        NA         NA   
+#> 6 Sex   Female   470     344        0.732 factor   11.2       0.140     17.2 
+#> 7 Age   Child    109      57        0.523 factor    2.89      0.244      4.35
+#> 8 Age   Adult   2092     654        0.313 factor   NA        NA         NA   
+#> # ℹ 5 more variables: p.value <dbl>, conf.low <dbl>, conf.high <dbl>,
+#> #   significance <chr>, comparator <dbl>
+```
+
+You can also output these details into a formatted table complete with a
+mini OR plot, which is ideal for inclusion in reports and publications.
+To do this, add `output = "gt"` as part of the `table_or()` function
+call.
+
+![](inst/img/table_or.png)
+
+## Assumption checks
+
+New to `plotor` is a new suite of automated checks. These checks verify
+the data used in your logistic regression analysis upholds the required
+assumptions, providing an added layer of confidence in your results.
+
+<table style="width:99%;">
+<caption>Assumptions for logistic regression</caption>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 54%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Assumption</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The outcome variable is <strong>binary</strong></td>
+<td><code>plotor</code> is designed to work with an outcome variable
+that has only two possible values, i.e. outcome is
+<strong>binary</strong>.</td>
+<td><p>✅</p>
+<p>Introduced in PR <a
+href="https://%20github.com/cr%20aig-parylo/pl%20otor/pull/42">42</a></p></td>
+</tr>
+<tr>
+<td>The predictor variables should <strong>not be highly
+correlated</strong> with each other</td>
+<td><p>Predictor variables which have high levels of correlation with
+each other is known as <strong>multicollinearity</strong>.</p>
+<p>Where this is the case the odds ratio estimates are likely to be
+unstable, confidence intervals are likely to be much larger, both of
+which make it difficult to interpret the results.</p></td>
+<td><p>✅</p>
+<p>Introduced in PR <a
+href="https://%20github.com/cr%20aig-parylo/pl%20otor/pull/43">43</a></p></td>
+</tr>
+<tr>
+<td>The outcome is <strong>not separated</strong> by predictors</td>
+<td><p>In logistic regression, <strong>separation</strong> occurs when a
+predictor variable (or a combination of predictor variables) perfectly
+predicts the outcome variable.</p>
+<p>Sepration results in infinite or extremely large odds ratios and
+possibly issues with non-convergence of the logistic regression model,
+making it difficult for the model to estimate the coefficients.</p></td>
+<td><p>✅</p>
+<p>Introduced in PR <a
+href="https://%20github.com/cr%20aig-parylo/pl%20otor/pull/47">47</a></p></td>
+</tr>
+<tr>
+<td>The sample size is large enough</td>
+<td>The sample size should be large enough to provide reliable estimates
+of the odds ratio. A general rule of thumb is to have at least 10 events
+(or outcomes of interest) per predictor variable.</td>
+<td>In development</td>
+</tr>
+<tr>
+<td>The observations should be independent</td>
+<td>Each observation should be independent of the others. This means
+that the outcome for one observation should not be influenced by the
+outcome of another observation.</td>
+<td>In development</td>
+</tr>
+<tr>
+<td>There are no extreme outlier values</td>
+<td>The data should not contain outliers or influential observations
+that can significantly affect the estimates of the odds ratio.</td>
+<td>In development</td>
+</tr>
+<tr>
+<td>There is a linear relationship between the predictors and the
+logit</td>
+<td>The relationship between the predictor variables and the log odds of
+the outcome should be linear. This can be checked using diagnostic
+plots, such as the logit plot.</td>
+<td>In development</td>
+</tr>
+</tbody>
+</table>
