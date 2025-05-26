@@ -4,7 +4,12 @@
 \alias{table_or}
 \title{Table OR}
 \usage{
-table_or(glm_model_results, conf_level = 0.95, output = "tibble")
+table_or(
+  glm_model_results,
+  conf_level = 0.95,
+  output = "tibble",
+  confint_fast_estimate = FALSE
+)
 }
 \arguments{
 \item{glm_model_results}{Results from a binomial Generalised Linear Model (GLM), as produced by \code{\link[stats:glm]{stats::glm()}}.}
@@ -12,6 +17,8 @@ table_or(glm_model_results, conf_level = 0.95, output = "tibble")
 \item{conf_level}{Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.}
 
 \item{output}{String description of the output type. Default = 'tibble'. Options include 'tibble' and 'gt'.}
+
+\item{confint_fast_estimate}{Boolean (default = \code{FALSE}) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to \code{TRUE} assumes normally distributed data, which may not be appropriate for your data.}
 }
 \value{
 object returned depends on \code{output} parameter - output = 'tibble' returns an object of "tbl_df", "tbl", "data.frame" class, whilst output = 'gt' returns an object of class "gt_tbl" and "list".
