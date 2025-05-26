@@ -1,4 +1,5 @@
 ---
+title: README
 output: github_document
 editor_options: 
   markdown: 
@@ -22,8 +23,6 @@ knitr::opts_chunk$set(
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org/package=plotor)
-[![Codecov test
-coverage](https://codecov.io/gh/craig-parylo/plotor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/craig-parylo/plotor?branch=main)
 [![](https://cranlogs.r-pkg.org/badges/plotor)](https://cran.r-project.org/package=plotor)
 
 <!-- badges: end -->
@@ -41,7 +40,8 @@ You can install the development version of plotor from
 devtools::install_github("craig-parylo/plotor")
 ```
 
-You can also install the latest released version from Cran with:
+You can also install the latest released version from
+[CRAN](https://cloud.r-project.org/web/packages/plotor/index.html) with:
 
 ``` r
 install.packages("plotor")
@@ -138,3 +138,102 @@ This plot makes it clear that:
     likely to survive than those in `1st` class,
 
 -   Women were 11.25 times more likely to survive than men.
+
+## Table outputs
+
+While an odds ratio plot can effectively visualise the direction and
+magnitude of relationships, a table of results offers additional
+information such as the value of the odds ratio, p-values and confidence
+intervals.
+
+Use the `table_or()` function to return a tibble of details about our
+Titanic analysis:
+
+```{r}
+# using table_or
+table_or(glm_model_results = lr)
+```
+
+You can also output these details into a formatted table complete with a
+mini OR plot, which is ideal for inclusion in reports and publications.
+To do this, add `output = "gt"` as part of the `table_or()` function
+call.
+
+```{r eval=FALSE, include=FALSE}
+# using table_or with a formatted output
+table_or(glm_model_results = lr, output = "gt")
+```
+
+![](inst/img/table_or.png)
+
+## Assumption checks
+
+New to `plotor` is a new suite of automated checks. These checks verify
+the data used in your logistic regression analysis upholds the required
+assumptions, providing an added layer of confidence in your results.
+
++---------------+--------------------------------------+---------------+
+| Assumption    | Description                          | Status        |
++===============+======================================+===============+
+| The outcome   | `plotor` is designed to work with an | ✅            |
+| variable is   | outcome variable that has only two   |               |
+| **binary**    | possible values, i.e. outcome is     | Introduced in |
+|               | **binary**.                          | PR            |
+|               |                                      | [42](https:// |
+|               |                                      | github.com/cr |
+|               |                                      | aig-parylo/pl |
+|               |                                      | otor/pull/42) |
++---------------+--------------------------------------+---------------+
+| The predictor | Predictor variables which have high  | ✅            |
+| variables     | levels of correlation with each      |               |
+| should **not  | other is known as                    | Introduced in |
+| be highly     | **multicollinearity**.               | PR            |
+| correlated**  |                                      | [43](https:// |
+| with each     | Where this is the case the odds      | github.com/cr |
+| other         | ratio estimates are likely to be     | aig-parylo/pl |
+|               | unstable, confidence intervals are   | otor/pull/43) |
+|               | likely to be much larger, both of    |               |
+|               | which make it difficult to interpret |               |
+|               | the results.                         |               |
++---------------+--------------------------------------+---------------+
+| The outcome   | In logistic regression,              | ✅            |
+| is **not      | **separation** occurs when a         |               |
+| separated**   | predictor variable (or a combination | Introduced in |
+| by predictors | of predictor variables) perfectly    | PR            |
+|               | predicts the outcome variable.       | [47](https:// |
+|               |                                      | github.com/cr |
+|               | Sepration results in infinite or     | aig-parylo/pl |
+|               | extremely large odds ratios and      | otor/pull/47) |
+|               | possibly issues with non-convergence |               |
+|               | of the logistic regression model,    |               |
+|               | making it difficult for the model to |               |
+|               | estimate the coefficients.           |               |
++---------------+--------------------------------------+---------------+
+| The sample    | The sample size should be large      | In            |
+| size is large | enough to provide reliable estimates | development   |
+| enough        | of the odds ratio. A general rule of |               |
+|               | thumb is to have at least 10 events  |               |
+|               | (or outcomes of interest) per        |               |
+|               | predictor variable.                  |               |
++---------------+--------------------------------------+---------------+
+| The           | Each observation should be           | In            |
+| observations  | independent of the others. This      | development   |
+| are           | means that the outcome for one       |               |
+| independent   | observation should not be influenced |               |
+|               | by the outcome of another            |               |
+|               | observation.                         |               |
++---------------+--------------------------------------+---------------+
+| There are no  | The data should not contain outliers | In            |
+| extreme       | or influential observations that can | development   |
+| outlier       | significantly affect the estimates   |               |
+| values        | of the odds ratio.                   |               |
++---------------+--------------------------------------+---------------+
+| There is a    | The relationship between the         | In            |
+| linear        | predictor variables and the log odds | development   |
+| relationship  | of the outcome should be linear.     |               |
+| between the   | This can be checked using diagnostic |               |
+| predictors    | plots, such as the logit plot.       |               |
+| and the logit |                                      |               |
++---------------+--------------------------------------+---------------+
+
+: Assumptions for logistic regression
