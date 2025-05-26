@@ -4,12 +4,14 @@
 \alias{plot_or}
 \title{Plot OR}
 \usage{
-plot_or(glm_model_results, conf_level = 0.95)
+plot_or(glm_model_results, conf_level = 0.95, confint_fast_estimate = FALSE)
 }
 \arguments{
 \item{glm_model_results}{Results from a binomial Generalised Linear Model (GLM), as produced by \code{\link[stats:glm]{stats::glm()}}.}
 
 \item{conf_level}{Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.}
+
+\item{confint_fast_estimate}{Boolean (default = \code{FALSE}) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to \code{TRUE} assumes normally distributed data, which may not be appropriate for your data.}
 }
 \value{
 an object of class \code{gg} and \code{ggplot}
