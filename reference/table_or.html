@@ -42,7 +42,12 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">table_or</span><span class="op">(</span><span class="va">glm_model_results</span>, conf_level <span class="op">=</span> <span class="fl">0.95</span>, output <span class="op">=</span> <span class="st">"tibble"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">table_or</span><span class="op">(</span></span>
+<span>  <span class="va">glm_model_results</span>,</span>
+<span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  output <span class="op">=</span> <span class="st">"tibble"</span>,</span>
+<span>  confint_fast_estimate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -59,6 +64,10 @@
 
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
 <dd><p>String description of the output type. Default = 'tibble'. Options include 'tibble' and 'gt'.</p></dd>
+
+
+<dt id="arg-confint-fast-estimate">confint_fast_estimate<a class="anchor" aria-label="anchor" href="#arg-confint-fast-estimate"></a></dt>
+<dd><p>Boolean (default = <code>FALSE</code>) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to <code>TRUE</code> assumes normally distributed data, which may not be appropriate for your data.</p></dd>
 
 </dl></div>
     <div class="section level2">
