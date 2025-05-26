@@ -6,6 +6,7 @@
 #'
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to `TRUE` assumes normally distributed data, which may not be appropriate for your data.
 #'
 #' @return an object of class `gg` and `ggplot`
 #' @seealso
@@ -41,7 +42,9 @@
 #'
 #' # produce the Odds Ratio plot
 #' plot_or(lr)
-plot_or <- function(glm_model_results, conf_level = 0.95) {
+plot_or <- function(glm_model_results,
+                    conf_level = 0.95,
+                    confint_fast_estimate = FALSE) {
 
   # data and input checks ----
   # check the model is logistic regression
@@ -56,7 +59,11 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
   # main ----
 
   # get summary of the data and results
-  df <- get_summary_table(glm_model_results = glm_model_results, conf_level = conf_level)
+  df <- get_summary_table(
+    glm_model_results = glm_model_results,
+    conf_level = conf_level,
+    confint_fast_estimate = confint_fast_estimate
+  )
 
   # plot the results
   p <- plot_odds_ratio(df = df, model = glm_model_results, conf_level = conf_level)
@@ -83,6 +90,7 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
 #' @param output String description of the output type. Default = 'tibble'. Options include 'tibble' and 'gt'.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to `TRUE` assumes normally distributed data, which may not be appropriate for your data.
 #'
 #' @returns object returned depends on `output` parameter - output = 'tibble' returns an object of "tbl_df", "tbl", "data.frame" class, whilst output = 'gt' returns an object of class "gt_tbl" and "list".
 #' @export
@@ -107,7 +115,11 @@ plot_or <- function(glm_model_results, conf_level = 0.95) {
 #' # produce the Odds Ratio table, first as a tibble then as gt object
 #' table_or(lr)
 #' table_or(lr, output = 'gt')
-table_or <- function(glm_model_results, conf_level = 0.95, output = 'tibble') {
+table_or <- function(glm_model_results,
+                     conf_level = 0.95,
+                     output = 'tibble',
+                     confint_fast_estimate = FALSE) {
+
 
   # data and input checks ----
   # check the model is logistic regression
@@ -124,7 +136,11 @@ table_or <- function(glm_model_results, conf_level = 0.95, output = 'tibble') {
 
   # main ----
   # get summary of rows and estimate OR
-  df <- get_summary_table(glm_model_results = glm_model_results, conf_level = conf_level)
+  df <- get_summary_table(
+    glm_model_results = glm_model_results,
+    conf_level = conf_level,
+    confint_fast_estimate = confint_fast_estimate
+  )
 
   # get the outcome variable
   str_outcome <- get_outcome_variable_name(model = glm_model_results)
@@ -595,15 +611,40 @@ validate_output_table_input <- function(output) {
 #'
 #' @returns Tibble providing a summary of the logistic regression model.
 #' @noRd
-get_summary_table <- function(glm_model_results, conf_level) {
+get_summary_table <- function(glm_model_results,
+                              conf_level,
+                              confint_fast_estimate) {
+
   # get the data from the model object
   df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
 
   # get odds ratio and confidence intervals
-  model_or <- glm_model_results |>
-    broom::tidy(exponentiate = T,
-                conf.int = T,
-                conf.level = conf_level)
+  if (confint_fast_estimate == TRUE) {
+
+    # use a fast approximation for confidence intervals
+    model_or <-
+      glm_model_results |>
+      # use broom to get or estimates but WITHOUT confidence intervals
+      broom::tidy(exponentiate = T, conf.int = F) |>
+      # add in confidence interval approximation using `stats::confint.default()`
+      dplyr::left_join(
+        y = glm_model_results |>
+          stats::confint.default(level = conf_level) |>
+          exp() |>
+          tibble::as_tibble(rownames = "term") |>
+          dplyr::rename("conf.low" = 2, "conf.high" = 3),
+        by = dplyr::join_by("term" == "term")
+      )
+
+  } else {
+
+    # use the correct method to estimate the confidence interval
+    model_or <- glm_model_results |>
+      broom::tidy(exponentiate = T,
+                  conf.int = T,
+                  conf.level = conf_level)
+
+  }
 
   # add the odds ratio and CIs to the summary dataframe
   df <- df |>
