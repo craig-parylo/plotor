@@ -246,7 +246,9 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
 #' @noRd
 summarise_rows_per_variable_in_model <- function(model_results) {
   # get the data from the model object
-  model_data <- model_results$model |> dplyr::as_tibble()
+  model_data <-
+    model_results$model |>
+    dplyr::as_tibble()
 
   # get the model variables
   model_vars = base::all.vars(stats::formula(model_results)[-2])
@@ -254,10 +256,11 @@ summarise_rows_per_variable_in_model <- function(model_results) {
   # get the outcome variable
   model_outcome = base::all.vars(stats::formula(model_results))[1]
 
-  # get a summary of all model vars (will be used as the spine of the data)
-  # this is important because the first value of factors is used as the baseline
-  # in the OR analysis and can be missed in the glm summary.
-  df <-
+  # get a summary of all model variables and levels (will be used as the spine)
+  df <- get_model_variables_and_levels(model_results = model_results)
+
+  # count the number of rows used for each variable and level
+  df_rows <-
     model_vars |>
     purrr::map_dfr(\(.x) count_rows_by_variable(
       df = model_data,
@@ -273,7 +276,59 @@ summarise_rows_per_variable_in_model <- function(model_results) {
         )
     )
 
+  # combine the two data
+  df <-
+    df |>
+    dplyr::select(.data$term) |>
+    dplyr::left_join(
+      y = df_rows,
+      by = dplyr::join_by('term' == 'term')
+    )
+
   # return the table summary
+  return(df)
+}
+
+#' Get a tibble of model variables and levels
+#'
+#' Returns a tibble containing the variables used in the model and expands it
+#' for categorical variables to include details of each level. This includes
+#' the reference levels, which is missed by {broom} outputs from the glm model.
+#'
+#' @param model_results Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
+#'
+#' @returns Tibble summary of variables and levels used in the model
+#' @noRd
+get_model_variables_and_levels <- function(model_results) {
+
+  # 1. get a list of all model variables
+  model_vars <-
+    model_results |>
+    stats::formula() |>
+    purrr::pluck(3) |>
+    base::all.vars() |>
+    tibble::enframe() |>
+    dplyr::select(-dplyr::any_of('name'), dplyr::any_of(c('variable' = 'value')))
+
+  # 2. for all categorical variables, list out the levels
+  model_var_levels <-
+    model_results$xlevels |>
+    tibble::enframe() |>
+    tidyr::unnest(cols = dplyr::any_of('value')) |>
+    dplyr::rename(dplyr::any_of(c(
+      'variable' = 1, 'level' = 2
+    )))
+
+  # 3. combine the two sets
+  df <-
+    model_vars |>
+    dplyr::left_join(y = model_var_levels,
+                     by = dplyr::join_by('variable' == 'variable')) |>
+    # create the 'term' outputted by {broom}
+    dplyr::mutate(term = glue::glue("{variable}{level}", .na = "")) |>
+    dplyr::relocate(dplyr::any_of('term'), .before = dplyr::any_of('variable'))
+
+  # return the result
   return(df)
 }
 
