@@ -32,11 +32,55 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/craig-parylo/plotor/blob/v0.6.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/craig-parylo/plotor/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="plotor-060">plotor 0.6.0<a class="anchor" aria-label="anchor" href="#plotor-060"></a></h2>
+<div class="section level4">
+<h4 id="user-focussed-changes-0-6-0">User-focussed changes<a class="anchor" aria-label="anchor" href="#user-focussed-changes-0-6-0"></a></h4>
+<ul><li>
+<p><strong>Summary OR tables</strong> (<a href="https://github.com/craig-parylo/plotor/issues/28" class="external-link">#28</a>)</p>
+<p>Introduced summary tables for odds ratios, making it easier to view and interpret results from your model.</p>
+</li>
+<li>
+<p><strong>Faster estimates of confidence intervals</strong> (<a href="https://github.com/craig-parylo/plotor/issues/53" class="external-link">#53</a>)</p>
+<p>Optional argument, <code>confint_fast_estimate</code>, for both <code><a href="../reference/plot_or.html">plot_or()</a></code> and <code><a href="../reference/table_or.html">table_or()</a></code> that allows for faster approximation of confidence intervals using <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">stats::confint.default()</a></code>. This can be helpful for large data sets where confidence intervals can take a long time to calculate for.</p>
+</li>
+<li>
+<p><strong>Improved validation of the confidence level</strong> (<a href="https://github.com/craig-parylo/plotor/issues/29" class="external-link">#29</a>)</p>
+<p>Enhanced how the package checks user input for confidence levels, reducing the risk of invalid values being used.</p>
+<p>This included enhanced checks in the internal function <code>validate_conf_level_inputs()</code> with enhanced error handling and user feedback (<a href="https://github.com/craig-parylo/plotor/issues/31" class="external-link">#31</a>).</p>
+</li>
+<li>
+<p><strong>Assumption checks</strong></p>
+<p>Started a suite of checks that assumptions for logistic regression are upheld. Implemented in this release:</p>
+<p><strong>Assumptions: check outcome is binary</strong> (<a href="https://github.com/craig-parylo/plotor/issues/42" class="external-link">#42</a>)</p>
+<p>Added logic to confirm the outcome variable is binary, as required for odds ratio calculations.</p>
+<p><strong>Assumptions: check for multicollinearity</strong> (<a href="https://github.com/craig-parylo/plotor/issues/43" class="external-link">#43</a>)</p>
+<p>Implemented checks to detect multicollinearity among predictors, helping users identify and address issues that could affect model validity.</p>
+<p><strong>Assumptions: check for separation</strong> (<a href="https://github.com/craig-parylo/plotor/issues/47" class="external-link">#47</a>)</p>
+<p>Added checks for separation in the data, which can cause estimation problems in logistic regression.</p>
+</li>
+<li>
+<p><strong>Updated README</strong></p>
+<p>Improved the README documentation, making it easier for users to get started and understand the package.</p>
+</li>
+</ul></div>
+<div class="section level4">
+<h4 id="developer-focussed-changes-0-6-0">Developer-focussed changes<a class="anchor" aria-label="anchor" href="#developer-focussed-changes-0-6-0"></a></h4>
+<ul><li>
+<p><strong>Test suite (Developer focus)</strong> (<a href="https://github.com/craig-parylo/plotor/issues/33" class="external-link">#33</a>, <a href="https://github.com/craig-parylo/plotor/issues/37" class="external-link">#37</a>)</p>
+<p>Added and developed a suite of tests for ensuring code reliability and maintaining quality as the package evolves.</p>
+</li>
+<li>
+<p><strong>Bug fixes</strong></p>
+<p>Addressed and resolved warnings related to the {tidyselect} package, leading to cleaner output and better compatibility with the tidyverse ecosystem. (<a href="https://github.com/craig-parylo/plotor/issues/34" class="external-link">#34</a>)</p>
+<p>Updated the way class descriptions are handled, consolidating them into single strings for consistency and clarity. (<a href="https://github.com/craig-parylo/plotor/issues/50" class="external-link">#50</a>)</p>
+<p>Fixed ordering of terms and levels in <code><a href="../reference/table_or.html">table_or()</a></code>, so results are presented in a logical and expected sequence. (<a href="https://github.com/craig-parylo/plotor/issues/54" class="external-link">#54</a>, <a href="https://github.com/craig-parylo/plotor/issues/56" class="external-link">#56</a>)</p>
+</li>
+</ul><p>For the full details, see the changelog: <a href="https://github.com/craig-parylo/plotor/compare/v0.5.2" class="external-link uri">https://github.com/craig-parylo/plotor/compare/v0.5.2</a>…v0.6.0</p>
+</div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.2" id="plotor-052">plotor 0.5.2<a class="anchor" aria-label="anchor" href="#plotor-052"></a></h2><p class="text-muted">CRAN release: 2025-02-09</p>
