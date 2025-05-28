@@ -1,7 +1,7 @@
 Package: plotor
 Type: Package
 Title: Produces an Odds Ratio Plot from a Logistic Regression Model
-Version: 0.5.2.9000
+Version: 0.6.0
 Authors@R:
   person(
     'Craig', 'Parylo', 

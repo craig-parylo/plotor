@@ -1,4 +1,4 @@
-# plotor (development version)
+# plotor 0.6.0
 
 # plotor 0.5.2
 

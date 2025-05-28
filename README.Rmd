@@ -41,7 +41,7 @@ devtools::install_github("craig-parylo/plotor")
 ```
 
 You can also install the latest released version from
-[CRAN](https://cloud.r-project.org/web/packages/plotor/index.html) with:
+[CRAN](https://CRAN.R-project.org/package=plotor) with:
 
 ``` r
 install.packages("plotor")
@@ -172,68 +172,67 @@ New to `plotor` is a new suite of automated checks. These checks verify
 the data used in your logistic regression analysis upholds the required
 assumptions, providing an added layer of confidence in your results.
 
-+---------------+--------------------------------------+---------------+
-| Assumption    | Description                          | Status        |
-+===============+======================================+===============+
-| The outcome   | `plotor` is designed to work with an | ✅            |
-| variable is   | outcome variable that has only two   |               |
-| **binary**    | possible values, i.e. outcome is     | Introduced in |
-|               | **binary**.                          | PR            |
-|               |                                      | [42](https:// |
-|               |                                      | github.com/cr |
-|               |                                      | aig-parylo/pl |
-|               |                                      | otor/pull/42) |
-+---------------+--------------------------------------+---------------+
-| The predictor | Predictor variables which have high  | ✅            |
-| variables     | levels of correlation with each      |               |
-| should **not  | other is known as                    | Introduced in |
-| be highly     | **multicollinearity**.               | PR            |
-| correlated**  |                                      | [43](https:// |
-| with each     | Where this is the case the odds      | github.com/cr |
-| other         | ratio estimates are likely to be     | aig-parylo/pl |
-|               | unstable, confidence intervals are   | otor/pull/43) |
-|               | likely to be much larger, both of    |               |
-|               | which make it difficult to interpret |               |
-|               | the results.                         |               |
-+---------------+--------------------------------------+---------------+
-| The outcome   | In logistic regression,              | ✅            |
-| is **not      | **separation** occurs when a         |               |
-| separated**   | predictor variable (or a combination | Introduced in |
-| by predictors | of predictor variables) perfectly    | PR            |
-|               | predicts the outcome variable.       | [47](https:// |
-|               |                                      | github.com/cr |
-|               | Sepration results in infinite or     | aig-parylo/pl |
-|               | extremely large odds ratios and      | otor/pull/47) |
-|               | possibly issues with non-convergence |               |
-|               | of the logistic regression model,    |               |
-|               | making it difficult for the model to |               |
-|               | estimate the coefficients.           |               |
-+---------------+--------------------------------------+---------------+
-| The sample    | The sample size should be large      | In            |
-| size is large | enough to provide reliable estimates | development   |
-| enough        | of the odds ratio. A general rule of |               |
-|               | thumb is to have at least 10 events  |               |
-|               | (or outcomes of interest) per        |               |
-|               | predictor variable.                  |               |
-+---------------+--------------------------------------+---------------+
-| The           | Each observation should be           | In            |
-| observations  | independent of the others. This      | development   |
-| are           | means that the outcome for one       |               |
-| independent   | observation should not be influenced |               |
-|               | by the outcome of another            |               |
-|               | observation.                         |               |
-+---------------+--------------------------------------+---------------+
-| There are no  | The data should not contain outliers | In            |
-| extreme       | or influential observations that can | development   |
-| outlier       | significantly affect the estimates   |               |
-| values        | of the odds ratio.                   |               |
-+---------------+--------------------------------------+---------------+
-| There is a    | The relationship between the         | In            |
-| linear        | predictor variables and the log odds | development   |
-| relationship  | of the outcome should be linear.     |               |
-| between the   | This can be checked using diagnostic |               |
-| predictors    | plots, such as the logit plot.       |               |
-| and the logit |                                      |               |
-+---------------+--------------------------------------+---------------+
++---------------+------------------------------------+---------------+
+| Assumption    | Description                        | Status        |
++===============+====================================+===============+
+| The outcome   | `plotor` is designed to work with  | ✅            |
+| variable is   | an outcome variable that has only  |               |
+| **binary**    | two possible values, i.e. outcome  | Introduced in |
+|               | is **binary**.                     | PR [42](#42)  |
++---------------+------------------------------------+---------------+
+| The predictor | Predictor variables which have     | ✅            |
+| variables     | high levels of correlation with    |               |
+| should **not  | each other is known as             | Introduced in |
+| be highly     | **multicollinearity**.             | PR [43](#43)  |
+| correlated**  |                                    |               |
+| with each     | Where this is the case the odds    |               |
+| other         | ratio estimates are likely to be   |               |
+|               | unstable, confidence intervals are |               |
+|               | likely to be much larger, both of  |               |
+|               | which make it difficult to         |               |
+|               | interpret the results.             |               |
++---------------+------------------------------------+---------------+
+| The outcome   | In logistic regression,            | ✅            |
+| is **not      | **separation** occurs when a       |               |
+| separated**   | predictor variable (or a           | Introduced in |
+| by predictors | combination of predictor           | PR [47](#47)  |
+|               | variables) perfectly predicts the  |               |
+|               | outcome variable.                  |               |
+|               |                                    |               |
+|               | Separation results in infinite or  |               |
+|               | extremely large odds ratios and    |               |
+|               | possibly issues with               |               |
+|               | non-convergence of the logistic    |               |
+|               | regression model, making it        |               |
+|               | difficult for the model to         |               |
+|               | estimate the coefficients.         |               |
++---------------+------------------------------------+---------------+
+| The sample    | The sample size should be large    | In            |
+| size is large | enough to provide reliable         | development   |
+| enough        | estimates of the odds ratio. A     |               |
+|               | general rule of thumb is to have   |               |
+|               | at least 10 events (or outcomes of |               |
+|               | interest) per predictor variable.  |               |
++---------------+------------------------------------+---------------+
+| The           | Each observation should be         | In            |
+| observations  | independent of the others. This    | development   |
+| are           | means that the outcome for one     |               |
+| independent   | observation should not be          |               |
+|               | influenced by the outcome of       |               |
+|               | another observation.               |               |
++---------------+------------------------------------+---------------+
+| There are no  | The data should not contain        | In            |
+| extreme       | outliers or influential            | development   |
+| outlier       | observations that can              |               |
+| values        | significantly affect the estimates |               |
+|               | of the odds ratio.                 |               |
++---------------+------------------------------------+---------------+
+| There is a    | The relationship between the       | In            |
+| linear        | predictor variables and the log    | development   |
+| relationship  | odds of the outcome should be      |               |
+| between the   | linear. This can be checked using  |               |
+| predictors    | diagnostic plots, such as the      |               |
+| and the logit | logit plot.                        |               |
++---------------+------------------------------------+---------------+
 
 : Assumptions for logistic regression
