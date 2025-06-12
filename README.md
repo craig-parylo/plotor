@@ -167,12 +167,12 @@ New to `plotor` is a new suite of automated checks. These checks verify
 the data used in your logistic regression analysis upholds the required
 assumptions, providing an added layer of confidence in your results.
 
-<table style="width:99%;">
+<table style="width:92%;">
 <caption>Assumptions for logistic regression</caption>
 <colgroup>
-<col style="width: 22%" />
-<col style="width: 54%" />
-<col style="width: 22%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
 </colgroup>
 <thead>
 <tr>
@@ -185,23 +185,23 @@ assumptions, providing an added layer of confidence in your results.
 <tr>
 <td>The outcome variable is <strong>binary</strong></td>
 <td><code>plotor</code> is designed to work with an outcome variable
-that has only two possible values, i.e. outcome is
+that has only two possible values, i.e. outcome is
 <strong>binary</strong>.</td>
 <td><p>✅</p>
 <p>Introduced in PR <a
-href="https://%20github.com/cr%20aig-parylo/pl%20otor/pull/42">42</a></p></td>
+href="https%20://%20githu%20b.com%20/cr%20aig-paryl%20o%20/pl%20otor/pull/42">42</a></p></td>
 </tr>
 <tr>
 <td>The predictor variables should <strong>not be highly
 correlated</strong> with each other</td>
 <td><p>Predictor variables which have high levels of correlation with
-each other is known as <strong>multicollinearity</strong>.</p>
+each other is known as <strong>m ulticollinearity</strong>.</p>
 <p>Where this is the case the odds ratio estimates are likely to be
 unstable, confidence intervals are likely to be much larger, both of
 which make it difficult to interpret the results.</p></td>
 <td><p>✅</p>
 <p>Introduced in PR <a
-href="https://%20github.com/cr%20aig-parylo/pl%20otor/pull/43">43</a></p></td>
+href="https%20://%20githu%20b.com%20/cr%20aig-paryl%20o%20/pl%20otor/pull/43">43</a></p></td>
 </tr>
 <tr>
 <td>The outcome is <strong>not separated</strong> by predictors</td>
@@ -213,17 +213,18 @@ possibly issues with non-convergence of the logistic regression model,
 making it difficult for the model to estimate the coefficients.</p></td>
 <td><p>✅</p>
 <p>Introduced in PR <a
-href="https://%20github.com/cr%20aig-parylo/pl%20otor/pull/47">47</a></p></td>
+href="https%20://%20githu%20b.com%20/cr%20aig-paryl%20o%20/pl%20otor/pull/47">47</a></p></td>
 </tr>
 <tr>
 <td>The sample size is large enough</td>
 <td>The sample size should be large enough to provide reliable estimates
 of the odds ratio. A general rule of thumb is to have at least 10 events
 (or outcomes of interest) per predictor variable.</td>
-<td>In development</td>
+<td><p>✅</p>
+<p>Introduced in PR</p></td>
 </tr>
 <tr>
-<td>The observations should be independent</td>
+<td>The observations are independent</td>
 <td>Each observation should be independent of the others. This means
 that the outcome for one observation should not be influenced by the
 outcome of another observation.</td>
