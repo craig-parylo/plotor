@@ -843,7 +843,8 @@ check_assumptions <- function(glm, details = FALSE) {
   list_return <- list(
     assume_binary = assumption_binary_outcome(glm = glm, details = details),
     assume_independent = assumption_no_multicollinearity(glm = glm, details = details),
-    assume_no_separation = assumption_no_separation(glm = glm, details = details)
+    assume_no_separation = assumption_no_separation(glm = glm, details = details),
+    assume_sample_size = assumption_sample_size(glm = glm, details = details)
   )
 
   # aborting assumptions
@@ -1193,6 +1194,209 @@ assumption_no_separation <- function(glm, details = FALSE) {
       wrap = TRUE
     )
     cli::cli_alert("The Odds Ratio estimates are likely to be unreliable.")
+  }
+
+  # return the result
+  return(result)
+}
+
+#' Check for minimum sample size
+#'
+#' This function checks whether the sample size is large enough.
+#'
+#' Binary logistic regression has an assumed minimum sample size because it is
+#' based on maximum likelihood estimation, which requires a sufficient number
+#' of observations to provide reliable estimates of the model parameters.
+#'
+#' The rule of thumb is at least 10 events (least frequent outcome) per
+#' predictor.
+#'
+#' Where the sample size is not large enough it may result in biased estimates,
+#' large standard errors, possible over fitting, lack of power and unreliable
+#' confidence intervals.
+#'
+#' Where the sample size is potentially too small then a warning will be raised
+#' alerting the user. This warning will not prevent the code from executing and
+#' producing the desired output.
+#'
+#' Any warning produced by this function is not prescriptive. The presence of
+#' a warning should be a sign to the user to *consider* their model and
+#' perform further investigations to satisfy themselves their model is correct.
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param min_events_per_predictor Integer - minimum number of events per predictor (default = 10)
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#'
+#' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
+#' @noRd
+assumption_sample_size <- function(glm, min_events_per_predictor = 10, details = FALSE) {
+
+  # get the model data
+  glm_df <- glm$model
+
+  # step 1 - check for minimum number of observations per variable
+  # gather some details
+  events <- sum(glm$y == 1)
+  non_events <- sum(glm$y == 0)
+  num_predictors <- length(glm$coefficients) - 1
+  event_threshold <- min_events_per_predictor * num_predictors
+
+  # test whether assumption is upheld
+  result <-
+    (events >= event_threshold) &
+    (non_events >= event_threshold)
+
+  # determine if there are too few events or non-events
+  if (!result) {
+    result_cause <-
+      if (events < event_threshold & non_events < event_threshold) {
+        "events and non-events"
+      } else if (events < event_threshold) {
+        "events"
+      } else {
+        "non-events"
+      }
+  }
+
+  # step 2 - check for minimum number of observations per level of each
+  # categorical predictor
+
+  # set up the flag
+  result_factors <- TRUE
+
+  # get the name of the outcome variable
+  temp_outcome_var <- glm$terms[[2]]
+
+  # get a vector of predictor variables which are factors
+  predictor_factors <-
+    # get the class of each term
+    sapply(glm$model, class) |>
+    # convert to a tibble and name terms as 'predictor'
+    tibble::as_tibble(rownames = c("predictor")) |>
+    # remove the outcome and keep only predictors formatted as factors
+    dplyr::filter(
+      .data$value == "factor",
+      .data$predictor != temp_outcome_var
+    ) |>
+    # pull a list of predictors
+    dplyr::pull(.data$predictor)
+
+  # only proceed if there is at least one factor predictor
+  if (length(predictor_factors) > 0) {
+
+    # count observations by each level of the factor predictors
+    predictor_factor_level_count <-
+      purrr::map_dfr(
+        .x = predictor_factors,
+        .f = function(.var = .data$.x, .df = glm$model) {
+
+          # rename the outcome variable and standardise the levels
+          .df <-
+            .df |>
+            dplyr::rename(outcome = dplyr::all_of(temp_outcome_var))
+
+          levels(.df$outcome)[1] <- ".nonevent"
+          levels(.df$outcome)[2] <- ".event"
+
+          # count the number of observations in each level of predictor
+          df <-
+            .df |>
+            # count rows by the outcome for each predictor variable (.var) level
+            dplyr::summarise(
+              predictor = {{.var}},
+              n = dplyr::n(),
+              .by = c("outcome", {{.var}})
+            ) |>
+            # rename var to level and move predictor to start of tibble
+            dplyr::rename(level = {{.var}}) |>
+            dplyr::relocate(.data$predictor, .before = .data$level) |>
+            # sort by count (in case this needs displaying)
+            dplyr::arrange(dplyr::desc(.data$n)) |>
+            # pivot outcomes to their own columns
+            tidyr::pivot_wider(
+              names_from = dplyr::any_of("outcome"),
+              values_from = .data$n
+            )
+        }
+      )
+
+    # test the condition
+    result_factors <-
+      (min(predictor_factor_level_count$.nonevent) >= min_events_per_predictor) &
+      (min(predictor_factor_level_count$.event) >= min_events_per_predictor)
+
+    # gather some additional information
+    predictor_factor_level_too_small <-
+      predictor_factor_level_count |>
+      dplyr::filter(.data$.nonevent < min_events_per_predictor |
+                      .data$.event < min_events_per_predictor)
+  }
+
+  # alert details ---
+
+  # set a heading for this feedback
+  if ((!result | !result_factors) & details) {
+    cli::cli_h1("Sample size assumption")
+  }
+
+  # alert the user if this assumption is not held
+  if (!result) {
+    cli::cli_warn(
+      "The sample size may be too small relative to the number of predictor variables.",
+      wrap = TRUE
+    )
+  } else if (!result_factors) {
+    cli::cli_warn(
+      "Some of your categorical predictor variables have levels with too few outcomes.",
+      wrap = TRUE
+    )
+  }
+
+  # provide additional details if requested
+  if (!result & details) {
+    cli::cli_alert_warning(
+      "Your sample size may be too small relative to the number of predictor variables.",
+      wrap = TRUE
+    )
+    cli::cli_alert(
+      "Based on a minimum of {.val {min_events_per_predictor}} events per predictor you need at least {.val {event_threshold}} events / non-events (whichever is smaller) for your {num_predictors} predictor variable{?s}.",
+      wrap = TRUE
+    )
+    cli::cli_alert(
+      "Your model contains {.val {events}} event{?s} and {.val {non_events}} non-event{?s}.",
+      wrap = TRUE
+    )
+    cli::cli_alert(
+      "There may be too few {result_cause} in your model.",
+      wrap = TRUE
+    )
+  }
+
+  # provide feedback with additional details for factor predictors with too few observations
+  if (!is.na(result_factors) & details) {
+    cli::cli_h3("Categorical predictors")
+    cli::cli_alert_warning(
+      "Too few outcomes per level of categorical predictors.",
+      wrap = TRUE
+    )
+    cli::cli_alert(
+      "{nrow(predictor_factor_level_too_small)} predictor variable level{?s} in your model {?has/have} fewer than {.val {min_events_per_predictor}} events and / or non-events:",
+      wrap = TRUE
+    )
+    print(predictor_factor_level_too_small)
+  }
+
+  # provide general advice on this assumption
+  if (details) {
+    cli::cli_h3("About")
+    cli::cli_alert_info(
+      "A minimum sample size is an important assumption for obtaining reliable and valid results in logistic regression.",
+      wrap = TRUE
+    )
+    cli::cli_alert_info(
+      "Your data was checked using a 'rule of thumb' for binary logistic regression of at least {.val {min_events_per_predictor}} events per predictor variable, and for at least {.val {min_events_per_predictor}} events for each level of any categorical predictor variable.",
+      wrap = TRUE
+    )
   }
 
   # return the result
