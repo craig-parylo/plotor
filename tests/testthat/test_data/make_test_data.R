@@ -4,6 +4,8 @@
 #' This script is used to make the files used as part of the test suite.
 #' -----------------------------------------------------------------------------
 
+flag_save_data <- FALSE
+
 # Data functions ---------------------------------------------------------------
 get_df_titanic <- function() {
   df <- datasets::Titanic |>
@@ -386,80 +388,84 @@ lr_correlated_four <- get_lr_correlated_four()
 lr_separated <- get_lr_separated()
 
 # Save data --------------------------------------------------------------------
-# titanic
-saveRDS(
-  object = df_titanic,
-  file = testthat::test_path('test_data', 'df_titanic.Rds')
-)
-saveRDS(
-  object = lr_titanic,
-  file = testthat::test_path('test_data', 'lr_titanic.Rds')
-)
 
-# infertility
-saveRDS(
-  object = df_infert,
-  file = testthat::test_path('test_data', 'df_infert.Rds')
-)
-saveRDS(
-  object = lr_infert,
-  file = testthat::test_path('test_data', 'lr_infert.Rds')
-)
+if (flag_save_data) {
+  # titanic
+  saveRDS(
+    object = df_titanic,
+    file = testthat::test_path('test_data', 'df_titanic.Rds')
+  )
+  saveRDS(
+    object = lr_titanic,
+    file = testthat::test_path('test_data', 'lr_titanic.Rds')
+  )
 
-# strep tb
-saveRDS(
-  object = df_streptb,
-  file = testthat::test_path('test_data', 'df_streptb.Rds')
-)
-saveRDS(
-  object = lr_streptb,
-  file = testthat::test_path('test_data', 'lr_streptb.Rds')
-)
-saveRDS(
-  object = nonlr_streptb,
-  file = testthat::test_path('test_data', 'nonlr_streptb.Rds')
-)
+  # infertility
+  saveRDS(
+    object = df_infert,
+    file = testthat::test_path('test_data', 'df_infert.Rds')
+  )
+  saveRDS(
+    object = lr_infert,
+    file = testthat::test_path('test_data', 'lr_infert.Rds')
+  )
 
-# diabetes
-saveRDS(
-  object = df_diabetes,
-  file = testthat::test_path('test_data', 'df_diabetes.Rds')
-)
-saveRDS(
-  object = lr_diabetes,
-  file = testthat::test_path('test_data', 'lr_diabetes.Rds')
-)
+  # strep tb
+  saveRDS(
+    object = df_streptb,
+    file = testthat::test_path('test_data', 'df_streptb.Rds')
+  )
+  saveRDS(
+    object = lr_streptb,
+    file = testthat::test_path('test_data', 'lr_streptb.Rds')
+  )
+  saveRDS(
+    object = nonlr_streptb,
+    file = testthat::test_path('test_data', 'nonlr_streptb.Rds')
+  )
 
-# triple outcomes
-saveRDS(
-  object = df_triple_outcome,
-  file = testthat::test_path('test_data', 'df_triple_outcome.Rds')
-)
-saveRDS(
-  object = lr_triple_outcome,
-  file = testthat::test_path('test_data', 'lr_triple_outcome.Rds')
-)
+  # diabetes
+  saveRDS(
+    object = df_diabetes,
+    file = testthat::test_path('test_data', 'df_diabetes.Rds')
+  )
+  saveRDS(
+    object = lr_diabetes,
+    file = testthat::test_path('test_data', 'lr_diabetes.Rds')
+  )
 
-# correlated
-saveRDS(
-  object = df_correlated,
-  file = testthat::test_path('test_data', 'df_correlated.Rds')
-)
-saveRDS(
-  object = lr_correlated_two,
-  file = testthat::test_path('test_data', 'lr_correlated_two.Rds')
-)
-saveRDS(
-  object = lr_correlated_four,
-  file = testthat::test_path('test_data', 'lr_correlated_four.Rds')
-)
+  # triple outcomes
+  saveRDS(
+    object = df_triple_outcome,
+    file = testthat::test_path('test_data', 'df_triple_outcome.Rds')
+  )
+  saveRDS(
+    object = lr_triple_outcome,
+    file = testthat::test_path('test_data', 'lr_triple_outcome.Rds')
+  )
 
-# separated
-saveRDS(
-  object = df_separated,
-  file = testthat::test_path('test_data', 'df_separated.Rds')
-)
-saveRDS(
-  object = lr_separated,
-  file = testthat::test_path('test_data', 'lr_separated.Rds')
-)
+  # correlated
+  saveRDS(
+    object = df_correlated,
+    file = testthat::test_path('test_data', 'df_correlated.Rds')
+  )
+  saveRDS(
+    object = lr_correlated_two,
+    file = testthat::test_path('test_data', 'lr_correlated_two.Rds')
+  )
+  saveRDS(
+    object = lr_correlated_four,
+    file = testthat::test_path('test_data', 'lr_correlated_four.Rds')
+  )
+
+  # separated
+  saveRDS(
+    object = df_separated,
+    file = testthat::test_path('test_data', 'df_separated.Rds')
+  )
+  saveRDS(
+    object = lr_separated,
+    file = testthat::test_path('test_data', 'lr_separated.Rds')
+  )
+
+}

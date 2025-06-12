@@ -185,21 +185,19 @@ assumptions, providing an added layer of confidence in your results.
 <tr>
 <td>The outcome variable is <strong>binary</strong></td>
 <td><code>plotor</code> is designed to work with an outcome variable
-that has only two possible values, i.e. outcome is
+that has only two possible values, i.e. outcome is
 <strong>binary</strong>.</td>
 <td><p>✅</p>
-<p>Introduced in PR <a href="#42">42</a></p></td>
 </tr>
 <tr>
 <td>The predictor variables should <strong>not be highly
 correlated</strong> with each other</td>
 <td><p>Predictor variables which have high levels of correlation with
-each other is known as <strong>multicollinearity</strong>.</p>
+each other is known as <strong>m ulticollinearity</strong>.</p>
 <p>Where this is the case the odds ratio estimates are likely to be
 unstable, confidence intervals are likely to be much larger, both of
 which make it difficult to interpret the results.</p></td>
 <td><p>✅</p>
-<p>Introduced in PR <a href="#43">43</a></p></td>
 </tr>
 <tr>
 <td>The outcome is <strong>not separated</strong> by predictors</td>
@@ -210,14 +208,14 @@ predicts the outcome variable.</p>
 possibly issues with non-convergence of the logistic regression model,
 making it difficult for the model to estimate the coefficients.</p></td>
 <td><p>✅</p>
-<p>Introduced in PR <a href="#47">47</a></p></td>
 </tr>
 <tr>
 <td>The sample size is large enough</td>
 <td>The sample size should be large enough to provide reliable estimates
 of the odds ratio. A general rule of thumb is to have at least 10 events
 (or outcomes of interest) per predictor variable.</td>
-<td>In development</td>
+<td><p>✅</p>
+<p>Introduced in PR</p></td>
 </tr>
 <tr>
 <td>The observations are independent</td>

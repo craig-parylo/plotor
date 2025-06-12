@@ -167,9 +167,12 @@ testthat::test_that("`assumption_no_multicollinearity()` works as expected", {
     plotor::plot_or(lr)
   })
 
+  # expecting to warn twice - once for multicollinearity and again for sample size
   testthat::expect_warning({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
-    plotor::plot_or(lr)
+    testthat::expect_warning({
+      lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
+      plotor::plot_or(lr)
+    })
   })
 
 })
@@ -183,3 +186,48 @@ testthat::test_that("`assumption_no_separation()` works as expected", {
   })
 
 })
+
+testthat::test_that("`assumption_sample_size()` works as expected", {
+
+  # raise a warning message for models with too few observations
+
+  # 1. list some models to test
+  list_models <- c(
+    'lr_titanic.Rds',
+    'lr_infert.Rds',
+    'lr_diabetes.Rds'
+  )
+
+  # 2. iterate over these models and test
+  purrr::walk(
+    .x = list_models,
+    .f = \(.x) {
+
+      # load the model
+      lr_old <- readRDS(file = testthat::test_path('test_data', .x))
+
+      # sample 20% of the data
+      set.seed(123)
+      df <-
+        model.frame(lr_old) |>
+        dplyr::slice_sample(prop = 0.2)
+
+      # create a model from the data
+      lr <-
+        stats::glm(
+          data = df,
+          formula = formula(lr_old),
+          family = binomial
+        )
+
+      # run the test that a warning is expected
+      testthat::expect_warning({
+        plotor:::assumption_sample_size(lr)
+      })
+
+    }
+  )
+
+})
+
+
