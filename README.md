@@ -27,7 +27,7 @@ devtools::install_github("craig-parylo/plotor")
 ```
 
 You can also install the latest released version from
-[CRAN](https://cloud.r-project.org/web/packages/plotor/index.html) with:
+[CRAN](https://CRAN.R-project.org/package=plotor) with:
 
 ``` r
 install.packages("plotor")
@@ -142,14 +142,14 @@ table_or(glm_model_results = lr)
 #> # A tibble: 8 × 14
 #>   label level   rows outcome outcome_rate class  estimate std.error statistic
 #>   <fct> <fct>  <int>   <int>        <dbl> <chr>     <dbl>     <dbl>     <dbl>
-#> 1 Class 3rd      706     178        0.252 factor    0.169     0.172    -10.4 
-#> 2 Class 1st      325     203        0.625 factor   NA        NA         NA   
-#> 3 Class 2nd      285     118        0.414 factor    0.361     0.196     -5.19
+#> 1 Class 1st      325     203        0.625 factor   NA        NA         NA   
+#> 2 Class 2nd      285     118        0.414 factor    0.361     0.196     -5.19
+#> 3 Class 3rd      706     178        0.252 factor    0.169     0.172    -10.4 
 #> 4 Class Crew     885     212        0.240 factor    0.424     0.157     -5.45
 #> 5 Sex   Male    1731     367        0.212 factor   NA        NA         NA   
 #> 6 Sex   Female   470     344        0.732 factor   11.2       0.140     17.2 
-#> 7 Age   Child    109      57        0.523 factor    2.89      0.244      4.35
-#> 8 Age   Adult   2092     654        0.313 factor   NA        NA         NA   
+#> 7 Age   Adult   2092     654        0.313 factor   NA        NA         NA   
+#> 8 Age   Child    109      57        0.523 factor    2.89      0.244      4.35
 #> # ℹ 5 more variables: p.value <dbl>, conf.low <dbl>, conf.high <dbl>,
 #> #   significance <chr>, comparator <dbl>
 ```
@@ -167,12 +167,12 @@ New to `plotor` is a new suite of automated checks. These checks verify
 the data used in your logistic regression analysis upholds the required
 assumptions, providing an added layer of confidence in your results.
 
-<table style="width:92%;">
+<table style="width:96%;">
 <caption>Assumptions for logistic regression</caption>
 <colgroup>
-<col style="width: 30%" />
-<col style="width: 30%" />
-<col style="width: 30%" />
+<col style="width: 22%" />
+<col style="width: 51%" />
+<col style="width: 22%" />
 </colgroup>
 <thead>
 <tr>
@@ -188,8 +188,6 @@ assumptions, providing an added layer of confidence in your results.
 that has only two possible values, i.e. outcome is
 <strong>binary</strong>.</td>
 <td><p>✅</p>
-<p>Introduced in PR <a
-href="https%20://%20githu%20b.com%20/cr%20aig-paryl%20o%20/pl%20otor/pull/42">42</a></p></td>
 </tr>
 <tr>
 <td>The predictor variables should <strong>not be highly
@@ -200,20 +198,16 @@ each other is known as <strong>m ulticollinearity</strong>.</p>
 unstable, confidence intervals are likely to be much larger, both of
 which make it difficult to interpret the results.</p></td>
 <td><p>✅</p>
-<p>Introduced in PR <a
-href="https%20://%20githu%20b.com%20/cr%20aig-paryl%20o%20/pl%20otor/pull/43">43</a></p></td>
 </tr>
 <tr>
 <td>The outcome is <strong>not separated</strong> by predictors</td>
 <td><p>In logistic regression, <strong>separation</strong> occurs when a
 predictor variable (or a combination of predictor variables) perfectly
 predicts the outcome variable.</p>
-<p>Sepration results in infinite or extremely large odds ratios and
+<p>Separation results in infinite or extremely large odds ratios and
 possibly issues with non-convergence of the logistic regression model,
 making it difficult for the model to estimate the coefficients.</p></td>
 <td><p>✅</p>
-<p>Introduced in PR <a
-href="https%20://%20githu%20b.com%20/cr%20aig-paryl%20o%20/pl%20otor/pull/47">47</a></p></td>
 </tr>
 <tr>
 <td>The sample size is large enough</td>
