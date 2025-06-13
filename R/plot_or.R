@@ -2,20 +2,24 @@
 
 #' Plot OR
 #'
-#' Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
+#' Produces an Odds Ratio plot to visualise the results of a logistic regression
+#' analysis.
 #'
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
-#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
-#' @param confint_fast_estimate Boolean (default = `FALSE`) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to `TRUE` assumes normally distributed data, which may not be appropriate for your data.
+#' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
 #'
-#' @return an object of class `gg` and `ggplot`
+#' @return
+#' The function returns an object of class `gg` and `ggplot`, which can be
+#' customised and extended using various `ggplot2` functions.
+#'
 #' @seealso
-#' See vignette('using_plotor', package = 'plotor') for more details on use.
+#' * See vignette('using_plotor', package = 'plotor') for more details on usage.
+#' * More details and examples can be found on the website: <https://craig-parylo.github.io/plotor/index.html>
 #'
-#' More details and examples are found on the website: <https://craig-parylo.github.io/plotor/index.html>
 #' @export
 #' @examples
-#' # libraries
+#' # Load required libraries
 #' library(plotor)
 #' library(datasets)
 #' library(dplyr)
@@ -24,7 +28,7 @@
 #' library(forcats)
 #' library(tidyr)
 #'
-#' # get some data
+#' # Load the Titanic dataset
 #' df <- datasets::Titanic |>
 #'   as_tibble() |>
 #'   # convert aggregated counts to individual observations
@@ -33,14 +37,14 @@
 #'   # convert character variables to factors
 #'   mutate(across(where(is.character), as.factor))
 #'
-#' # perform logistic regression using `glm`
+#' # Perform logistic regression using `glm`
 #' lr <- glm(
 #'   data = df,
 #'   family = 'binomial',
 #'   formula = Survived ~ Class + Sex + Age
 #' )
 #'
-#' # produce the Odds Ratio plot
+#' # Produce the Odds Ratio plot
 #' plot_or(lr)
 plot_or <- function(glm_model_results,
                     conf_level = 0.95,
@@ -73,7 +77,22 @@ plot_or <- function(glm_model_results,
 
 #' Table OR
 #'
-#' Produces a formatted table showing the outputs from the Odds Ratio analysis.
+#' Produces a formatted table showing the outputs from the Odds Ratio analysis,
+#' including details on covariate characteristics and model results.
+#'
+#' @details
+#' The table includes the following information:
+#' * Covariate characteristics:
+#'   * Number of observations for each characteristic
+#'   * Number of observiations resulting in the outcome of interest
+#'   * Conversion rate of outcome by the number of observations
+#'
+#' * Model results:
+#'   * Estimated Odds Ratio, standard error and p-value
+#'   * Calculated confidence interval for the specified confidence level
+#'
+#' * A visualisation of the OR plot is also provided for an at-a-glance view of
+#' the model results
 #'
 #' Includes details on the characteristics of the covariates, such as:
 #' * the number of observations for each characteristic,
@@ -88,15 +107,18 @@ plot_or <- function(glm_model_results,
 #' view of the model results.
 #'
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
-#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
-#' @param output String description of the output type. Default = 'tibble'. Options include 'tibble' and 'gt'.
-#' @param confint_fast_estimate Boolean (default = `FALSE`) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to `TRUE` assumes normally distributed data, which may not be appropriate for your data.
+#' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
+#' @param output String describing of the output type (default = 'tibble'). Options include 'tibble' and 'gt'.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
 #'
-#' @returns object returned depends on `output` parameter - output = 'tibble' returns an object of "tbl_df", "tbl", "data.frame" class, whilst output = 'gt' returns an object of class "gt_tbl" and "list".
+#' @returns
+#' The returned object depends on the `output` parameter:
+#' * If `output = 'tibble'`, the function returns an object of class "tbl_df", "tbl" and "data.frame".
+#' * If `output = 'gt'`, the function returns an object of class "gt_tbl" and "list"
 #' @export
 #'
 #' @examples
-#' # get some data
+#' # Load the Titanic dataset
 #' df <- datasets::Titanic |>
 #'   dplyr::as_tibble() |>
 #'   # convert aggregated counts to individual observations
@@ -105,15 +127,17 @@ plot_or <- function(glm_model_results,
 #'   # convert character variables to factors
 #'   dplyr::mutate(dplyr::across(dplyr::where(is.character), as.factor))
 #'
-#' # perform logistic regression using `glm`
+#' # Perform logistic regression using `glm`
 #' lr <- stats::glm(
 #'   data = df,
 #'   family = 'binomial',
 #'   formula = Survived ~ Class + Sex + Age
 #' )
 #'
-#' # produce the Odds Ratio table, first as a tibble then as gt object
+#' # Produce the Odds Ratio table as a tibble
 #' table_or(lr)
+#'
+#' # Produce the Odds Ratio table as a gt object
 #' table_or(lr, output = 'gt')
 table_or <- function(glm_model_results,
                      conf_level = 0.95,
@@ -171,6 +195,145 @@ table_or <- function(glm_model_results,
     )
 
   return(obj_return)
+}
+
+#' Check OR
+#'
+#' Performs a series of tests to ensure that assumptions for logistic regression
+#' are met, with optional detailed feedback if any tests fail.
+#'
+#' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param confint_fast_estimate Boolean (default = `FALSE`) Use a faster estimate of the confidence interval? Note: this assumes normally distributed data, which may not be suitable for your data.
+#' @param details Boolean (default = `TRUE`) Show detailed feedback for any failed tests?
+#'
+#' @returns Logical, `TRUE` if all assumption tests pass, `FALSE` if one or more tests fail
+#' @export
+#'
+#' @examples
+#' # Load the Titanic dataset
+#' df <- datasets::Titanic |>
+#'   dplyr::as_tibble() |>
+#'   # convert aggregated counts to individual observations
+#'   dplyr::filter(n > 0) |>
+#'   tidyr::uncount(weights = n) |>
+#'   # convert character variables to factors
+#'   dplyr::mutate(dplyr::across(dplyr::where(is.character), as.factor))
+#'
+#' # Perform logistic regression using `glm`
+#' lr <- stats::glm(
+#'   data = df,
+#'   family = binomial,
+#'   formula = Survived ~ Class + Sex + Age
+#' )
+#'
+#' # Check the model for logistic regression assumption violations
+#' check_or(lr)
+check_or <- function(glm_model_results,
+                     confint_fast_estimate = FALSE,
+                     details = TRUE) {
+
+  # set heading
+  cli::cli_h1("Assumption checks")
+
+  # get a summary of test results
+  # NB, detailed feedback is handled by each of the test functions
+  test_results <- check_assumptions(
+    glm = glm_model_results,
+    #confint_fast_estimate = confint_fast_estimate,
+    details = details
+  )
+
+  # ... detailed feedback appears here ...
+
+  # summarise
+  cli::cli_h2("Summary")
+
+  # binary outcome
+  if (test_results$assume_binary) {
+    cli::cli_alert_success(
+      "The outcome variable is binary",
+      wrap = TRUE
+    )
+  } else {
+    cli::cli_alert_danger(
+      "The outcome variable is not binary",
+      wrap = TRUE
+    )
+  }
+
+  # no multicollinearity
+  if (test_results$assume_independent) {
+    cli::cli_alert_success(
+      "The predictor variables are not highly correlated with each other",
+      wrap = TRUE
+    )
+  } else {
+    cli::cli_alert_danger(
+      "The predictor variables may be correlated",
+      wrap = TRUE
+    )
+  }
+
+  # no separation
+  if (test_results$assume_no_separation) {
+    cli::cli_alert_success(
+      "The outcome is not separated by predictors",
+      wrap = TRUE
+    )
+  } else {
+    cli::cli_alert_danger(
+      "The outcome is separated by at least one predictor",
+      wrap = TRUE
+    )
+  }
+
+  # sufficient sample size
+  if (test_results$assume_sample_size) {
+    cli::cli_alert_success(
+      "The sample size is large enough",
+      wrap = TRUE
+    )
+  } else {
+    cli::cli_alert_danger(
+      "The sample size may not be large enough"
+    )
+  }
+
+  # summary text
+  cli::cli_par()
+  cli::cli_end()
+  cli::cli_par()
+  cli::cli_text("Your model was checked for logistic regression assumptions in the following areas:")
+  cli::cli_end()
+  cli::cli_par()
+  cli::cli_text("{.emph Binary outcome:}")
+  cli::cli_text("The outcome variable was checked for containing precisely two levels.")
+  cli::cli_end()
+  cli::cli_par()
+  cli::cli_text("{.emph Multicollinearity:}")
+  cli::cli_text("The {.fn vif} function from the {.pkg car} package was used to check for highly correlated predictor variables.")
+  cli::cli_end()
+  cli::cli_par()
+  cli::cli_text("{.emph Separation:}")
+  cli::cli_text("The {.fn detectseparation} function from the {.pkg detectseparation} package was used to check for complete or quasi-complete separation in the data.")
+  cli::cli_end()
+  cli::cli_par()
+  cli::cli_text("{.emph Sample size:}")
+  cli::cli_text("A rule of thumb was applied, requiring at least 10 events per predictor variable and at least 10 events per level of categorical variables to ensure sufficient data for reliable estimates.")
+  cli::cli_end()
+  cli::cli_par()
+  if (all(unlist(test_results))) {
+    cli::cli_alert_success(
+      "These tests found no issues with your model.",
+      wrap = TRUE
+    )
+  } else {
+    cli::cli_alert_warning(
+      "These tests indicate there are issues (reported above) that you may wish to explore further before reporting your findings.",
+      wrap = TRUE
+    )
+  }
+
 }
 
 # Internal functions -----------------------------------------------------------
@@ -886,6 +1049,9 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
 #'
 #' The assumptions tested are:
 #' * the outcome variable is binary encoded,
+#' * there is no multicollinearity among the predictor variables,
+#' * the outcome variable is not separated by any of the predictor variables,
+#' * the sample size is sufficient to avoid biased estimates
 #'
 #' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
@@ -1494,5 +1660,5 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
   }
 
   # return the result
-  return(result)
+  return(result & result_factors)
 }

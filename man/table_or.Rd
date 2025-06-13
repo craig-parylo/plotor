@@ -14,19 +14,41 @@ table_or(
 \arguments{
 \item{glm_model_results}{Results from a binomial Generalised Linear Model (GLM), as produced by \code{\link[stats:glm]{stats::glm()}}.}
 
-\item{conf_level}{Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.}
+\item{conf_level}{Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.}
 
-\item{output}{String description of the output type. Default = 'tibble'. Options include 'tibble' and 'gt'.}
+\item{output}{String describing of the output type (default = 'tibble'). Options include 'tibble' and 'gt'.}
 
-\item{confint_fast_estimate}{Boolean (default = \code{FALSE}) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to \code{TRUE} assumes normally distributed data, which may not be appropriate for your data.}
+\item{confint_fast_estimate}{Boolean (default = \code{FALSE}) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.}
 }
 \value{
-object returned depends on \code{output} parameter - output = 'tibble' returns an object of "tbl_df", "tbl", "data.frame" class, whilst output = 'gt' returns an object of class "gt_tbl" and "list".
+The returned object depends on the \code{output} parameter:
+\itemize{
+\item If \code{output = 'tibble'}, the function returns an object of class "tbl_df", "tbl" and "data.frame".
+\item If \code{output = 'gt'}, the function returns an object of class "gt_tbl" and "list"
+}
 }
 \description{
-Produces a formatted table showing the outputs from the Odds Ratio analysis.
+Produces a formatted table showing the outputs from the Odds Ratio analysis,
+including details on covariate characteristics and model results.
 }
 \details{
+The table includes the following information:
+\itemize{
+\item Covariate characteristics:
+\itemize{
+\item Number of observations for each characteristic
+\item Number of observiations resulting in the outcome of interest
+\item Conversion rate of outcome by the number of observations
+}
+\item Model results:
+\itemize{
+\item Estimated Odds Ratio, standard error and p-value
+\item Calculated confidence interval for the specified confidence level
+}
+\item A visualisation of the OR plot is also provided for an at-a-glance view of
+the model results
+}
+
 Includes details on the characteristics of the covariates, such as:
 \itemize{
 \item the number of observations for each characteristic,
@@ -44,7 +66,7 @@ Also included is a visualisation of the OR plot to provide an at-a-glance
 view of the model results.
 }
 \examples{
-# get some data
+# Load the Titanic dataset
 df <- datasets::Titanic |>
   dplyr::as_tibble() |>
   # convert aggregated counts to individual observations
@@ -53,14 +75,16 @@ df <- datasets::Titanic |>
   # convert character variables to factors
   dplyr::mutate(dplyr::across(dplyr::where(is.character), as.factor))
 
-# perform logistic regression using `glm`
+# Perform logistic regression using `glm`
 lr <- stats::glm(
   data = df,
   family = 'binomial',
   formula = Survived ~ Class + Sex + Age
 )
 
-# produce the Odds Ratio table, first as a tibble then as gt object
+# Produce the Odds Ratio table as a tibble
 table_or(lr)
+
+# Produce the Odds Ratio table as a gt object
 table_or(lr, output = 'gt')
 }
