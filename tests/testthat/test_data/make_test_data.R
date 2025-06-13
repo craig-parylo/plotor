@@ -358,6 +358,16 @@ get_lr_separated <- function() {
   )
 }
 
+get_lr_separated_quasi <- function() {
+  df <- get_df_separated()
+  lr <-
+    stats::glm(
+      data = df,
+      formula = outcome ~ pred1 + pred3,
+      family = 'binomial'
+    )
+}
+
 # Get data ---------------------------------------------------------------------
 # df
 df_titanic <- get_df_titanic()
