@@ -962,7 +962,7 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
 
   # alert details ---
 
-  # alert the user if this assumption is not held
+  # abort processing if this assumption is not held
   if (!result) {
     cli::cli_abort(
       "Logistic regression requires a binary outcome variable."
@@ -971,12 +971,24 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
 
   # provide additional details if requested
   if (!result & details) {
+    cli::cli_h1("Binary outcome assumption")
     cli::cli_alert(
       "Your outcome variable {.var {str_outcome}} has {outcome_level_count} level{?s}: {.val {outcome_levels}}.",
       wrap = TRUE
     )
     cli::cli_alert(
       "This alert is commonly caused by errant blank responses such as {.val NA}, {.val Blank} or {.val Unknown}. Check your model data to ensure only two outcome measures are included.",
+      wrap = TRUE
+    )
+
+    # provide general advice on this assumption
+    cli::cli_h3("About")
+    cli::cli_alert_info(
+      "The binary outcome assumption in logistic regression is essential because the model predicts probabilities for two categories (e.g., success/failure). This allows the logistic function to map outputs to values between 0 and 1, ensuring interpretability. Without a binary outcome, the model's log-odds transformation would be invalid, making it unsuitable for non-binary classifications.",
+      wrap = TRUE
+    )
+    cli::cli_alert_info(
+      "Your data was checked to ensure that your outcome variable contains exactly {.val two} levels, either as a factor or as a binary number of length {.val 2}.",
       wrap = TRUE
     )
   }
@@ -1025,7 +1037,7 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
 #'
 #' For GVIF-based measures a threshold of 2 will be used:
 #' * below 2: zero to moderate multicollinearity (no alert)
-#' * 5 or above: high multicollinearity (alert)
+#' * 2 or above: high multicollinearity (alert)
 #'
 #' Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics. Journal of the American Statistical Association, 87(417), 178-183.
 #'
@@ -1131,6 +1143,7 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
 
   # provide additional details if requested
   if (!result & details) {
+    cli::cli_h1("No multicollinearity assumption")
     cli::cli_alert_warning(
       "Signs of multicollinearity detected in {correlated_predictor_count} of your predictor variables.",
       wrap = TRUE
@@ -1143,6 +1156,20 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
       "{var_measure} values equal to or greater than {.val {var_thresholds[var_measure]}} are indicative of correlation.",
       wrap = TRUE
     )
+
+    # provide general advice on this assumption
+    cli::cli_h3("About")
+    cli::cli_alert_info(
+      "The assumption of no multicollinearity in logistic regression is important because it ensures that the independent variables are not highly correlated. High multicollinearity can inflate standard errors, making it difficult to determine the individual effect of each predictor on the outcome. This can lead to unreliable coefficient estimates and hinder the model's interpretability and predictive power.",
+      wrap = TRUE
+    )
+    cli::cli_alert_info(
+      "Your data was analysed using the {.fn vif} function from the {.pkg car} package to calculate the variance inflation factor (VIF) for numerical predictors, and a generalised variance inflation factor (GVIF) for models that include both numerical and categorical predictors.",
+      wrap = TRUE
+    )
+    cli::cli_ul()
+    cli::cli_li("For the VIF, a threshold of 5 or higher indicates multicollinearity.")
+    cli::cli_li("For the GVIF-based measures, a threshold of 2 or higher is used to indicate multicollinearity")
   }
 
   # return the result
@@ -1241,6 +1268,7 @@ assumption_no_separation <- function(glm, details = FALSE) {
 
   # provide additional details if requested
   if (!result & details) {
+    cli::cli_h1("No separation assumption")
     cli::cli_alert_warning(
       "Signs of separation detected in {length(var_separation_sig)} of your predictor variables."
     )
@@ -1249,6 +1277,17 @@ assumption_no_separation <- function(glm, details = FALSE) {
       wrap = TRUE
     )
     cli::cli_alert("The Odds Ratio estimates are likely to be unreliable.")
+
+    # provide general advice on this assumption
+    cli::cli_h3("About")
+    cli::cli_alert_info(
+      "The assumption of no separation in logistic regression is important because it ensures that the predictor variables do not perfectly predict the outcome variable. If separation occurs, it can lead to infinite estimates for the coefficients, making the model unstable and unreliable. This can result in difficulties in interpretation and hinder the model's ability to generalize to new data.",
+      wrap = TRUE
+    )
+    cli::cli_alert_info(
+      "Your data was analysed using the {.fn detectseparation} function from the {.pkg detectseparation} package to identify models with infinite maximum likelihood estimates and determine which predictor variable(s) are responsible.",
+      wrap = TRUE
+    )
   }
 
   # return the result
@@ -1428,7 +1467,7 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
   }
 
   # provide feedback with additional details for factor predictors with too few observations
-  if (!is.na(result_factors) & details) {
+  if (!result_factors & details) {
     cli::cli_h3("Categorical predictors")
     cli::cli_alert_warning(
       "Too few outcomes per level of categorical predictors.",
@@ -1442,7 +1481,7 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
   }
 
   # provide general advice on this assumption
-  if (details) {
+  if ((!result | !result_factors) & details) {
     cli::cli_h3("About")
     cli::cli_alert_info(
       "A minimum sample size is an important assumption for obtaining reliable and valid results in logistic regression.",
