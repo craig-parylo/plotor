@@ -9,18 +9,20 @@ plot_or(glm_model_results, conf_level = 0.95, confint_fast_estimate = FALSE)
 \arguments{
 \item{glm_model_results}{Results from a binomial Generalised Linear Model (GLM), as produced by \code{\link[stats:glm]{stats::glm()}}.}
 
-\item{conf_level}{Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.}
+\item{conf_level}{Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.}
 
-\item{confint_fast_estimate}{Boolean (default = \code{FALSE}) Should a faster estimate of the confidence interval be used? IMPORTANT, setting this to \code{TRUE} assumes normally distributed data, which may not be appropriate for your data.}
+\item{confint_fast_estimate}{Boolean (default = \code{FALSE}) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.}
 }
 \value{
-an object of class \code{gg} and \code{ggplot}
+The function returns an object of class \code{gg} and \code{ggplot}, which can be
+customised and extended using various \code{ggplot2} functions.
 }
 \description{
-Produces an Odds Ratio plot to visualise the results of a logistic regression analysis.
+Produces an Odds Ratio plot to visualise the results of a logistic regression
+analysis.
 }
 \examples{
-# libraries
+# Load required libraries
 library(plotor)
 library(datasets)
 library(dplyr)
@@ -29,7 +31,7 @@ library(stats)
 library(forcats)
 library(tidyr)
 
-# get some data
+# Load the Titanic dataset
 df <- datasets::Titanic |>
   as_tibble() |>
   # convert aggregated counts to individual observations
@@ -38,18 +40,19 @@ df <- datasets::Titanic |>
   # convert character variables to factors
   mutate(across(where(is.character), as.factor))
 
-# perform logistic regression using `glm`
+# Perform logistic regression using `glm`
 lr <- glm(
   data = df,
   family = 'binomial',
   formula = Survived ~ Class + Sex + Age
 )
 
-# produce the Odds Ratio plot
+# Produce the Odds Ratio plot
 plot_or(lr)
 }
 \seealso{
-See vignette('using_plotor', package = 'plotor') for more details on use.
-
-More details and examples are found on the website: \url{https://craig-parylo.github.io/plotor/index.html}
+\itemize{
+\item See vignette('using_plotor', package = 'plotor') for more details on usage.
+\item More details and examples can be found on the website: \url{https://craig-parylo.github.io/plotor/index.html}
+}
 }
