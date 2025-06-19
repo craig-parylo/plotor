@@ -442,7 +442,7 @@ summarise_rows_per_variable_in_model <- function(model_results) {
   # combine the two data
   df <-
     df |>
-    dplyr::select(.data$term) |>
+    dplyr::select(dplyr::any_of("term")) |>
     dplyr::left_join(
       y = df_rows,
       by = dplyr::join_by('term' == 'term')
@@ -584,11 +584,12 @@ plot_odds_ratio <- function(df, model, conf_level) {
       ggplot2::aes(size = .data$rows_scale),
       shape = 15
     ) +
-    ggplot2::geom_errorbarh(
+    ggplot2::geom_errorbar(
       # remove any confidence estimates with NA values
       data = df |> dplyr::filter(!is.na(.data$conf.high), !is.na(.data$conf.low)),
       ggplot2::aes(xmax = .data$conf.high, xmin = .data$conf.low),
-      height = 1 / 5
+      width = 1 / 5,
+      na.rm = TRUE
     ) +
     ggplot2::scale_x_log10(n.breaks = 10, labels = scales::comma) +
     ggplot2::theme_minimal() +
@@ -990,7 +991,13 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
       "))
     ) |>
     # add an OR plot to visualise the results
-    gtExtras::gt_plt_conf_int(
+    # gtExtras::gt_plt_conf_int(
+    #   column = 'plot_or',
+    #   ci_columns = c('plot_ci_l', 'plot_ci_u'),
+    #   ref_line = 0,
+    #   text_size = 0
+    # ) |>
+    gt_plt_conf_int_new(
       column = 'plot_or',
       ci_columns = c('plot_ci_l', 'plot_ci_u'),
       ref_line = 0,
@@ -1569,13 +1576,14 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
             ) |>
             # rename var to level and move predictor to start of tibble
             dplyr::rename(level = {{.var}}) |>
-            dplyr::relocate(.data$predictor, .before = .data$level) |>
+            dplyr::relocate("predictor", .before = "level") |>
             # sort by count (in case this needs displaying)
             dplyr::arrange(dplyr::desc(.data$n)) |>
             # pivot outcomes to their own columns
             tidyr::pivot_wider(
               names_from = dplyr::any_of("outcome"),
-              values_from = .data$n
+              #values_from = .data$n
+              values_from = "n"
             )
         }
       )
