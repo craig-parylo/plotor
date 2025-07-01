@@ -11,7 +11,7 @@
 #' @param ref_line A number indicating where to place reference line on x-axis.
 #'
 #' @return a gt table
-#' @export
+#' @noRd
 #'
 #' @section Examples:
 #' ```r
@@ -22,15 +22,15 @@
 #'   n = 50, n_grps = 3,
 #'   mean = c(10, 15, 20), sd = c(10, 10, 10),
 #'   with_seed = 37
-#' ) %>%
-#'   dplyr::group_by(grp) %>%
+#' ) |>
+#'   dplyr::group_by(grp) |>
 #'   dplyr::summarise(
 #'     n = dplyr::n(),
 #'     avg = mean(values),
 #'     sd = sd(values),
 #'     list_data = list(values)
-#'   ) %>%
-#'   gt::gt() %>%
+#'   ) |>
+#'   gt::gt() |>
 #'   gt_plt_conf_int(list_data, ci = 0.9)
 #'
 #' # You can also provide your own values
@@ -38,8 +38,8 @@
 #' pre_calc_ci_tab <- dplyr::tibble(
 #'   mean = c(12, 10), ci1 = c(8, 5), ci2 = c(16, 15),
 #'   ci_plot = c(12, 10)
-#' ) %>%
-#'   gt::gt() %>%
+#' ) |>
+#'   gt::gt() |>
 #'   gt_plt_conf_int(
 #'     ci_plot, c(ci1, ci2),
 #'     palette = c("red", "lightgrey", "black", "red")
@@ -52,18 +52,22 @@
 #' @family Themes
 #' @section Function ID:
 #' 3-10
-gt_plt_conf_int_new <- function(gt_object,
-                            column,
-                            ci_columns,
-                            ci = 0.9,
-                            ref_line = NULL,
-                            palette = c("black", "grey", "white", "black"),
-                            width = 45,
-                            text_args = list(accuracy = 1),
-                            text_size = 1.5) {
+gt_plt_conf_int_new <- function(
+  gt_object,
+  column,
+  ci_columns,
+  ci = 0.9,
+  ref_line = NULL,
+  palette = c("black", "grey", "white", "black"),
+  width = 45,
+  text_args = list(accuracy = 1),
+  text_size = 1.5
+) {
   all_vals <- gt_index(gt_object, {{ column }}, as_vector = FALSE)
 
-  stopifnot("Confidence level must be between 0 and 1" = dplyr::between(ci, 0, 1))
+  stopifnot(
+    "Confidence level must be between 0 and 1" = dplyr::between(ci, 0, 1)
+  )
   # convert desired confidence interval from percentage
   # to a two-tailed level to be used in confint() function
   level <- 1 - ((1 - ci) * 2)
@@ -71,7 +75,7 @@ gt_plt_conf_int_new <- function(gt_object,
   # if user doesn't supply their own pre-defined columns
   # grab them or save as "none"
   if (!missing(ci_columns)) {
-    ci_vals <- all_vals %>%
+    ci_vals <- all_vals |>
       dplyr::select({{ ci_columns }})
 
     ci_val1 <- ci_vals[[1]]
@@ -80,20 +84,22 @@ gt_plt_conf_int_new <- function(gt_object,
     ci_val1 <- "none"
   }
 
-  column_vals <- all_vals %>%
-    dplyr::select({{ column }}) %>%
+  column_vals <- all_vals |>
+    dplyr::select({{ column }}) |>
     dplyr::pull()
 
   if ("none" %in% ci_val1) {
     stopifnot(
-      "Must provide list column if no defined Confidence Intervals" =
-        (class(column_vals) %in% c("list"))
+      "Must provide list column if no defined Confidence Intervals" = (class(
+        column_vals
+      ) %in%
+        c("list"))
     )
 
     # create a list of dataframes with
     # roughly calculated confidence intervals
     data_in <- lapply(column_vals, function(x) {
-      dplyr::tibble(x = stats::na.omit(x), y = "1a") %>%
+      dplyr::tibble(x = stats::na.omit(x), y = "1a") |>
         dplyr::summarise(
           mean = mean(.data$x, na.rm = TRUE),
           y = unique(.data$y, na.rm = TRUE),
@@ -101,22 +107,24 @@ gt_plt_conf_int_new <- function(gt_object,
           ci = list(stats::confint(.data$lm_out[[1]], level = level)),
           ci1 = ci[[1]][1],
           ci2 = ci[[1]][2]
-        ) %>%
+        ) |>
         dplyr::mutate(y = "1a")
     })
   } else {
     stopifnot(
-      "Must provide single values per row if defining Confidence Intervals" =
-        !(class(column_vals) %in% "list")
+      "Must provide single values per row if defining Confidence Intervals" = !(class(
+        column_vals
+      ) %in%
+        "list")
     )
 
-    data_in <- dplyr::tibble(mean = column_vals, y = "1a") %>%
+    data_in <- dplyr::tibble(mean = column_vals, y = "1a") |>
       dplyr::mutate(
         ci1 = ci_val1,
         ci2 = ci_val2,
         row_n = dplyr::row_number()
-      ) %>%
-      split(.$row_n)
+      ) |>
+      dplyr::group_split(.data$row_n)
   }
 
   # calculate the total range so the x-axis can be shared across rows
@@ -135,7 +143,7 @@ gt_plt_conf_int_new <- function(gt_object,
     list(ref_line)
   }
 
-  gt_object %>%
+  gt_object |>
     gt::text_transform(
       locations = gt::cells_body(columns = {{ column }}),
       fn = function(x) {
@@ -153,10 +161,9 @@ gt_plt_conf_int_new <- function(gt_object,
 
         tab_built
       }
-    ) %>%
+    ) |>
     gt::cols_align(align = "left", columns = {{ column }})
 }
-
 
 
 #' Add a confidence interval plot inside a specific row
@@ -170,22 +177,25 @@ gt_plt_conf_int_new <- function(gt_object,
 #' @noRd
 #'
 #' @return SVG/HTML
-add_ci_plot <- function(data_in,
-                        pal_vals,
-                        width,
-                        ext_range,
-                        text_args = list(scale_cut = cut_short_scale()),
-                        text_size,
-                        ref_line) {
+add_ci_plot <- function(
+  data_in,
+  pal_vals,
+  width,
+  ext_range,
+  #text_args = list(scale_cut = cut_short_scale()),
+  text_args,
+  text_size,
+  ref_line
+) {
   if (NA %in% unlist(data_in)) {
     return("&nbsp;")
   }
 
   if (unlist(ref_line) == "none") {
-    base_plot <- data_in %>%
+    base_plot <- data_in |>
       ggplot2::ggplot(ggplot2::aes(x = .data$mean, y = "1a"))
   } else {
-    base_plot <- data_in %>%
+    base_plot <- data_in |>
       ggplot2::ggplot(ggplot2::aes(x = .data$mean, y = "1a")) +
       ggplot2::geom_text(
         ggplot2::aes(
@@ -205,9 +215,15 @@ add_ci_plot <- function(data_in,
 
   plot_out <- base_plot +
     ggplot2::geom_segment(
-      ggplot2::aes(x = .data$ci1, xend = .data$ci2, y = .data$y, yend = .data$y),
+      ggplot2::aes(
+        x = .data$ci1,
+        xend = .data$ci2,
+        y = .data$y,
+        yend = .data$y
+      ),
       lineend = "round",
-      linewidth = 1,
+      #linewidth = 1,
+      size = 1,
       color = pal_vals[2],
       alpha = 0.75
     ) +
@@ -219,23 +235,23 @@ add_ci_plot <- function(data_in,
       color = pal_vals[3],
       stroke = 0.75
     ) +
-    ggplot2::geom_label(
-      ggplot2::aes(
-        x = .data$ci2,
-        label = do.call(scales::label_number, text_args)(.data$ci2)
-      ),
-      color = pal_vals[4],
-      hjust = 1.1,
-      size = text_size,
-      vjust = 0,
-      fill = "transparent",
-      position = ggplot2::position_nudge(y = 0.25),
-      family = "mono",
-      fontface = "bold",
-      linewidth = 0,
-      label.padding = ggplot2::unit(0.05, "lines"),
-      label.r = ggplot2::unit(0, "lines")
-    ) +
+    # ggplot2::geom_label(
+    #   ggplot2::aes(
+    #     x = .data$ci2,
+    #     label = do.call(scales::label_number, text_args)(.data$ci2)
+    #   ),
+    #   color = pal_vals[4],
+    #   hjust = 1.1,
+    #   size = text_size,
+    #   vjust = 0,
+    #   fill = "transparent",
+    #   position = ggplot2::position_nudge(y = 0.25),
+    #   family = "mono",
+    #   fontface = "bold",
+    #   linewidth = 0,
+    #   label.padding = ggplot2::unit(0.05, "lines"),
+    #   label.r = ggplot2::unit(0, "lines")
+    # ) +
     # ggplot2::geom_label(
     #   ggplot2::aes(x = .data$ci1, label = do.call(scales::label_number, text_args)(.data$ci1)),
     #   position = ggplot2::position_nudge(y = 0.25),
@@ -276,8 +292,8 @@ add_ci_plot <- function(data_in,
     device = "svg"
   )
 
-  img_plot <- readLines(out_name) %>%
-    paste0(collapse = "") %>%
+  img_plot <- readLines(out_name) |>
+    paste0(collapse = "") |>
     gt::html()
 
   on.exit(file.remove(out_name), add = TRUE)
@@ -288,7 +304,7 @@ add_ci_plot <- function(data_in,
 
 #' Return the underlying data, arranged by the internal index
 #' @description This is a utility function to extract the underlying data from
-#' a `gt` table. You can use it with a saved `gt` table, in the pipe (`%>%`)
+#' a `gt` table. You can use it with a saved `gt` table, in the pipe (`|>`)
 #' or even within most other `gt` functions (eg `tab_style()`). It defaults to
 #' returning the column indicated as a vector, so that you can work with the
 #' values. Typically this is used with logical statements to affect one column
@@ -301,7 +317,7 @@ add_ci_plot <- function(data_in,
 #' @param column The column name that you intend to extract, accepts tidyeval semantics (ie `mpg` instead of `"mpg"`)
 #' @param as_vector A logical indicating whether you'd like just the column indicated as a vector, or the entire dataframe
 #' @return A vector or a `tibble`
-#' @export
+#' @noRd
 #'
 #' @examples
 #' library(gt)
@@ -311,10 +327,10 @@ add_ci_plot <- function(data_in,
 #' # this sampling will return a row-group order for cyl of 6,4,8
 #'
 #' set.seed(1234)
-#' sliced_data <- mtcars %>%
-#'   dplyr::group_by(cyl) %>%
-#'   dplyr::slice_head(n = 3) %>%
-#'   dplyr::ungroup() %>%
+#' sliced_data <- mtcars |>
+#'   dplyr::group_by(cyl) |>
+#'   dplyr::slice_head(n = 3) |>
+#'   dplyr::ungroup() |>
 #'   # randomize the order
 #'   dplyr::slice_sample(n = 9)
 #'
@@ -325,11 +341,11 @@ add_ci_plot <- function(data_in,
 #' unique(sliced_data$cyl)
 #'
 #' # creating a standalone basic table
-#' test_tab <- sliced_data %>%
+#' test_tab <- sliced_data |>
 #'   gt(groupname_col = "cyl")
 #'
 #' # can style a specific column based on the contents of another column
-#' tab_out_styled <- test_tab %>%
+#' tab_out_styled <- test_tab |>
 #'   tab_style(
 #'     locations = cells_body(mpg, rows = gt_index(., am) == 0),
 #'     style = cell_fill("red")
@@ -352,7 +368,10 @@ add_ci_plot <- function(data_in,
 #' 2-20
 
 gt_index <- function(gt_object, column, as_vector = TRUE) {
-  stopifnot("'gt_object' must be a 'gt_tbl', have you accidentally passed raw data?" = "gt_tbl" %in% class(gt_object))
+  stopifnot(
+    "'gt_object' must be a 'gt_tbl', have you accidentally passed raw data?" = "gt_tbl" %in%
+      class(gt_object)
+  )
   stopifnot("'as_vector' must be a TRUE or FALSE" = is.logical(as_vector))
 
   if (length(gt_object[["_row_groups"]]) >= 1) {
@@ -362,12 +381,12 @@ gt_index <- function(gt_object, column, as_vector = TRUE) {
     #  (ie alphabetical or numerical)
     gt_row_grps <- gt_object[["_row_groups"]]
 
-    grp_vec_ord <- gt_object[["_stub_df"]] %>%
-      dplyr::mutate(group_id = factor(group_id, levels = gt_row_grps)) %>%
-      dplyr::arrange(group_id) %>%
-      dplyr::pull(rownum_i)
+    grp_vec_ord <- gt_object[["_stub_df"]] |>
+      dplyr::mutate(group_id = factor("group_id", levels = gt_row_grps)) |>
+      dplyr::arrange("group_id") |>
+      dplyr::pull("rownum_i")
 
-    df_ordered <- gt_object[["_data"]] %>%
+    df_ordered <- gt_object[["_data"]] |>
       dplyr::slice(grp_vec_ord)
   } else {
     # if the data is not grouped, then it will just "work"
@@ -376,7 +395,7 @@ gt_index <- function(gt_object, column, as_vector = TRUE) {
 
   # return as vector or tibble in correct, gt-indexed ordered
   if (isTRUE(as_vector)) {
-    df_ordered %>%
+    df_ordered |>
       dplyr::pull({{ column }})
   } else {
     df_ordered
