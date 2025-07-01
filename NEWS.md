@@ -1,3 +1,40 @@
+# plotor 0.7.0
+
+### Compatibility and testing fixes:
+
+* **Test suite** (#68)
+  
+  Addressed issues where snapshot tests failed depending on the installed 
+  version of ggplot2. Snapshots produced by different ggplot2 versions were 
+  causing test failures, especially with `vdiffr::expect_doppelganger()`. 
+  
+  The temporary solution was to suspend these visual comparison tests to avoid 
+  unnecessary failures for users not on the latest ggplot2.
+
+* **Readiness for upcoming {ggplot2} release** (#65) 
+  
+  Investigated and resolved failures with the upcoming major release of ggplot2, 
+  ensuring that the package’s examples, vignettes, and tests remain compatible.
+
+### Enhancements for model diagnostics:
+
+* **New function `check_or()`** (#62) 
+
+  Added an exported function, `check_or()`, to provide users with detailed 
+  feedback on whether their logistic regression models meet underlying 
+  assumptions. Previously, detailed diagnostics were only accessible via 
+  undocumented internal functions.
+
+* **Assumptions: check for sample size** (#41)
+  
+  Introduced a check for sufficient sample size, further improving diagnostics 
+  for logistic regression models.
+
+These improvements make the package more robust to upstream changes in 
+dependencies and offer users more transparent and accessible model validation 
+tools.
+
+
 # plotor 0.6.0
 
 ### User-focussed changes
