@@ -2,7 +2,6 @@
 
 ## test successful ----
 testthat::test_that("`plot_or()` does not produce messages or warnings", {
-
   # titanic lr model
   testthat::expect_silent({
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
@@ -14,11 +13,9 @@ testthat::test_that("`plot_or()` does not produce messages or warnings", {
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
     plotor::plot_or(lr)
   })
-
 })
 
 testthat::test_that("`table_or()` does not produce messages or warnings", {
-
   # titanic lr model
   testthat::expect_silent({
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
@@ -30,65 +27,40 @@ testthat::test_that("`table_or()` does not produce messages or warnings", {
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
     plotor::table_or(lr)
   })
-
 })
 
 ## snapshots -------
-# testthat::test_that("table_or() produces output equivalent to a snapshot", {
-#   testthat::skip_on_cran()
-#
+
+# IMPORTANT NOTE
+# These tests are suspended because different versions of {ggplot2} in
+# produce identical-looking plots but are somehow different internally which
+# results in these tests failing if they don't use the same version of {ggplot2}
+# which produced the snapshot. See issue #68 for details.
+# testthat::test_that("`plot_or()` produces plots equivalent to a snapshot", {
 #   # titanic lr model
-#   testthat::expect_snapshot({
-#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-#     plotor::table_or(lr)
-#   },
-#   cran = FALSE)
-# })
-
-testthat::test_that("`plot_or()` produces plots equivalent to a snapshot", {
-
-  # titanic lr model
-  vdiffr::expect_doppelganger({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::plot_or(lr)
-  },
-  title = "plot_titanic", cran = FALSE)
-
-  # diabetes lr model
-  vdiffr::expect_doppelganger({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
-    plotor::plot_or(lr)
-  }, title = "plot_diabetes", cran = FALSE)
-
-})
-
-# testthat::test_that("table_or() produces {gt} tables equivalent to a snapshot", {
-#   testthat::skip_on_cran()
-#
-#   # titanic lr model
-#   testthat::expect_snapshot({
-#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-#     plotor::table_or(lr, output = 'gt')
-#   }, cran = FALSE)
+#   vdiffr::expect_doppelganger(
+#     {
+#       lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
+#       plotor::plot_or(lr)
+#     },
+#     title = "plot_titanic",
+#     cran = FALSE
+#   )
 #
 #   # diabetes lr model
-#   testthat::expect_snapshot({
-#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
-#     plotor::table_or(lr, output = 'gt')
-#   }, cran = FALSE)
-#
-#   # infertility lr model
-#   testthat::expect_snapshot({
-#     lr <- readRDS(file = testthat::test_path('test_data', 'lr_infert.Rds'))
-#     plotor::table_or(lr, output = 'gt')
-#   }, cran = FALSE)
-#
+#   vdiffr::expect_doppelganger(
+#     {
+#       lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
+#       plotor::plot_or(lr)
+#     },
+#     title = "plot_diabetes",
+#     cran = FALSE
+#   )
 # })
 
 ## test failure -----
 
 testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
-
   # not a binomial glm model
   testthat::expect_error({
     lr <- readRDS(file = testthat::test_path('test_data', 'nonlr_streptb.Rds'))
@@ -114,12 +86,10 @@ testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
     plotor::table_or(lr, output = "pink_elephant")
   })
-
 })
 
 # validation functions ---------------------------------------------------------
 testthat::test_that("`validate_conf_level_input()` works as expected", {
-
   # inputs which are not single value and numeric
   testthat::expect_error(plotor:::validate_conf_level_input("0.95"))
   testthat::expect_error(plotor:::validate_conf_level_input(c(0.95, 0.8)))
@@ -141,29 +111,31 @@ testthat::test_that("`validate_conf_level_input()` works as expected", {
   testthat::expect_message(plotor:::validate_conf_level_input(100))
   testthat::expect_message(plotor:::validate_conf_level_input(95))
   testthat::expect_message(plotor:::validate_conf_level_input(99))
-
 })
 
 testthat::test_that("`assumption_binary_outcome()` works as expected", {
-
   # raise error for models with more than two outcome levels
   testthat::expect_error({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_triple_outcome.Rds'))
+    lr <- readRDS(
+      file = testthat::test_path('test_data', 'lr_triple_outcome.Rds')
+    )
     plotor::plot_or(lr)
   })
-
 })
 
 testthat::test_that("`assumption_no_multicollinearity()` works as expected", {
-
   # raise warning message for models with high correlations
   testthat::expect_warning({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_correlated_two.Rds'))
+    lr <- readRDS(
+      file = testthat::test_path('test_data', 'lr_correlated_two.Rds')
+    )
     plotor::plot_or(lr)
   })
 
   testthat::expect_warning({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_correlated_four.Rds'))
+    lr <- readRDS(
+      file = testthat::test_path('test_data', 'lr_correlated_four.Rds')
+    )
     plotor::plot_or(lr)
   })
 
@@ -174,21 +146,17 @@ testthat::test_that("`assumption_no_multicollinearity()` works as expected", {
       plotor::plot_or(lr)
     })
   })
-
 })
 
 testthat::test_that("`assumption_no_separation()` works as expected", {
-
   # raise warning message for models with separation
   testthat::expect_warning({
     lr <- readRDS(file = testthat::test_path('test_data', 'lr_separated.Rds'))
     plotor:::assumption_no_separation(lr)
   })
-
 })
 
 testthat::test_that("`assumption_sample_size()` works as expected", {
-
   # raise a warning message for models with too few observations
 
   # 1. list some models to test
@@ -202,7 +170,6 @@ testthat::test_that("`assumption_sample_size()` works as expected", {
   purrr::walk(
     .x = list_models,
     .f = \(.x) {
-
       # load the model
       lr_old <- readRDS(file = testthat::test_path('test_data', .x))
 
@@ -224,10 +191,6 @@ testthat::test_that("`assumption_sample_size()` works as expected", {
       testthat::expect_warning({
         plotor:::assumption_sample_size(lr)
       })
-
     }
   )
-
 })
-
-
