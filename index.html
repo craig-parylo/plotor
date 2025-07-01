@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -172,14 +172,14 @@
 <h2 id="assumption-checks">Assumption checks<a class="anchor" aria-label="anchor" href="#assumption-checks"></a>
 </h2>
 <p>New to <code>plotor</code> is a new suite of automated checks. These checks verify the data used in your logistic regression analysis upholds the required assumptions, providing an added layer of confidence in your results.</p>
-<table style="width:96%;" class="table">
+<table style="width:93%;" class="table">
 <caption>
 Assumptions for logistic regression
 </caption>
 <colgroup>
-<col style="width: 22%">
-<col style="width: 51%">
-<col style="width: 22%">
+<col style="width: 27%">
+<col style="width: 50%">
+<col style="width: 15%">
 </colgroup>
 <thead><tr>
 <th>
@@ -201,9 +201,7 @@ The outcome variable is <strong>binary</strong>
 <code>plotor</code> is designed to work with an outcome variable that has only two possible values, i.e. outcome is <strong>binary</strong>.
 </td>
 <td>
-<p>
 ✅
-</p>
 </td>
 </tr>
 <tr>
@@ -212,16 +210,14 @@ The predictor variables should <strong>not be highly correlated</strong> with ea
 </td>
 <td>
 <p>
-Predictor variables which have high levels of correlation with each other is known as <strong>m ulticollinearity</strong>.
+Predictor variables which have high levels of correlation with each other is known as <strong>multicollinearity</strong>.
 </p>
 <p>
 Where this is the case the odds ratio estimates are likely to be unstable, confidence intervals are likely to be much larger, both of which make it difficult to interpret the results.
 </p>
 </td>
 <td>
-<p>
 ✅
-</p>
 </td>
 </tr>
 <tr>
@@ -237,9 +233,7 @@ Separation results in infinite or extremely large odds ratios and possibly issue
 </p>
 </td>
 <td>
-<p>
 ✅
-</p>
 </td>
 </tr>
 <tr>
@@ -250,12 +244,7 @@ The sample size is large enough
 The sample size should be large enough to provide reliable estimates of the odds ratio. A general rule of thumb is to have at least 10 events (or outcomes of interest) per predictor variable.
 </td>
 <td>
-<p>
 ✅
-</p>
-<p>
-Introduced in PR
-</p>
 </td>
 </tr>
 <tr>
@@ -266,7 +255,7 @@ The observations are independent
 Each observation should be independent of the others. This means that the outcome for one observation should not be influenced by the outcome of another observation.
 </td>
 <td>
-In development
+In dev elopment
 </td>
 </tr>
 <tr>
@@ -277,7 +266,7 @@ There are no extreme outlier values
 The data should not contain outliers or influential observations that can significantly affect the estimates of the odds ratio.
 </td>
 <td>
-In development
+In dev elopment
 </td>
 </tr>
 <tr>
@@ -288,7 +277,7 @@ There is a linear relationship between the predictors and the logit
 The relationship between the predictor variables and the log odds of the outcome should be linear. This can be checked using diagnostic plots, such as the logit plot.
 </td>
 <td>
-In development
+In dev elopment
 </td>
 </tr>
 </tbody>

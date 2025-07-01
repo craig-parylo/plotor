@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,33 @@
       <small>Source: <a href="https://github.com/craig-parylo/plotor/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.0" id="plotor-070">plotor 0.7.0<a class="anchor" aria-label="anchor" href="#plotor-070"></a></h2>
+<div class="section level4">
+<h4 id="compatibility-and-testing-fixes-0-7-0">Compatibility and testing fixes:<a class="anchor" aria-label="anchor" href="#compatibility-and-testing-fixes-0-7-0"></a></h4>
+<ul><li>
+<p><strong>Test suite</strong> (<a href="https://github.com/craig-parylo/plotor/issues/68" class="external-link">#68</a>)</p>
+<p>Addressed issues where snapshot tests failed depending on the installed version of ggplot2. Snapshots produced by different ggplot2 versions were causing test failures, especially with <code><a href="https://vdiffr.r-lib.org/reference/expect_doppelganger.html" class="external-link">vdiffr::expect_doppelganger()</a></code>.</p>
+<p>The temporary solution was to suspend these visual comparison tests to avoid unnecessary failures for users not on the latest ggplot2.</p>
+</li>
+<li>
+<p><strong>Readiness for upcoming {ggplot2} release</strong> (<a href="https://github.com/craig-parylo/plotor/issues/65" class="external-link">#65</a>)</p>
+<p>Investigated and resolved failures with the upcoming major release of ggplot2, ensuring that the package’s examples, vignettes, and tests remain compatible.</p>
+</li>
+</ul></div>
+<div class="section level4">
+<h4 id="enhancements-for-model-diagnostics-0-7-0">Enhancements for model diagnostics:<a class="anchor" aria-label="anchor" href="#enhancements-for-model-diagnostics-0-7-0"></a></h4>
+<ul><li>
+<p><strong>New function <code><a href="../reference/check_or.html">check_or()</a></code></strong> (<a href="https://github.com/craig-parylo/plotor/issues/62" class="external-link">#62</a>)</p>
+<p>Added an exported function, <code><a href="../reference/check_or.html">check_or()</a></code>, to provide users with detailed feedback on whether their logistic regression models meet underlying assumptions. Previously, detailed diagnostics were only accessible via undocumented internal functions.</p>
+</li>
+<li>
+<p><strong>Assumptions: check for sample size</strong> (<a href="https://github.com/craig-parylo/plotor/issues/41" class="external-link">#41</a>)</p>
+<p>Introduced a check for sufficient sample size, further improving diagnostics for logistic regression models.</p>
+</li>
+</ul><p>These improvements make the package more robust to upstream changes in dependencies and offer users more transparent and accessible model validation tools.</p>
+</div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="plotor-060">plotor 0.6.0<a class="anchor" aria-label="anchor" href="#plotor-060"></a></h2><p class="text-muted">CRAN release: 2025-05-28</p>
 <div class="section level4">
