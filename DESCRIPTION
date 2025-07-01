@@ -28,7 +28,6 @@ Imports:
     ggplot2,
     glue,
     gt,
-    gtExtras,
     janitor,
     purrr,
     rlang,
