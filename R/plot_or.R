@@ -46,16 +46,20 @@
 #'
 #' # Produce the Odds Ratio plot
 #' plot_or(lr)
-plot_or <- function(glm_model_results,
-                    conf_level = 0.95,
-                    confint_fast_estimate = FALSE) {
-
+plot_or <- function(
+  glm_model_results,
+  conf_level = 0.95,
+  confint_fast_estimate = FALSE
+) {
   # data and input checks ----
   # check the model is logistic regression
   valid_glm_model <- validate_glm_model(glm_model_results)
 
   # check logistic regression assumptions
-  valid_assumptions <- check_assumptions(glm = glm_model_results, details = FALSE)
+  valid_assumptions <- check_assumptions(
+    glm = glm_model_results,
+    details = FALSE
+  )
 
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
@@ -70,7 +74,11 @@ plot_or <- function(glm_model_results,
   )
 
   # plot the results
-  p <- plot_odds_ratio(df = df, model = glm_model_results, conf_level = conf_level)
+  p <- plot_odds_ratio(
+    df = df,
+    model = glm_model_results,
+    conf_level = conf_level
+  )
 
   return(p)
 }
@@ -139,18 +147,21 @@ plot_or <- function(glm_model_results,
 #'
 #' # Produce the Odds Ratio table as a gt object
 #' table_or(lr, output = 'gt')
-table_or <- function(glm_model_results,
-                     conf_level = 0.95,
-                     output = 'tibble',
-                     confint_fast_estimate = FALSE) {
-
-
+table_or <- function(
+  glm_model_results,
+  conf_level = 0.95,
+  output = 'tibble',
+  confint_fast_estimate = FALSE
+) {
   # data and input checks ----
   # check the model is logistic regression
   valid_glm_model <- validate_glm_model(glm_model_results)
 
   # check logistic regression assumptions
-  valid_assumptions <- check_assumptions(glm = glm_model_results, details = FALSE)
+  valid_assumptions <- check_assumptions(
+    glm = glm_model_results,
+    details = FALSE
+  )
 
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
@@ -173,25 +184,34 @@ table_or <- function(glm_model_results,
   df <-
     df |>
     # remove variables which aren't necessary for table views
-    dplyr::select(!dplyr::any_of(c(
-      'term', 'rows_scale', 'label_or', 'group', 'p_label'
-    ))) |>
+    dplyr::select(
+      !dplyr::any_of(c(
+        'term',
+        'rows_scale',
+        'label_or',
+        'group',
+        'p_label'
+      ))
+    ) |>
     # work out the rate of 'outcome'
     dplyr::mutate(outcome_rate = .data$outcome / .data$rows) |>
     dplyr::relocate('outcome_rate', .after = 'outcome')
 
   # decide what object to return
   obj_return <-
-    switch(output,
+    switch(
+      output,
       # output a tibble
-      'tibble' = {df},
+      'tibble' = {
+        df
+      },
 
       # output a gt-formatted table
       'gt' = {
         df |>
           dplyr::group_by(.data$label) |>
           output_gt(conf_level = conf_level, title = str_outcome)
-        }
+      }
     )
 
   return(obj_return)
@@ -228,10 +248,11 @@ table_or <- function(glm_model_results,
 #'
 #' # Check the model for logistic regression assumption violations
 #' check_or(lr)
-check_or <- function(glm_model_results,
-                     confint_fast_estimate = FALSE,
-                     details = TRUE) {
-
+check_or <- function(
+  glm_model_results,
+  confint_fast_estimate = FALSE,
+  details = TRUE
+) {
   # set heading
   cli::cli_h1("Assumption checks")
 
@@ -264,12 +285,12 @@ check_or <- function(glm_model_results,
   # no multicollinearity
   if (test_results$assume_independent) {
     cli::cli_alert_success(
-      "The predictor variables are not highly correlated with each other",
+      "Predictor variables are not highly correlated with each other",
       wrap = TRUE
     )
   } else {
     cli::cli_alert_danger(
-      "The predictor variables may be correlated",
+      "Predictor variables may be correlated",
       wrap = TRUE
     )
   }
@@ -295,7 +316,21 @@ check_or <- function(glm_model_results,
     )
   } else {
     cli::cli_alert_danger(
-      "The sample size may not be large enough"
+      "The sample size may not be large enough",
+      wrap = TRUE
+    )
+  }
+
+  # linear relationship with continuous variables and log-odds of outcome
+  if (test_results$assume_linearity) {
+    cli::cli_alert_success(
+      "Continuous variables either have a linear relationship with the log-odds of the outcome or are absent",
+      wrap = TRUE
+    )
+  } else {
+    cli::cli_alert_danger(
+      "Signs of non-linear relationship detected",
+      wrap = TRUE
     )
   }
 
@@ -303,23 +338,39 @@ check_or <- function(glm_model_results,
   cli::cli_par()
   cli::cli_end()
   cli::cli_par()
-  cli::cli_text("Your model was checked for logistic regression assumptions in the following areas:")
+  cli::cli_text(
+    "Your model was checked for logistic regression assumptions in the following areas:"
+  )
   cli::cli_end()
   cli::cli_par()
   cli::cli_text("{.emph Binary outcome:}")
-  cli::cli_text("The outcome variable was checked for containing precisely two levels.")
+  cli::cli_text(
+    "The outcome variable was checked for containing precisely two levels."
+  )
   cli::cli_end()
   cli::cli_par()
   cli::cli_text("{.emph Multicollinearity:}")
-  cli::cli_text("The {.fn vif} function from the {.pkg car} package was used to check for highly correlated predictor variables.")
+  cli::cli_text(
+    "The {.fn vif} function from the {.pkg car} package was used to check for highly correlated predictor variables."
+  )
   cli::cli_end()
   cli::cli_par()
   cli::cli_text("{.emph Separation:}")
-  cli::cli_text("The {.fn detectseparation} function from the {.pkg detectseparation} package was used to check for complete or quasi-complete separation in the data.")
+  cli::cli_text(
+    "The {.fn detectseparation} function from the {.pkg detectseparation} package was used to check for complete or quasi-complete separation in the data."
+  )
   cli::cli_end()
   cli::cli_par()
   cli::cli_text("{.emph Sample size:}")
-  cli::cli_text("A rule of thumb was applied, requiring at least 10 events per predictor variable and at least 10 events per level of categorical variables to ensure sufficient data for reliable estimates.")
+  cli::cli_text(
+    "A rule of thumb was applied, requiring at least 10 events per predictor variable and at least 10 events per level of categorical variables to ensure sufficient data for reliable estimates."
+  )
+  cli::cli_end()
+  cli::cli_par()
+  cli::cli_text("{.emph Linearity:}")
+  cli::cli_text(
+    "A likelihood ratio test was conducted to assess improvements in model fit compared to a model using Box-Tidwell power transformations on continuous predictors. Any observed improvement likely indicates non-linear relationships between the continuous predictors and the log-odds of the outcome."
+  )
   cli::cli_end()
   cli::cli_par()
   if (all(unlist(test_results))) {
@@ -333,7 +384,6 @@ check_or <- function(glm_model_results,
       wrap = TRUE
     )
   }
-
 }
 
 # Internal functions -----------------------------------------------------------
@@ -359,7 +409,10 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
   outcome = base::as.symbol(outcome_name)
 
   # determine the outcome of interest
-  outcome_num <- df[[outcome_name]] |> stats::na.omit() |> as.numeric() |> max(na.rm = TRUE)
+  outcome_num <- df[[outcome_name]] |>
+    stats::na.omit() |>
+    as.numeric() |>
+    max(na.rm = TRUE)
   outcome_txt <- levels(df[[outcome_name]])[outcome_num]
 
   var_temp <- df |>
@@ -371,23 +424,37 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
     if (is.numeric(var_temp)) {
       df |>
         dplyr::filter(!is.na(var_name)) |>
-        dplyr::summarise(rows = dplyr::n(), outcome = sum({{outcome}} == outcome_txt)) |>
-        dplyr::mutate(group = var_name,
-                      level = var_name,
-                      term = var_name) |>
+        dplyr::summarise(
+          rows = dplyr::n(),
+          outcome = sum({{ outcome }} == outcome_txt)
+        ) |>
+        dplyr::mutate(group = var_name, level = var_name, term = var_name) |>
         dplyr::select(dplyr::any_of(c(
-          'term', 'group', 'level', 'rows', 'outcome'
+          'term',
+          'group',
+          'level',
+          'rows',
+          'outcome'
         )))
     } else {
       df |>
-        dplyr::mutate(outcome = sum({{outcome}} == outcome_txt), .by = {{var}}) |>
+        dplyr::mutate(
+          outcome = sum({{ outcome }} == outcome_txt),
+          .by = {{ var }}
+        ) |>
         #dplyr::summarise(rows = dplyr::n(), .by = c({{var}}, {{outcome}})) |>
-        dplyr::summarise(rows = dplyr::n(), .by = c({{var}}, 'outcome')) |>
-        dplyr::rename(level = {{var}}) |>
-        dplyr::mutate(group = var_name,
-                      term = base::paste0(.data$group, .data$level)) |>
+        dplyr::summarise(rows = dplyr::n(), .by = c({{ var }}, 'outcome')) |>
+        dplyr::rename(level = {{ var }}) |>
+        dplyr::mutate(
+          group = var_name,
+          term = base::paste0(.data$group, .data$level)
+        ) |>
         dplyr::select(dplyr::any_of(c(
-          'term', 'group', 'level', 'rows', 'outcome'
+          'term',
+          'group',
+          'level',
+          'rows',
+          'outcome'
         )))
     }
 
@@ -425,18 +492,20 @@ summarise_rows_per_variable_in_model <- function(model_results) {
   # count the number of rows used for each variable and level
   df_rows <-
     model_vars |>
-    purrr::map_dfr(\(.x) count_rows_by_variable(
-      df = model_data,
-      var_name = .x,
-      outcome_name = model_outcome
-    )) |>
+    purrr::map_dfr(\(.x) {
+      count_rows_by_variable(
+        df = model_data,
+        var_name = .x,
+        outcome_name = model_outcome
+      )
+    }) |>
     # rescale rows (will be used to set the size of the dot in the plot)
     dplyr::mutate(
       rows_scale = dplyr::case_when(
-          .data$class == 'numeric' ~ 1,
-          .default = .data$rows |>
-            scales::rescale(to = c(1, 5))
-        )
+        .data$class == 'numeric' ~ 1,
+        .default = .data$rows |>
+          scales::rescale(to = c(1, 5))
+      )
     )
 
   # combine the two data
@@ -463,7 +532,6 @@ summarise_rows_per_variable_in_model <- function(model_results) {
 #' @returns Tibble summary of variables and levels used in the model
 #' @noRd
 get_model_variables_and_levels <- function(model_results) {
-
   # 1. get a list of all model variables
   model_vars <-
     model_results |>
@@ -471,7 +539,10 @@ get_model_variables_and_levels <- function(model_results) {
     purrr::pluck(3) |>
     base::all.vars() |>
     tibble::enframe() |>
-    dplyr::select(-dplyr::any_of('name'), dplyr::any_of(c('variable' = 'value')))
+    dplyr::select(
+      -dplyr::any_of('name'),
+      dplyr::any_of(c('variable' = 'value'))
+    )
 
   # 2. for all categorical variables, list out the levels
   model_var_levels <-
@@ -479,14 +550,17 @@ get_model_variables_and_levels <- function(model_results) {
     tibble::enframe() |>
     tidyr::unnest(cols = dplyr::any_of('value')) |>
     dplyr::rename(dplyr::any_of(c(
-      'variable' = 1, 'level' = 2
+      'variable' = 1,
+      'level' = 2
     )))
 
   # 3. combine the two sets
   df <-
     model_vars |>
-    dplyr::left_join(y = model_var_levels,
-                     by = dplyr::join_by('variable' == 'variable')) |>
+    dplyr::left_join(
+      y = model_var_levels,
+      by = dplyr::join_by('variable' == 'variable')
+    ) |>
     # create the 'term' outputted by {broom}
     dplyr::mutate(term = glue::glue("{variable}{level}", .na = "")) |>
     dplyr::relocate(dplyr::any_of('term'), .before = dplyr::any_of('variable'))
@@ -586,7 +660,8 @@ plot_odds_ratio <- function(df, model, conf_level) {
     ) +
     ggplot2::geom_errorbar(
       # remove any confidence estimates with NA values
-      data = df |> dplyr::filter(!is.na(.data$conf.high), !is.na(.data$conf.low)),
+      data = df |>
+        dplyr::filter(!is.na(.data$conf.high), !is.na(.data$conf.low)),
       ggplot2::aes(xmax = .data$conf.high, xmin = .data$conf.low),
       width = 1 / 5,
       na.rm = TRUE
@@ -613,7 +688,9 @@ plot_odds_ratio <- function(df, model, conf_level) {
     ) +
     ggplot2::labs(
       title = glue::glue('{model_outcome}'),
-      subtitle = glue::glue('Odds Ratio (OR) plot with {str_conf_level} Confidence Interval (CI)'),
+      subtitle = glue::glue(
+        'Odds Ratio (OR) plot with {str_conf_level} Confidence Interval (CI)'
+      ),
       x = glue::glue('Odds ratio ({str_conf_level} CI, log scale)')
     ) +
     ggplot2::scale_colour_manual(
@@ -637,9 +714,11 @@ plot_odds_ratio <- function(df, model, conf_level) {
 #' @return Character vectors of labels for both group and level
 #' @noRd
 label_groups <- function(group, level) {
-  dplyr::case_when(is.na(dplyr::lag(group)) ~ group,
-                   group != dplyr::lag(group) ~ group,
-                   .default = '')
+  dplyr::case_when(
+    is.na(dplyr::lag(group)) ~ group,
+    group != dplyr::lag(group) ~ group,
+    .default = ''
+  )
 }
 
 #' Use Variable Labels
@@ -689,7 +768,6 @@ use_var_labels <- function(df, lr) {
     dplyr::arrange('label', 'level')
 
   return(df_return)
-
 }
 
 ## validation funcs -----
@@ -727,12 +805,12 @@ validate_conf_level_input <- function(conf_level) {
 
   # validate conf_level
   conf_level_new <- dplyr::case_when(
-
     # parse if given an integer version, e.g. 95 instead of 0.95
     conf_level > 50 & conf_level < 100 ~ conf_level / 100,
 
     # if otherwise outside limits then set to nearest limit
-    conf_level < ci_min | conf_level > ci_max ~ min(ci_max, max(ci_min, conf_level)),
+    conf_level < ci_min | conf_level > ci_max ~
+      min(ci_max, max(ci_min, conf_level)),
 
     # if all checks pass then return the input
     .default = conf_level
@@ -763,7 +841,6 @@ validate_conf_level_input <- function(conf_level) {
 #' @returns boolean (TRUE = logistic regression, FALSE = other model)
 #' @noRd
 validate_glm_model <- function(glm_model) {
-
   # find the response to the validation
   response <- (
     class(glm_model)[1] == 'glm' & # must be a glm class object
@@ -794,7 +871,6 @@ validate_glm_model <- function(glm_model) {
 #' @returns Boolean indicating whether the 'output' parameter is valid
 #' @noRd
 validate_output_table_input <- function(output) {
-
   # specify accepted output types
   accepted_outputs <- c('tibble', 'gt')
 
@@ -830,16 +906,16 @@ validate_output_table_input <- function(output) {
 #'
 #' @returns Tibble providing a summary of the logistic regression model.
 #' @noRd
-get_summary_table <- function(glm_model_results,
-                              conf_level,
-                              confint_fast_estimate) {
-
+get_summary_table <- function(
+  glm_model_results,
+  conf_level,
+  confint_fast_estimate
+) {
   # get the data from the model object
   df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
 
   # get odds ratio and confidence intervals
   if (confint_fast_estimate == TRUE) {
-
     # use a fast approximation for confidence intervals
     model_or <-
       glm_model_results |>
@@ -854,15 +930,10 @@ get_summary_table <- function(glm_model_results,
           dplyr::rename("conf.low" = 2, "conf.high" = 3),
         by = dplyr::join_by("term" == "term")
       )
-
   } else {
-
     # use the correct method to estimate the confidence interval
     model_or <- glm_model_results |>
-      broom::tidy(exponentiate = T,
-                  conf.int = T,
-                  conf.level = conf_level)
-
+      broom::tidy(exponentiate = T, conf.int = T, conf.level = conf_level)
   }
 
   # add the odds ratio and CIs to the summary dataframe
@@ -889,7 +960,6 @@ get_summary_table <- function(glm_model_results,
 #' @returns {gt}
 #' @noRd
 output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
-
   # get the outcome
 
   # produce the gt table
@@ -930,7 +1000,12 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
       drop_trailing_zeros = TRUE
     ) |>
     gt::fmt_number(
-      columns = c(.data$estimate, .data$std.error, .data$conf.low, .data$conf.high),
+      columns = c(
+        .data$estimate,
+        .data$std.error,
+        .data$conf.low,
+        .data$conf.high
+      ),
       n_sigfig = 4
     ) |>
     gt::fmt_scientific(
@@ -944,7 +1019,12 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
     ) |>
     gt::tab_spanner(
       label = 'Odds Ratio (OR)',
-      columns = c(.data$estimate, .data$std.error, .data$statistic, .data$p.value),
+      columns = c(
+        .data$estimate,
+        .data$std.error,
+        .data$statistic,
+        .data$p.value
+      ),
       id = 'or'
     ) |>
     gt::tab_spanner(
@@ -955,40 +1035,50 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
     # reference value rows
     gt::sub_missing() |>
     # hide columns that don't need displaying
-    gt::cols_hide(columns = c(
-      .data$comparator,
-      .data$statistic,
-      .data$plot_ci_l,
-      .data$plot_ci_u
-    )) |>
+    gt::cols_hide(
+      columns = c(
+        .data$comparator,
+        .data$statistic,
+        .data$plot_ci_l,
+        .data$plot_ci_u
+      )
+    ) |>
     # add titles
     gt::tab_header(
       title = gt::md(glue::glue("{title}")),
-      subtitle = gt::md(glue::glue("Odds Ratio summary table with {conf_level * 100}% Confidence Interval"))
+      subtitle = gt::md(glue::glue(
+        "Odds Ratio summary table with {conf_level * 100}% Confidence Interval"
+      ))
     ) |>
     # add footnotes
     gt::tab_footnote(
       locations = gt::cells_column_spanners('Characteristic'),
-      footnote = gt::md("**Characteristics** are the explanatory variables in the logistic regression analysis. For categorical variables the first characteristic is designated as a reference against which the others are compared. For numeric variables the results indicate a change per single unit increase.\n\n
+      footnote = gt::md(
+        "**Characteristics** are the explanatory variables in the logistic regression analysis. For categorical variables the first characteristic is designated as a reference against which the others are compared. For numeric variables the results indicate a change per single unit increase.\n\n
 *Level* - the name or the description of the explanatory variable.\n\n
 *N* - the number of observations examined.\n\n
 *n* - the number of observations resulting in the outcome of interest.\n\n
 *Rate* - the proportion of observations resulting in the outcome of interest (n / N).\n\n
-*Class* - description of the data type.")
+*Class* - description of the data type."
+      )
     ) |>
     gt::tab_footnote(
       locations = gt::cells_column_spanners('or'),
-      footnote = gt::md("**Odds Ratios** estimate the relative *odds* of an outcome with reference to the *Characteristic*. For categorical data the first level is the reference against which the odds of other levels are compared. Numerical characteristics indicate the change in *OR* for each additional increase of one unit in the variable.\n\n
+      footnote = gt::md(
+        "**Odds Ratios** estimate the relative *odds* of an outcome with reference to the *Characteristic*. For categorical data the first level is the reference against which the odds of other levels are compared. Numerical characteristics indicate the change in *OR* for each additional increase of one unit in the variable.\n\n
 *OR* - The Odds Ratio point estimate - values below 1 indicate an inverse relationship whereas values above 1 indicate a positive relationship. Values shown to 4 significant figures.\n\n
 *SE* - Standard Error of the point estimate. Values shown to 4 significant figures.\n\n
-*p* - The p-value estimate based on the residual Chi-squared statistic.")
+*p* - The p-value estimate based on the residual Chi-squared statistic."
+      )
     ) |>
     gt::tab_footnote(
       locations = gt::cells_column_spanners('ci'),
-      footnote = gt::md(glue::glue("**Confidence Interval** - the range of values likely to contain the *OR* in {conf_level * 100}% of cases if this study were to be repeated multiple times. If the *CI* touches or crosses the value 1 then it is unlikely the *Characteristic* is significantly associated with the outcome.\n\n
+      footnote = gt::md(glue::glue(
+        "**Confidence Interval** - the range of values likely to contain the *OR* in {conf_level * 100}% of cases if this study were to be repeated multiple times. If the *CI* touches or crosses the value 1 then it is unlikely the *Characteristic* is significantly associated with the outcome.\n\n
 *Lower* & *Upper* - The range of values comprising the *CI*, shown to 4 significant figures.\n\n
 *Significance* - The statistical significance indicated by the *CI*, *Significant* where the *CI* does not touch or cross the value 1.
-      "))
+      "
+      ))
     ) |>
     # add an OR plot to visualise the results
     # gtExtras::gt_plt_conf_int(
@@ -1007,7 +1097,6 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
       columns = .data$plot_or,
       align = 'center'
     )
-
 }
 
 
@@ -1020,7 +1109,6 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
 #' @returns String
 #' @noRd
 get_outcome_variable_name <- function(model, return_var_name = FALSE) {
-
   # get the name of the outcome variable from the model formula
   model_outcome_var <-
     model$formula[[2]] |>
@@ -1034,8 +1122,10 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
 
   # return either the label or variable name
   model_outcome <-
-    dplyr::coalesce(model_outcome_label,
-                    model_outcome_var |> base::as.character())
+    dplyr::coalesce(
+      model_outcome_label,
+      model_outcome_var |> base::as.character()
+    )
 
   # return the variable name if requested
   if (return_var_name) {
@@ -1043,7 +1133,6 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
   } else {
     return(model_outcome)
   }
-
 }
 
 
@@ -1066,13 +1155,19 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
 #' @returns Named list indicating the results of each assumption
 #' @noRd
 check_assumptions <- function(glm, details = FALSE) {
-
   # check assumptions
   list_return <- list(
     assume_binary = assumption_binary_outcome(glm = glm, details = details),
-    assume_independent = assumption_no_multicollinearity(glm = glm, details = details),
-    assume_no_separation = assumption_no_separation(glm = glm, details = details),
-    assume_sample_size = assumption_sample_size(glm = glm, details = details)
+    assume_independent = assumption_no_multicollinearity(
+      glm = glm,
+      details = details
+    ),
+    assume_no_separation = assumption_no_separation(
+      glm = glm,
+      details = details
+    ),
+    assume_sample_size = assumption_sample_size(glm = glm, details = details),
+    assume_linearity = assumption_linearity(glm = glm, details = details)
   )
 
   # aborting assumptions
@@ -1081,7 +1176,6 @@ check_assumptions <- function(glm, details = FALSE) {
   }
 
   return(list_return)
-
 }
 
 
@@ -1105,7 +1199,6 @@ check_assumptions <- function(glm, details = FALSE) {
 #' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
 #' @noRd
 assumption_binary_outcome <- function(glm, details = FALSE) {
-
   # data prep ---
   # get the data
   df <- glm$model
@@ -1117,10 +1210,10 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
   # assumption details ---
 
   # count outcomes as a tibble
-  df_outcome_count <- df |> dplyr::count({{var_outcome}})
+  df_outcome_count <- df |> dplyr::count({{ var_outcome }})
 
   # what outcomes are included
-  outcome_levels <- df_outcome_count |> dplyr::pull({{var_outcome}})
+  outcome_levels <- df_outcome_count |> dplyr::pull({{ var_outcome }})
 
   # count how many levels are in the outcome
   outcome_level_count <- length(outcome_levels)
@@ -1168,7 +1261,6 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
 
   # return the result
   return(result)
-
 }
 
 #' Check for multicollinearity
@@ -1229,7 +1321,6 @@ assumption_binary_outcome <- function(glm, details = FALSE) {
 #' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
 #' @noRd
 assumption_no_multicollinearity <- function(glm, details = FALSE) {
-
   # get the variance inflation factor (VIF) or
   df_vif <- car::vif(glm) |>
     tibble::as_tibble(rownames = 'predictor') |>
@@ -1247,7 +1338,7 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
     dplyr::mutate(
       dplyr::across(
         .cols = dplyr::any_of('gvif_scaled'),
-        .fns = \(.x) .x ^ 2,
+        .fns = \(.x) .x^2,
         .names = "{.col}_squared"
       )
     )
@@ -1262,19 +1353,23 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
       # models involving continuous predictors only
       dplyr::across(
         .cols = dplyr::any_of('vif'),
-        .fns = \(.x) dplyr::case_when(
-          .x >= var_thresholds['VIF'] ~ TRUE,
-          .default = FALSE
-        ),
+        .fns = \(.x) {
+          dplyr::case_when(
+            .x >= var_thresholds['VIF'] ~ TRUE,
+            .default = FALSE
+          )
+        },
         .names = "above_threshold"
       ),
       # models involving categorical variables
       dplyr::across(
         .cols = dplyr::any_of('gvif_scaled_squared'),
-        .fns = \(.x) dplyr::case_when(
-          .x >= var_thresholds['GVIF^(1/(2*Df))^2'] ~ TRUE,
-          .default = FALSE
-        ),
+        .fns = \(.x) {
+          dplyr::case_when(
+            .x >= var_thresholds['GVIF^(1/(2*Df))^2'] ~ TRUE,
+            .default = FALSE
+          )
+        },
         .names = "above_threshold"
       )
     )
@@ -1294,7 +1389,7 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
 
   # what measure of inflation was used
   var_measure <- dplyr::if_else(
-    condition =  'gvif_scaled_squared' %in% names(df_vif),
+    condition = 'gvif_scaled_squared' %in% names(df_vif),
     true = 'GVIF^(1/(2*Df))^2',
     false = 'VIF'
   )
@@ -1341,8 +1436,12 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
       wrap = TRUE
     )
     cli::cli_ul()
-    cli::cli_li("For the VIF, a threshold of 5 or higher indicates multicollinearity.")
-    cli::cli_li("For the GVIF-based measures, a threshold of 2 or higher is used to indicate multicollinearity")
+    cli::cli_li(
+      "For the VIF, a threshold of 5 or higher indicates multicollinearity."
+    )
+    cli::cli_li(
+      "For the GVIF-based measures, a threshold of 2 or higher is used to indicate multicollinearity"
+    )
   }
 
   # return the result
@@ -1376,7 +1475,6 @@ assumption_no_multicollinearity <- function(glm, details = FALSE) {
 #' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
 #' @noRd
 assumption_no_separation <- function(glm, details = FALSE) {
-
   # get the model data
   glm_df <- glm$model
 
@@ -1399,7 +1497,6 @@ assumption_no_separation <- function(glm, details = FALSE) {
 
   # identify which predictor variables are responsible for separation
   if (separation) {
-
     # get the predictor variables
     var_predictors <- attr(glm$terms, "term")
 
@@ -1408,7 +1505,6 @@ assumption_no_separation <- function(glm, details = FALSE) {
       purrr::map_dfr(
         .x = var_predictors,
         .f = function(.predictor) {
-
           # remove the predictor from the formula
           glm_fm_test <- stats::update(glm_fm, paste("~ . -", .predictor))
 
@@ -1496,8 +1592,11 @@ assumption_no_separation <- function(glm, details = FALSE) {
 #'
 #' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
 #' @noRd
-assumption_sample_size <- function(glm, min_events_per_predictor = 10, details = FALSE) {
-
+assumption_sample_size <- function(
+  glm,
+  min_events_per_predictor = 10,
+  details = FALSE
+) {
   # get the model data
   glm_df <- glm$model
 
@@ -1550,13 +1649,11 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
 
   # only proceed if there is at least one factor predictor
   if (length(predictor_factors) > 0) {
-
     # count observations by each level of the factor predictors
     predictor_factor_level_count <-
       purrr::map_dfr(
         .x = predictor_factors,
         .f = function(.var = .data$.x, .df = glm$model) {
-
           # rename the outcome variable and standardise the levels
           .df <-
             .df |>
@@ -1570,12 +1667,12 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
             .df |>
             # count rows by the outcome for each predictor variable (.var) level
             dplyr::summarise(
-              predictor = {{.var}},
+              predictor = {{ .var }},
               n = dplyr::n(),
-              .by = c("outcome", {{.var}})
+              .by = c("outcome", {{ .var }})
             ) |>
             # rename var to level and move predictor to start of tibble
-            dplyr::rename(level = {{.var}}) |>
+            dplyr::rename(level = {{ .var }}) |>
             dplyr::relocate("predictor", .before = "level") |>
             # sort by count (in case this needs displaying)
             dplyr::arrange(dplyr::desc(.data$n)) |>
@@ -1590,14 +1687,17 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
 
     # test the condition
     result_factors <-
-      (min(predictor_factor_level_count$.nonevent) >= min_events_per_predictor) &
+      (min(predictor_factor_level_count$.nonevent) >=
+        min_events_per_predictor) &
       (min(predictor_factor_level_count$.event) >= min_events_per_predictor)
 
     # gather some additional information
     predictor_factor_level_too_small <-
       predictor_factor_level_count |>
-      dplyr::filter(.data$.nonevent < min_events_per_predictor |
-                      .data$.event < min_events_per_predictor)
+      dplyr::filter(
+        .data$.nonevent < min_events_per_predictor |
+          .data$.event < min_events_per_predictor
+      )
   }
 
   # alert details ---
@@ -1669,4 +1769,167 @@ assumption_sample_size <- function(glm, min_events_per_predictor = 10, details =
 
   # return the result
   return(result & result_factors)
+}
+
+#' Check for Linearity in Logistic Regression
+#'
+#' @description
+#' Evaluates the linearity assumption in logistic regression by testing
+#' whether continuous predictors have a linear relationship with the log-odds
+#' of the outcome.
+#'
+#' @details
+#' Logistic regression assumes that continuous predictors have a linear
+#' relationship with the log-odds of the outcome. This allows transforming
+#' probabilities into a linear space (log-odds) where predictors can have
+#' a linear relationship, while keeping final probabilities between 0 and 1.
+#'
+#' @section Potential Issues:
+#' Violation of the linearity assumption can lead to:
+#' - Biased odds ratio estimates
+#' - Reduced model accuracy
+#' - Misspecification of predictor effects
+#'
+#' @section Methodology:
+#' The function uses the Box-Tidwell power transformation:
+#' - Creates interaction terms between continuous predictors and their log
+#' - Compares the original model with an expanded model including these interactions
+#' - Performs a likelihood ratio test to assess model fit improvement
+#'
+#' @section Interpretation:
+#' - Significant likelihood ratio test suggests non-linear relationships
+#' - Significant interaction term p-values indicate specific predictors
+#'   that may benefit from transformation
+#'
+#' @note
+#' Warnings are not prescriptive. They suggest further investigation
+#' is needed to validate model assumptions.
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by `stats::glm()`
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#' @param p_val_threshold Numeric - what value of p-value is the threshold below which the assumption of linearity is upheld, default = 0.05
+#'
+#' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
+#' @noRd
+assumption_linearity <- function(glm, details = FALSE, p_val_threshold = 0.05) {
+  # get a summary of predictors used in the model
+  predictors <- summarise_rows_per_variable_in_model(glm)
+
+  # get the continuous predictors
+  predictors_continuous <-
+    predictors |>
+    dplyr::filter(class %in% c("numeric", "integer")) |>
+    dplyr::pull("group") |>
+    unique()
+
+  # conduct the test (if there is at least one continuous predictor)
+  if (length(predictors_continuous) == 0) {
+    # set the result as 'TRUE', i.e. there are no issues with linearity
+    result = TRUE
+  } else {
+    # create interaction terms between continuous variables and their log
+    interaction_terms <-
+      purrr::map(
+        .x = predictors_continuous,
+        # NB, using log1p in case there are any zeroes
+        .f = \(.x) glue::glue("I({.x} * log1p({.x}))")
+      )
+
+    # convert the list to a vector
+    interaction_terms <- unlist(interaction_terms)
+
+    # add the interaction terms to the formula
+    expanded_formula <-
+      stats::reformulate(
+        termlabels = c(all.vars(glm$formula)[-1], interaction_terms),
+        response = all.vars(glm$formula)[1]
+      )
+
+    # fit the expanded model
+    expanded_glm <-
+      stats::glm(
+        formula = expanded_formula,
+        family = "binomial",
+        data = glm$model
+      )
+
+    # perform the likelihood ratio test
+    lr_test <-
+      stats::anova(
+        glm,
+        expanded_glm,
+        test = "Chisq"
+      ) |>
+      janitor::clean_names()
+
+    # extract the p-values for the interaction terms
+    interaction_pvalues <-
+      summary(expanded_glm)$coefficients |>
+      tibble::as_tibble(rownames = "term") |>
+      dplyr::filter(.data$term %in% interaction_terms) |>
+      janitor::clean_names()
+
+    # summarise the results
+
+    # get the p-value from the likelihood ratio test
+    linearity_probability <-
+      lr_test |>
+      tibble::as_tibble() |>
+      dplyr::slice_tail(n = 1) |>
+      dplyr::pull("pr_chi")
+
+    # is the assumption upheld?
+    result <- linearity_probability > p_val_threshold
+
+    # which predictors are not linearly related?
+    predictors_nonlinear <-
+      interaction_pvalues |>
+      # select those who are unlikely to be linear
+      dplyr::filter(.data$pr_z <= p_val_threshold) |>
+      dplyr::mutate(
+        # extract the original term from the interaction term
+        term_original = .data$term |>
+          stringr::str_extract("(?<=I\\()([^*]+)(?=\\s*\\*)") |>
+          stringr::str_trim()
+      ) |>
+      # pull out to a vector
+      dplyr::pull("term_original")
+  }
+
+  # alert details ---
+
+  # alert the user if this assumption is not held
+  if (!result) {
+    cli::cli_warn(
+      "Signs of a non-linear relationship detected in {length(predictors_nonlinear)} of your continuous predictor variables.",
+      wrap = TRUE
+    )
+  }
+
+  # provide additional details if requested
+  if (!result & details) {
+    cli::cli_h1("Linearity assumption")
+    cli::cli_alert_warning(
+      "Signs of a non-linear relationship detected in {length(predictors_nonlinear)} of your continuous predictor variables.",
+      wrap = TRUE
+    )
+    cli::cli_alert(
+      "{.var {predictors_nonlinear}} {?appears/appear} to have non-linear relationship with the log-odds of the outcome.",
+      wrap = TRUE
+    )
+    cli::cli_alert("The Odds Ratio estimates are likely to be unreliable.")
+
+    # provide general advice on this assumption
+    cli::cli_h3("About")
+    cli::cli_alert_info(
+      "When the linearity assumption holds, each unit change in a continuous predictor produces a consistent, predictable change in the log-odds of the outcome. This consistency is crucial for reliable statistical inference. However, when linearity is violated, the model can produce misleading Odds Ratio estimates.",
+      wrap = TRUE
+    )
+    cli::cli_alert_info(
+      "Your data was analysed using a Box-Tidwell power transformation with interaction terms between continuous predictors and their log. A likelihood ratio test found the transformed model a better fit to the data, indicating there are non-linear relationships in your model data",
+      wrap = TRUE
+    )
+  }
+
+  # return the result
+  return(result)
 }
