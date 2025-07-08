@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Produces an Odds Ratio (OR) Plot to visualise the result of a logistic regression analysis. Provide it with a binomial regression model produced by 'glm()' and it will convert the estimates to odds ratios with a 95% confidence interval and plot the results using 'ggplot2'.
+Produces an odds‐ratio (OR) plot to visualise the results of a logistic regression model fitted with `glm(..., family = binomial)`. Estimates are converted to ORs with configurable confidence intervals (default is 95%). The package can return either a `ggplot2`-based plot, a formatted table via `gt`, or a set of diagnostic checks for model assumptions.
 }
 \seealso{
 Useful links:

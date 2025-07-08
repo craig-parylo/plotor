@@ -222,8 +222,8 @@ add_ci_plot <- function(
         yend = .data$y
       ),
       lineend = "round",
-      #linewidth = 1,
-      size = 1,
+      linewidth = 1,
+      #size = 1,
       color = pal_vals[2],
       alpha = 0.75
     ) +

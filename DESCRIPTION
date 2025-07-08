@@ -10,11 +10,12 @@ Authors@R:
     comment = c(ORCID = '0000-0003-4297-7808')
   )
 Maintainer: Craig Parylo <craig.parylo2@nhs.net>
-Description: Produces an Odds Ratio (OR) Plot to visualise the result of a 
-    logistic regression analysis.
-    Provide it with a binomial regression model produced by 'glm()' and it will 
-    convert the estimates to odds ratios with a 95% confidence interval and 
-    plot the results using 'ggplot2'.
+Description: 
+    Produces an odds‐ratio (OR) plot to visualise the results of a logistic 
+    regression model fitted with `glm(..., family = binomial)`. Estimates are 
+    converted to ORs with configurable confidence intervals (default is 95%).
+    The package can return either a `ggplot2`-based plot, a formatted table via 
+    `gt`, or a set of diagnostic checks for model assumptions.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -35,6 +36,7 @@ Imports:
     stats,
     stringr,
     tibble,
+    tidyr,
     tidyselect
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -42,10 +44,13 @@ Suggests:
     datasets,
     knitr,
     labelled,
+    MASS,
+    medicaldata (>= 0.2.0.9001),
+    NHANES,
+    R4HCR,
     rmarkdown,
     svglite,
     testthat (>= 3.0.0),
-    tidyr,
     vdiffr
 VignetteBuilder: knitr
 URL: https://github.com/craig-parylo/plotor, https://craig-parylo.github.io/plotor/
@@ -53,3 +58,5 @@ BugReports: https://github.com/craig-parylo/plotor/issues
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.1.0)
+Remotes: 
+    higgi13425/medicaldata
