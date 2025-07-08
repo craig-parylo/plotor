@@ -8,9 +8,9 @@ testthat::test_that("`plot_or()` does not produce messages or warnings", {
     plotor::plot_or(lr)
   })
 
-  # diabetes lr model
+  # nhanes
   testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_nhanes.Rds'))
     plotor::plot_or(lr)
   })
 })
@@ -22,9 +22,9 @@ testthat::test_that("`table_or()` does not produce messages or warnings", {
     plotor::table_or(lr)
   })
 
-  # diabetes lr model
+  # nhanes
   testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_diabetes.Rds'))
+    lr <- readRDS(file = testthat::test_path('test_data', 'lr_nhanes.Rds'))
     plotor::table_or(lr)
   })
 })
@@ -190,6 +190,30 @@ testthat::test_that("`assumption_sample_size()` works as expected", {
       # run the test that a warning is expected
       testthat::expect_warning({
         plotor:::assumption_sample_size(lr)
+      })
+    }
+  )
+})
+
+testthat::test_that("`assumption_linearity()` works as expected", {
+  # raise a warning message for models with non-linear relationships between a continuous predictor and the outcome
+
+  # 1. list some models to test for non-linearity
+  list_models <- c(
+    'lr_framingham.Rds',
+    'lr_birth_weight.Rds'
+  )
+
+  # 2. iterate over these models and test
+  purrr::walk(
+    .x = list_models,
+    .f = \(.x) {
+      # load the model
+      lr <- readRDS(file = testthat::test_path('test_data', .x))
+
+      # run the test that a warning is expected
+      testthat::expect_warning({
+        plotor:::assumption_linearity(lr)
       })
     }
   )
