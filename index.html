@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Produces an Odds Ratio Plot from a Logistic Regression Model">
-<meta name="description" content="Produces an Odds Ratio (OR) Plot to visualise the result of a logistic regression analysis. Provide it with a binomial regression model produced by glm() and it will convert the estimates to odds ratios with a 95% confidence interval and plot the results using ggplot2.">
-<meta property="og:description" content="Produces an Odds Ratio (OR) Plot to visualise the result of a logistic regression analysis. Provide it with a binomial regression model produced by glm() and it will convert the estimates to odds ratios with a 95% confidence interval and plot the results using ggplot2.">
+<meta name="description" content="Produces an odds‐ratio (OR) plot to visualise the results of a logistic regression model fitted with `glm(..., family = binomial)`. Estimates are converted to ORs with configurable confidence intervals (default is 95%). The package can return either a `ggplot2`-based plot, a formatted table via `gt`, or a set of diagnostic checks for model assumptions.">
+<meta property="og:description" content="Produces an odds‐ratio (OR) plot to visualise the results of a logistic regression model fitted with `glm(..., family = binomial)`. Estimates are converted to ORs with configurable confidence intervals (default is 95%). The package can return either a `ggplot2`-based plot, a formatted table via `gt`, or a set of diagnostic checks for model assumptions.">
 <meta property="og:image" content="https://craig-parylo.github.io/plotor/logo.png">
 </head>
 <body>
@@ -67,11 +67,11 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p>The goal of plotor is to generate Odds Ratio plots from logistic regression models.</p>
+<p>The goal of <code>plotor</code> is to generate Odds Ratio plots from logistic regression models.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of plotor from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the development version of <code>plotor</code> from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"craig-parylo/plotor"</span><span class="op">)</span></span></code></pre></div>
@@ -172,14 +172,14 @@
 <h2 id="assumption-checks">Assumption checks<a class="anchor" aria-label="anchor" href="#assumption-checks"></a>
 </h2>
 <p>New to <code>plotor</code> is a new suite of automated checks. These checks verify the data used in your logistic regression analysis upholds the required assumptions, providing an added layer of confidence in your results.</p>
-<table style="width:93%;" class="table">
+<table style="width:90%;" class="table">
 <caption>
 Assumptions for logistic regression
 </caption>
 <colgroup>
-<col style="width: 27%">
-<col style="width: 50%">
-<col style="width: 15%">
+<col style="width: 23%">
+<col style="width: 45%">
+<col style="width: 20%">
 </colgroup>
 <thead><tr>
 <th>
@@ -255,7 +255,7 @@ The observations are independent
 Each observation should be independent of the others. This means that the outcome for one observation should not be influenced by the outcome of another observation.
 </td>
 <td>
-In dev elopment
+In development
 </td>
 </tr>
 <tr>
@@ -266,18 +266,18 @@ There are no extreme outlier values
 The data should not contain outliers or influential observations that can significantly affect the estimates of the odds ratio.
 </td>
 <td>
-In dev elopment
+In development
 </td>
 </tr>
 <tr>
 <td>
-There is a linear relationship between the predictors and the logit
+There is a linear relationship between continuous predictors and the logit
 </td>
 <td>
-The relationship between the predictor variables and the log odds of the outcome should be linear. This can be checked using diagnostic plots, such as the logit plot.
+The relationship between continuous predictor variables and the log odds of the outcome should be linear.
 </td>
 <td>
-In dev elopment
+✅
 </td>
 </tr>
 </tbody>

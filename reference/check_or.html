@@ -34,7 +34,7 @@ are met, with optional detailed feedback if any tests fail."><meta property="og:
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Check OR</h1>
-      <small class="dont-index">Source: <a href="https://github.com/craig-parylo/plotor/blob/v0.7.0/R/plot_or.R" class="external-link"><code>R/plot_or.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/craig-parylo/plotor/blob/main/R/plot_or.R" class="external-link"><code>R/plot_or.R</code></a></small>
       <div class="d-none name"><code>check_or.Rd</code></div>
     </div>
 
@@ -95,9 +95,11 @@ are met, with optional detailed feedback if any tests fail.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Summary</span> ──</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> The outcome variable is binary</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> The predictor variables are not highly correlated with each other</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Predictor variables are not highly correlated with each other</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> The outcome is not separated by predictors</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> The sample size is large enough</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Continuous variables either have a linear relationship with the log-odds of</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> the outcome or are absent</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Your model was checked for logistic regression assumptions in the following</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> areas:</span>
@@ -117,6 +119,12 @@ are met, with optional detailed feedback if any tests fail.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> A rule of thumb was applied, requiring at least 10 events per predictor</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> variable and at least 10 events per level of categorical variables to ensure</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> sufficient data for reliable estimates.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">Linearity:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A likelihood ratio test was conducted to assess improvements in model fit</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> compared to a model using Box-Tidwell power transformations on continuous</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> predictors. Any observed improvement likely indicates non-linear relationships</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> between the continuous predictors and the log-odds of the outcome.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> These tests found no issues with your model.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
