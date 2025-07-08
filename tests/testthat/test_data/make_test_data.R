@@ -76,11 +76,14 @@ get_df_streptb <- function() {
   df <-
     medicaldata::strep_tb |>
     dplyr::mutate(
-      arm = arm |> forcats::fct(levels = c('Control', 'Streptomycin')),
+      arm = arm |>
+        as.character() |>
+        forcats::fct(levels = c('Control', 'Streptomycin')),
       dose_strep_g = dose_strep_g |> as.numeric(),
       dose_PAS_g = dose_PAS_g |> as.numeric(),
       gender = gender |> forcats::fct_infreq(),
       baseline_condition = baseline_condition |>
+        as.character() |>
         forcats::fct(levels = c('1_Good', '2_Fair', '3_Poor')),
       baseline_temp = baseline_temp |>
         dplyr::case_match(
@@ -91,8 +94,10 @@ get_df_streptb <- function() {
           '3_100-100.9F/37.8-38.2C/37.8-38.2C' ~ '37.8 - 38.2C',
           '4_>=101F/38.3C' ~ '>= 38.3C'
         ) |>
-        forcats::fct(levels = c('<= 37.2C', '37.3 - 37.7C', '37.8 - 38.2C', '>= 38.3C')) |>
-        forcats::fct_inorder(ordered = TRUE),
+        forcats::fct(
+          levels = c('<= 37.2C', '37.3 - 37.7C', '37.8 - 38.2C', '>= 38.3C')
+        ), #|>
+      #forcats::fct_inorder(ordered = TRUE),
       baseline_esr = baseline_esr |>
         dplyr::case_match(
           '2_11-20' ~ '11-20',
@@ -105,7 +110,16 @@ get_df_streptb <- function() {
       baseline_cavitation = baseline_cavitation |>
         forcats::fct(levels = c('no', 'yes')),
       radiologic_6m = radiologic_6m |>
-        forcats::fct(levels = c('1_Death', '2_Considerable_deterioration', '3_Moderate_deterioration', '4_No_change', '5_Moderate_improvement', '6_Considerable_improvement'))
+        forcats::fct(
+          levels = c(
+            '1_Death',
+            '2_Considerable_deterioration',
+            '3_Moderate_deterioration',
+            '4_No_change',
+            '5_Moderate_improvement',
+            '6_Considerable_improvement'
+          )
+        )
     )
 
   # create a list of variable = labels
@@ -132,7 +146,6 @@ get_df_diabetes <- function() {
   df <-
     medicaldata::diabetes |>
     janitor::clean_names()
-
 
   # create a list of variable = labels
   var_labels <- list(
@@ -173,7 +186,14 @@ get_df_correlated <- function() {
       magrittr::add(sample(1:2, size = n, replace = TRUE)) |>
       factor(
         levels = c(2, 3, 4, 5, 6, 7),
-        labels = c('Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+        labels = c(
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday'
+        )
       )
   )
 
@@ -221,12 +241,11 @@ get_df_triple_outcome <- function() {
 }
 
 get_df_separated <- function() {
-
   set.seed(123)
   n <- 1000
   df <- tibble::tibble(
     # an outcome variable with 20:80 distribution of 'alive' vs 'died'
-    outcome = sample(0:1, size = 1000, replace = TRUE, prob = c(0.2,0.8)) |>
+    outcome = sample(0:1, size = 1000, replace = TRUE, prob = c(0.2, 0.8)) |>
       factor(levels = 0:1, labels = c('Alive', 'Died')),
 
     # a separated numeric predictor variable
@@ -265,12 +284,210 @@ get_df_separated <- function() {
 
   # return the result
   return(df)
-
 }
+
+get_df_birth_weight <- function() {
+  df <-
+    MASS::birthwt |>
+    tibble::as_tibble() |>
+    # convert categorical variables to factors with appropriate values
+    dplyr::mutate(
+      low = low |>
+        factor(
+          levels = 0:1,
+          labels = c(
+            "Birth weight above 2.5kg",
+            "Low birth weight"
+          )
+        ),
+      race = race |>
+        factor(
+          levels = 1:3,
+          labels = c(
+            "White",
+            "Black",
+            "Other"
+          )
+        ),
+      smoke = smoke |>
+        factor(
+          levels = 0:1,
+          labels = c(
+            "Did not smoke",
+            "Smoked"
+          )
+        ),
+      ht = ht |>
+        factor(
+          levels = 0:1,
+          labels = c(
+            "No history of hypertension",
+            "History of hypertension"
+          )
+        ),
+      ui = ui |>
+        factor(
+          levels = 0:1,
+          labels = c(
+            "Absence of uterine irritability",
+            "Presence of uterine irritability"
+          )
+        )
+    )
+
+  # create a list of variable = labels
+  var_labels <- list(
+    low = "Low birth weight (birth weight less than 2.5 kg)",
+    age = "Mother's age (years)",
+    lwt = "Mother's weight (pounds) at last menstrual period",
+    race = "Mother's race",
+    smoke = "Smoking status during pregnancy",
+    ptl = "Number of previous premature labours",
+    ht = "History of hypertension",
+    ui = "Presence of uterine irritability",
+    ftv = "Number of physician visits during the first trimester",
+    bwt = "Birth weight (grams)"
+  )
+
+  # apply the labels
+  labelled::var_label(df) <- var_labels
+
+  # return the result
+  return(df)
+}
+
+# df <- get_df_birth_weight()
+# dplyr::glimpse(df)
+# df |> dplyr::count(low)
+# lr <- get_lr_birth_weight()
+# plotor::plot_or(lr)
+# plotor::table_or(lr, output = "gt")
+# plotor::check_or(lr)
+
+get_df_framingham <- function() {
+  df <-
+    R4HCR::Framingham |>
+    dplyr::mutate(
+      sex = sex |>
+        factor(
+          levels = c(0, 1),
+          labels = c("Female", "Male")
+        ),
+      education = education |>
+        factor(
+          levels = c(1, 2, 3, 4),
+          labels = c(
+            "0-11 years",
+            "High school diploma, GED",
+            "Some college, vocational school",
+            "College (BS, BA) degree or more"
+          )
+        ) |>
+        forcats::fct_na_value_to_level("Not known"),
+      currentsmoker = currentsmoker |>
+        factor(
+          levels = c(0, 1),
+          labels = c(
+            "Not current smoker",
+            "Current smoker"
+          )
+        ) |>
+        forcats::fct_na_value_to_level("Not known"),
+      cigsperday = cigsperday |>
+        factor(
+          levels = c(0, 1),
+          labels = c(
+            "Not current smoker",
+            "1-90 cigarettes per day"
+          )
+        ) |>
+        forcats::fct_na_value_to_level("Not known"),
+      bpmeds = bpmeds |>
+        factor(
+          levels = c(0, 1),
+          labels = c(
+            "Not currently used",
+            "Current use"
+          )
+        ) |>
+        forcats::fct_na_value_to_level("Not known"),
+      prevalentstroke = prevalentstroke |>
+        factor(
+          levels = c(0, 1),
+          labels = c(
+            "Free of disease",
+            "Prevalent stroke"
+          )
+        ) |>
+        forcats::fct_na_value_to_level("Not known"),
+      prevalenthyp = prevalenthyp |>
+        factor(
+          levels = c(0, 1),
+          labels = c(
+            "Free of disease",
+            "Prevalent hypertension"
+          )
+        ) |>
+        forcats::fct_na_value_to_level("Not known"),
+      diabetes = diabetes |>
+        factor(
+          levels = c(0, 1),
+          labels = c(
+            "No diabetes",
+            "Diabetes"
+          )
+        ) |>
+        forcats::fct_na_level_to_value("Not known"),
+      tenyearchd = tenyearchd |>
+        factor(
+          levels = c(0, 1),
+          labels = c(
+            "Free of CHD after 10 years",
+            "Developed CHD within 10 years"
+          )
+        )
+    )
+
+  # create a list of variable = labels
+  var_labels <- list(
+    sex = "Sex of participant",
+    age = "Age (years)",
+    education = "Highest educational attainment",
+    currentsmoker = "Current cigarette smoking at exam",
+    cigsperday = "Number of cigarettes smoked each day",
+    bpmeds = "Use of anti-hypertensive medication at exam",
+    prevalentstroke = "Prevalent stroke",
+    prevalenthyp = "Prevalent hypertension",
+    diabetes = "Prevalent diabetic",
+    totchol = "Serum Total Cholesterol (mg/dL)",
+    sysbp = "Systolic blood pressure (mmHg)",
+    diabp = "Diastolic blood pressure (mmHg)",
+    bmi = "Body mass index (kg/m2)",
+    heartrate = "Heart rate (beats/min)",
+    glucose = "Casual serum glucose (mg/dL)",
+    tenyearchd = "Developed Coronary Heart Disease within ten years"
+  )
+
+  # apply the labels
+  labelled::var_label(df) <- var_labels
+
+  # return the results
+  return(df)
+}
+
+# df_framingham <- get_df_framingham()
+#
+#
+# lr_framingham <- get_lr_framingham()
+
+get_df_nhanes <- function() {
+  df <-
+    NHANES::NHANES
+}
+
 
 # Model functions --------------------------------------------------------------
 get_lr_titanic <- function() {
-
   df <- get_df_titanic()
   lr <- stats::glm(
     data = df,
@@ -282,7 +499,6 @@ get_lr_titanic <- function() {
 }
 
 get_lr_infert <- function() {
-
   df <- get_df_infert()
   lr <- stats::glm(
     data = df,
@@ -298,7 +514,14 @@ get_lr_diabetes <- function() {
   lr <- stats::glm(
     data = df,
     family = 'binomial',
-    formula = diabetes_5y ~ age + bmi + pregnancy_num + glucose_mg_dl + dbp_mm_hg + triceps_mm + insulin_microiu_ml
+    formula = diabetes_5y ~
+      age +
+        bmi +
+        pregnancy_num +
+        glucose_mg_dl +
+        dbp_mm_hg +
+        triceps_mm +
+        insulin_microiu_ml
   )
 }
 
@@ -307,7 +530,13 @@ get_lr_streptb <- function() {
   lr <- stats::glm(
     data = df,
     family = 'binomial',
-    formula = improved ~ gender + dose_strep_g + baseline_condition + baseline_temp + baseline_esr + baseline_cavitation
+    formula = improved ~
+      gender +
+        dose_strep_g +
+        baseline_condition +
+        baseline_temp +
+        baseline_esr +
+        baseline_cavitation
   )
 }
 
@@ -368,6 +597,49 @@ get_lr_separated_quasi <- function() {
     )
 }
 
+get_lr_birth_weight <- function() {
+  df <- get_df_birth_weight()
+  lr <- stats::glm(
+    data = df,
+    family = binomial,
+    formula = low ~ age + lwt + race + smoke + ptl + ht + ui + ftv
+  )
+
+  return(lr)
+}
+
+get_lr_framingham <- function() {
+  df <- get_df_framingham()
+  lr <- stats::glm(
+    data = df,
+    family = binomial,
+    formula = tenyearchd ~
+      sex +
+        age +
+        education +
+        currentsmoker +
+        bpmeds +
+        prevalentstroke +
+        prevalenthyp +
+        diabetes +
+        totchol +
+        sysbp +
+        diabp +
+        bmi +
+        heartrate +
+        glucose
+  )
+}
+
+get_lr_nhanes <- function() {
+  df <- get_df_nhanes()
+  lr <- stats::glm(
+    data = df,
+    family = binomial,
+    formula = Diabetes ~ Gender + BPSys3 + Education
+  )
+}
+
 # Get data ---------------------------------------------------------------------
 # df
 df_titanic <- get_df_titanic()
@@ -377,12 +649,18 @@ df_diabetes <- get_df_diabetes()
 df_triple_outcome <- get_df_triple_outcome()
 df_correlated <- get_df_correlated()
 df_separated <- get_df_separated()
+df_birth_weight <- get_df_birth_weight()
+df_framingham <- get_df_framingham()
+df_nhanes <- get_df_nhanes()
 
 # lr
 lr_titanic <- get_lr_titanic()
 lr_infert <- get_lr_infert()
 lr_diabetes <- get_lr_diabetes()
 lr_streptb <- get_lr_streptb()
+lr_birth_weight <- get_lr_birth_weight()
+lr_framingham <- get_lr_framingham()
+lr_nhanes <- get_lr_nhanes()
 
 # non-lr
 nonlr_streptb <- get_nonlr_streptb()
@@ -396,6 +674,7 @@ lr_correlated_four <- get_lr_correlated_four()
 
 # separated
 lr_separated <- get_lr_separated()
+
 
 # Save data --------------------------------------------------------------------
 
@@ -478,4 +757,33 @@ if (flag_save_data) {
     file = testthat::test_path('test_data', 'lr_separated.Rds')
   )
 
+  # framingham
+  saveRDS(
+    object = df_framingham,
+    file = testthat::test_path('test_data', 'df_framingham.Rds')
+  )
+  saveRDS(
+    object = lr_framingham,
+    file = testthat::test_path('test_data', 'lr_framingham.Rds')
+  )
+
+  # birth weight
+  saveRDS(
+    object = df_birth_weight,
+    file = testthat::test_path('test_data', 'df_birth_weight.Rds')
+  )
+  saveRDS(
+    object = lr_birth_weight,
+    file = testthat::test_path('test_data', 'lr_birth_weight.Rds')
+  )
+
+  # nhanes
+  saveRDS(
+    object = df_nhanes,
+    file = testthat::test_path('test_data', 'df_nhanes.Rds')
+  )
+  saveRDS(
+    object = lr_nhanes,
+    file = testthat::test_path('test_data', 'lr_nhanes.Rds')
+  )
 }
