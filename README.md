@@ -13,12 +13,12 @@ status](https://www.r-pkg.org/badges/version/plotor)](https://CRAN.R-project.org
 
 <!-- badges: end -->
 
-The goal of plotor is to generate Odds Ratio plots from logistic
+The goal of `plotor` is to generate Odds Ratio plots from logistic
 regression models.
 
 ## Installation
 
-You can install the development version of plotor from
+You can install the development version of `plotor` from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -167,12 +167,12 @@ New to `plotor` is a new suite of automated checks. These checks verify
 the data used in your logistic regression analysis upholds the required
 assumptions, providing an added layer of confidence in your results.
 
-<table style="width:93%;">
+<table style="width:90%;">
 <caption>Assumptions for logistic regression</caption>
 <colgroup>
-<col style="width: 27%" />
-<col style="width: 50%" />
-<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 45%" />
+<col style="width: 20%" />
 </colgroup>
 <thead>
 <tr>
@@ -221,21 +221,20 @@ of the odds ratio. A general rule of thumb is to have at least 10 events
 <td>Each observation should be independent of the others. This means
 that the outcome for one observation should not be influenced by the
 outcome of another observation.</td>
-<td>In dev elopment</td>
+<td>In development</td>
 </tr>
 <tr>
 <td>There are no extreme outlier values</td>
 <td>The data should not contain outliers or influential observations
 that can significantly affect the estimates of the odds ratio.</td>
-<td>In dev elopment</td>
+<td>In development</td>
 </tr>
 <tr>
-<td>There is a linear relationship between the predictors and the
+<td>There is a linear relationship between continuous predictors and the
 logit</td>
-<td>The relationship between the predictor variables and the log odds of
-the outcome should be linear. This can be checked using diagnostic
-plots, such as the logit plot.</td>
-<td>In dev elopment</td>
+<td>The relationship between continuous predictor variables and the log
+odds of the outcome should be linear.</td>
+<td>✅</td>
 </tr>
 </tbody>
 </table>
