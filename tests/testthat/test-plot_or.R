@@ -89,6 +89,7 @@ testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
 })
 
 # validation functions ---------------------------------------------------------
+## conf_level_input() ----
 testthat::test_that("`validate_conf_level_input()` works as expected", {
   # inputs which are not single value and numeric
   testthat::expect_error(plotor:::validate_conf_level_input("0.95"))
@@ -113,6 +114,7 @@ testthat::test_that("`validate_conf_level_input()` works as expected", {
   testthat::expect_message(plotor:::validate_conf_level_input(99))
 })
 
+## assumption_binary_outcome() ----
 testthat::test_that("`assumption_binary_outcome()` works as expected", {
   # raise error for models with more than two outcome levels
   testthat::expect_error({
@@ -123,6 +125,7 @@ testthat::test_that("`assumption_binary_outcome()` works as expected", {
   })
 })
 
+## assumption_no_multicollinearity() ----
 testthat::test_that("`assumption_no_multicollinearity()` works as expected", {
   # raise warning message for models with high correlations
   testthat::expect_warning({
@@ -148,6 +151,7 @@ testthat::test_that("`assumption_no_multicollinearity()` works as expected", {
   })
 })
 
+## assumption_no_separation() ----
 testthat::test_that("`assumption_no_separation()` works as expected", {
   # raise warning message for models with separation
   testthat::expect_warning({
@@ -156,6 +160,18 @@ testthat::test_that("`assumption_no_separation()` works as expected", {
   })
 })
 
+## assumpption_no_separation_fast() ----
+testthat::test_that("`assumption_no_separation_fast()` works as expected", {
+  # raise warning message for models with separation
+  testthat::expect_warning({
+    lr <- readRDS(
+      file = testthat::test_path('test_data', 'lr_separated_large.Rds')
+    )
+    plotor:::assumption_no_separation_fast(lr)
+  })
+})
+
+## assumption_sample_size() ----
 testthat::test_that("`assumption_sample_size()` works as expected", {
   # raise a warning message for models with too few observations
 
@@ -195,6 +211,7 @@ testthat::test_that("`assumption_sample_size()` works as expected", {
   )
 })
 
+## assumption_linearity() ----
 testthat::test_that("`assumption_linearity()` works as expected", {
   # raise a warning message for models with non-linear relationships between a continuous predictor and the outcome
 
@@ -218,3 +235,4 @@ testthat::test_that("`assumption_linearity()` works as expected", {
     }
   )
 })
+
