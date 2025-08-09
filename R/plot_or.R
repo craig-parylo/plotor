@@ -1663,7 +1663,6 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
     )
 
   # consolidate the results to a single TRUE / FALSE
-  #result <- results$separation |> any(na.rm = TRUE)
   result <- !results$separation |> any(na.rm = TRUE)
 
   # list predictors where there are signs of separation
