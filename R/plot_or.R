@@ -58,7 +58,8 @@ plot_or <- function(
   # check logistic regression assumptions
   valid_assumptions <- check_assumptions(
     glm = glm_model_results,
-    details = FALSE
+    details = FALSE,
+    confint_fast_estimate = confint_fast_estimate
   )
 
   # limit conf_level to between 0.001 and 0.999
@@ -160,7 +161,8 @@ table_or <- function(
   # check logistic regression assumptions
   valid_assumptions <- check_assumptions(
     glm = glm_model_results,
-    details = FALSE
+    details = FALSE,
+    confint_fast_estimate = confint_fast_estimate
   )
 
   # limit conf_level to between 0.001 and 0.999
@@ -260,7 +262,7 @@ check_or <- function(
   # NB, detailed feedback is handled by each of the test functions
   test_results <- check_assumptions(
     glm = glm_model_results,
-    #confint_fast_estimate = confint_fast_estimate,
+    confint_fast_estimate = confint_fast_estimate,
     details = details
   )
 
@@ -356,9 +358,15 @@ check_or <- function(
   cli::cli_end()
   cli::cli_par()
   cli::cli_text("{.emph Separation:}")
-  cli::cli_text(
-    "The {.fn detectseparation} function from the {.pkg detectseparation} package was used to check for complete or quasi-complete separation in the data."
-  )
+  if (confint_fast_estimate) {
+    cli::cli_text(
+      "Numeric predictors were checked for overlapping ranges across both outcomes and categorical predictors were checked for each level appearing at least once in both outcomes."
+    )
+  } else {
+    cli::cli_text(
+      "The {.fn detectseparation} function from the {.pkg detectseparation} package was used to check for complete or quasi-complete separation in the data."
+    )
+  }
   cli::cli_end()
   cli::cli_par()
   cli::cli_text("{.emph Sample size:}")
@@ -1154,19 +1162,28 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
 #'
 #' @returns Named list indicating the results of each assumption
 #' @noRd
-check_assumptions <- function(glm, details = FALSE) {
+check_assumptions <- function(
+  glm,
+  details = FALSE,
+  confint_fast_estimate = FALSE
+) {
   # check assumptions
   list_return <- list(
     assume_binary = assumption_binary_outcome(glm = glm, details = details),
+
     assume_independent = assumption_no_multicollinearity(
       glm = glm,
       details = details
     ),
-    assume_no_separation = assumption_no_separation(
-      glm = glm,
-      details = details
+
+    assume_no_separation = ifelse(
+      test = confint_fast_estimate,
+      yes = assumption_no_separation_fast(glm = glm, details = details),
+      no = assumption_no_separation(glm = glm, details = details)
     ),
+
     assume_sample_size = assumption_sample_size(glm = glm, details = details),
+
     assume_linearity = assumption_linearity(glm = glm, details = details)
   )
 
@@ -1550,7 +1567,7 @@ assumption_no_separation <- function(glm, details = FALSE) {
     # provide general advice on this assumption
     cli::cli_h3("About")
     cli::cli_alert_info(
-      "The assumption of no separation in logistic regression is important because it ensures that the predictor variables do not perfectly predict the outcome variable. If separation occurs, it can lead to infinite estimates for the coefficients, making the model unstable and unreliable. This can result in difficulties in interpretation and hinder the model's ability to generalize to new data.",
+      "The assumption of no separation in logistic regression is important because it ensures that the predictor variables do not perfectly predict the outcome variable. If separation occurs, it can lead to infinite estimates for the coefficients, making the model unstable and unreliable. This can result in difficulties in interpretation and hinder the model's ability to generalise to new data.",
       wrap = TRUE
     )
     cli::cli_alert_info(
@@ -1560,6 +1577,134 @@ assumption_no_separation <- function(glm, details = FALSE) {
   }
 
   # return the result
+  return(result)
+}
+
+#' Check for complete separation in logistic regression
+#'
+#' This function checks for potential issues with complete separation.
+#'
+#' Complete separation happens when one or more predictors perfectly predict
+#' the binary outcome. In such cases, coefficient estimates and standard
+#' errors can become unstable, undermining inference and interpretation.
+#'
+#' This function tests each predictor in a binomial GLM for potential
+#' separation:
+#' - Numeric predictors: checks whether the range of values for each
+#'   outcome class overlaps. Non-overlapping ranges signal separation.
+#' - Categorical predictors: checks whether any factor level has zero
+#'   observations in one of the outcome classes.
+#'
+#' If a predictor shows signs of separation, a warning is issued. The warning
+#' does not stop execution but indicates you should review your model and data
+#' more closely.
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#'
+#' @returns Boolean: TRUE = assumption is upheld, FALSE = assumption failed
+#' @noRd
+assumption_no_separation_fast <- function(glm, details = FALSE) {
+  # gather some information
+  df <- glm$model
+  outcome <- glm$formula[[2]]
+  predictors <-
+    plotor:::summarise_rows_per_variable_in_model(glm) |>
+    dplyr::select(group, class) |>
+    dplyr::distinct()
+
+  # test each predictor for separation
+  results <-
+    purrr::map2_dfr(
+      .x = predictors$group,
+      .y = predictors$class %in% c('integer', 'numeric'),
+      .f = \(.pred, .numeric) {
+        # test for separation depends on whether the predictor is numeric
+        if (.numeric) {
+          # work out the predictor ranges for each outcome
+          range <-
+            df |>
+            dplyr::summarise(
+              low = min({{ .pred }}, na.rm = TRUE),
+              high = max({{ .pred }}, na.rm = TRUE),
+              .by = outcome
+            )
+
+          # do the ranges overlap?
+          result <-
+            (range[[1, 2]] <= range[[2, 3]]) &
+            (range[[2, 2]] <= range[[1, 3]])
+        } else {
+          # a factor variable:
+          # do any levels result in zero outcomes?
+          result <-
+            df |>
+            # count the outcomes by the predictor
+            dplyr::count({{ outcome }}, {{ .pred }}) |>
+            # put the outcome as columns
+            tidyr::pivot_wider(
+              names_from = {{ outcome }},
+              values_from = n,
+              values_fill = 0
+            ) |>
+            dplyr::rename(n0 = 2, n1 = 3) |>
+            dplyr::filter(n0 == 0 | n1 == 0) |>
+            dplyr::summarise(separated = dplyr::n() > 0) |>
+            dplyr::pull(separated)
+        }
+
+        # return the result
+        df_result <- tibble::tibble(
+          predictor = .pred,
+          separation = result
+        )
+        return(df_result)
+      }
+    )
+
+  # consolidate the results to a single TRUE / FALSE
+  #result <- results$separation |> any(na.rm = TRUE)
+  result <- !results$separation |> any(na.rm = TRUE)
+
+  # list predictors where there are signs of separation
+  var_separation <- results |>
+    dplyr::filter(separation == TRUE) |>
+    dplyr::pull(predictor)
+
+  # alert details ---
+
+  # alert the user if this assumption is not held
+  if (!result) {
+    cli::cli_warn(
+      "Signs of separation detected in {length(var_separation)} of your predictor variables."
+    )
+  }
+
+  # provide additional details if requested
+  if (!result && details) {
+    cli::cli_h1("No separation assumption")
+    cli::cli_alert_warning(
+      "Signs of separation detected in {length(var_separation)} of your predictor variables."
+    )
+    cli::cli_alert(
+      "{.var {var_separation}} {?is/are} associated with complete separation.",
+      wrap = TRUE
+    )
+    cli::cli_alert("The Odds Ratio estimates are likely to be unreliable.")
+
+    # provide general advice on this assumption
+    cli::cli_h3("About")
+    cli::cli_alert_info(
+      "The assumption of no separation in logistic regression is important because it ensures that the predictor variables do not perfectly predict the outcome variable. If separation occurs, it can lead to infinite estimates for the coefficients, making the model unstable and unreliable. This can result in difficulties in interpretation and hinder the model's ability to generalise to new data.",
+      wrap = TRUE
+    )
+    cli::cli_alert_info(
+      "Your data was analysed for complete separation. For numeric predictors, the ranges of each outcome class were compared. Non-overlapping ranges indicate separation. For categorical predictors, each factor level was checked to ensure it appears in both outcome classes; any level found in only one class signals separation.",
+      wrap = TRUE
+    )
+  }
+
+  # return the results
   return(result)
 }
 
@@ -1597,6 +1742,7 @@ assumption_sample_size <- function(
   min_events_per_predictor = 10,
   details = FALSE
 ) {
+
   # get the model data
   glm_df <- glm$model
 
@@ -1679,12 +1825,16 @@ assumption_sample_size <- function(
             # pivot outcomes to their own columns
             tidyr::pivot_wider(
               names_from = dplyr::any_of("outcome"),
-              #values_from = .data$n
               values_from = "n"
+            ) |> 
+            # replace any NA values with zeroes (in cases of complete separation)
+            dplyr::mutate(
+              .event = dplyr::coalesce(.event, 0L),
+              .nonevent = dplyr::coalesce(.nonevent, 0L)
             )
         }
       )
-
+    
     # test the condition
     result_factors <-
       (min(predictor_factor_level_count$.nonevent) >=
