@@ -88,6 +88,34 @@ testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
   })
 })
 
+## test `assumption_checks` parameter works
+# setting to `TRUE` with models with known issues should result in a warning and should be silent if setting to `FALSE`
+testthat::test_that("`assumption_checks` parameter works as expected", {
+
+  # 1. list some models that result in at least one warning for assumptions
+  list_models <- c(
+    'lr_diabetes.Rds',
+    'lr_infert.Rds'
+  )
+
+  # 2. iterate over these models and test
+  purrr::walk(
+    .x = list_models,
+    .f = \(.x) {
+      # load the model
+      lr <- readRDS(file = testthat::test_path('test_data', .x))
+
+      # test that warnings are not raised if `assumption_checks` is FALSE
+      testthat::expect_silent({
+        plotor::plot_or(lr, assumption_checks = FALSE)
+      })
+      testthat::expect_silent({
+        plotor::table_or(lr, assumption_checks = FALSE)
+      })
+    }
+  )
+})
+
 # validation functions ---------------------------------------------------------
 ## conf_level_input() ----
 testthat::test_that("`validate_conf_level_input()` works as expected", {
