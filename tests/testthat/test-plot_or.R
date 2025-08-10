@@ -89,7 +89,7 @@ testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
 })
 
 ## test `assumption_checks` parameter works
-# setting to `TRUE` with models with known issues should result in a warning and should be silent if setting to `FALSE`
+# setting to `FALSE` with models with known issues should not result in warnings
 testthat::test_that("`assumption_checks` parameter works as expected", {
 
   # 1. list some models that result in at least one warning for assumptions
