@@ -7,3 +7,7 @@ inst/doc
 /Meta/
 docs
 /plotor_image/
+/secret/
+revdep
+
+/.quarto/

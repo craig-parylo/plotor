@@ -240,33 +240,34 @@ get_df_triple_outcome <- function() {
   return(df)
 }
 
-get_df_separated <- function() {
+get_df_separated <- function(rows = 1000) {
   set.seed(123)
-  n <- 1000
+  #n <- 1000
+  n <- rows
   df <- tibble::tibble(
     # an outcome variable with 20:80 distribution of 'alive' vs 'died'
-    outcome = sample(0:1, size = 1000, replace = TRUE, prob = c(0.2, 0.8)) |>
+    outcome = sample(0:1, size = n, replace = TRUE, prob = c(0.2, 0.8)) |>
       factor(levels = 0:1, labels = c('Alive', 'Died')),
 
     # a separated numeric predictor variable
     pred1 = dplyr::if_else(
       condition = outcome == 'Alive',
-      true = sample(0:10, size = 1000, replace = TRUE),
-      false = sample(10:20, size = 1000, replace = TRUE)
+      true = sample(0:10, size = n, replace = TRUE),
+      false = sample(10:20, size = n, replace = TRUE)
     ),
 
     # a separated categorical predictor variable
     pred2 = dplyr::if_else(
       condition = outcome == 'Alive',
-      true = sample(0:2, size = 1000, replace = TRUE),
-      false = sample(1:3, size = 1000, replace = TRUE)
+      true = sample(0:2, size = n, replace = TRUE),
+      false = sample(1:3, size = n, replace = TRUE)
     ) |>
       factor(levels = 0:3, labels = c('North', 'South', 'East', 'West')),
 
     # two randomly allocated predictors
-    pred3 = rpois(n = 1000, lambda = 10),
+    pred3 = rpois(n = n, lambda = 10),
 
-    pred4 = sample(0:3, size = 1000, replace = TRUE) |>
+    pred4 = sample(0:3, size = n, replace = TRUE) |>
       factor(levels = 0:3, labels = c('red', 'green', 'yellow', 'blue')),
   )
 
@@ -597,6 +598,15 @@ get_lr_separated_quasi <- function() {
     )
 }
 
+get_lr_separated_large <- function() {
+  df <- get_df_separated(rows = 1e5)
+  lr <- stats::glm(
+    data = df,
+    formula = outcome ~ pred1 + pred2,
+    family = 'binomial'
+  )
+}
+
 get_lr_birth_weight <- function() {
   df <- get_df_birth_weight()
   lr <- stats::glm(
@@ -649,6 +659,7 @@ df_diabetes <- get_df_diabetes()
 df_triple_outcome <- get_df_triple_outcome()
 df_correlated <- get_df_correlated()
 df_separated <- get_df_separated()
+df_separated_large <- get_df_separated(rows = 1e5)
 df_birth_weight <- get_df_birth_weight()
 df_framingham <- get_df_framingham()
 df_nhanes <- get_df_nhanes()
@@ -674,6 +685,7 @@ lr_correlated_four <- get_lr_correlated_four()
 
 # separated
 lr_separated <- get_lr_separated()
+lr_separated_large <- get_lr_separated_large()
 
 
 # Save data --------------------------------------------------------------------
@@ -755,6 +767,12 @@ if (flag_save_data) {
   saveRDS(
     object = lr_separated,
     file = testthat::test_path('test_data', 'lr_separated.Rds')
+  )
+
+  # separated large
+  saveRDS(
+    object = lr_separated_large,
+    file = testthat::test_path('test_data', 'lr_separated_large.Rds')
   )
 
   # framingham
