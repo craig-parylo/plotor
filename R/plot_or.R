@@ -8,6 +8,7 @@
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
 #' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
+#' @param assumption_checks Boolean (default = `TRUE`) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.
 #'
 #' @return
 #' The function returns an object of class `gg` and `ggplot`, which can be
@@ -49,18 +50,21 @@
 plot_or <- function(
   glm_model_results,
   conf_level = 0.95,
-  confint_fast_estimate = FALSE
+  confint_fast_estimate = FALSE,
+  assumption_checks = TRUE
 ) {
   # data and input checks ----
   # check the model is logistic regression
   valid_glm_model <- validate_glm_model(glm_model_results)
 
-  # check logistic regression assumptions
-  valid_assumptions <- check_assumptions(
-    glm = glm_model_results,
-    details = FALSE,
-    confint_fast_estimate = confint_fast_estimate
-  )
+  # check logistic regression assumptions if the user requested it
+  if (assumption_checks) {
+    valid_assumptions <- check_assumptions(
+      glm = glm_model_results,
+      details = FALSE,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  }
 
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
@@ -119,6 +123,7 @@ plot_or <- function(
 #' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
 #' @param output String describing of the output type (default = 'tibble'). Options include 'tibble' and 'gt'.
 #' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
+#' @param assumption_checks Boolean (default = `TRUE`) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.
 #'
 #' @returns
 #' The returned object depends on the `output` parameter:
@@ -152,18 +157,21 @@ table_or <- function(
   glm_model_results,
   conf_level = 0.95,
   output = 'tibble',
-  confint_fast_estimate = FALSE
+  confint_fast_estimate = FALSE,
+  assumption_checks = TRUE
 ) {
   # data and input checks ----
   # check the model is logistic regression
   valid_glm_model <- validate_glm_model(glm_model_results)
 
-  # check logistic regression assumptions
-  valid_assumptions <- check_assumptions(
-    glm = glm_model_results,
-    details = FALSE,
-    confint_fast_estimate = confint_fast_estimate
-  )
+  # check logistic regression assumptions if the user requested it
+  if (assumption_checks) {
+    valid_assumptions <- check_assumptions(
+      glm = glm_model_results,
+      details = FALSE,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  }
 
   # limit conf_level to between 0.001 and 0.999
   conf_level <- validate_conf_level_input(conf_level)
