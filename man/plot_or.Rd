@@ -4,7 +4,12 @@
 \alias{plot_or}
 \title{Plot OR}
 \usage{
-plot_or(glm_model_results, conf_level = 0.95, confint_fast_estimate = FALSE)
+plot_or(
+  glm_model_results,
+  conf_level = 0.95,
+  confint_fast_estimate = FALSE,
+  assumption_checks = TRUE
+)
 }
 \arguments{
 \item{glm_model_results}{Results from a binomial Generalised Linear Model (GLM), as produced by \code{\link[stats:glm]{stats::glm()}}.}
@@ -12,6 +17,8 @@ plot_or(glm_model_results, conf_level = 0.95, confint_fast_estimate = FALSE)
 \item{conf_level}{Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.}
 
 \item{confint_fast_estimate}{Boolean (default = \code{FALSE}) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.}
+
+\item{assumption_checks}{Boolean (default = \code{TRUE}) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.}
 }
 \value{
 The function returns an object of class \code{gg} and \code{ggplot}, which can be
