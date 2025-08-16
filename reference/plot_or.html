@@ -45,7 +45,12 @@ analysis.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_or</span><span class="op">(</span><span class="va">glm_model_results</span>, conf_level <span class="op">=</span> <span class="fl">0.95</span>, confint_fast_estimate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_or</span><span class="op">(</span></span>
+<span>  <span class="va">glm_model_results</span>,</span>
+<span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  confint_fast_estimate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  assumption_checks <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -62,6 +67,10 @@ analysis.</p>
 
 <dt id="arg-confint-fast-estimate">confint_fast_estimate<a class="anchor" aria-label="anchor" href="#arg-confint-fast-estimate"></a></dt>
 <dd><p>Boolean (default = <code>FALSE</code>) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.</p></dd>
+
+
+<dt id="arg-assumption-checks">assumption_checks<a class="anchor" aria-label="anchor" href="#arg-assumption-checks"></a></dt>
+<dd><p>Boolean (default = <code>TRUE</code>) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.</p></dd>
 
 </dl></div>
     <div class="section level2">
