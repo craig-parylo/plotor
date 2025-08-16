@@ -9,7 +9,8 @@ table_or(
   conf_level = 0.95,
   output = "tibble",
   confint_fast_estimate = FALSE,
-  assumption_checks = TRUE
+  assumption_checks = TRUE,
+  anonymise_counts = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ table_or(
 \item{confint_fast_estimate}{Boolean (default = \code{FALSE}) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.}
 
 \item{assumption_checks}{Boolean (default = \code{TRUE}) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.}
+
+\item{anonymise_counts}{Boolean (default = \code{FALSE}) indicating whether to anonymise counts in the outputted table. If \code{TRUE} counts less than 10 are suppressed and otherwise rounded to the nearest multiple of 5. This feature can helpful when working with sensitive data.}
 }
 \value{
 The returned object depends on the \code{output} parameter:
@@ -64,6 +67,9 @@ Details are calculated showing the:
 \item estimated Odds Ratio, standard error and p-value,
 \item calculated confidence interval for the confidence level,
 }
+
+If \code{anonymise_counts} is set to \code{TRUE} then counts below 10 are suppressed
+by \verb{<10} and otherwise are rounded to the nearest multiple of 5.
 
 Also included is a visualisation of the OR plot to provide an at-a-glance
 view of the model results.
