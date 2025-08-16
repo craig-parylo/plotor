@@ -99,45 +99,40 @@ plot_or <- function(
 
 #' Table OR
 #'
-#' Produces a formatted table showing the outputs from the Odds Ratio analysis,
-#' including details on covariate characteristics and model results.
+#' @description
+#' Produces a formatted table displaying the outputs from the Odds Ratio
+#' analysis, including details on covariate characteristics and model results.
 #'
 #' @details
 #' The table includes the following information:
-#' * Covariate characteristics:
-#'   * Number of observations for each characteristic
-#'   * Number of observiations resulting in the outcome of interest
-#'   * Conversion rate of outcome by the number of observations
+#' - **Covariate Characteristics**:
+#'   - Number of observations for each characteristic
+#'   - Number of observations resulting in the outcome of interest
+#'   - Conversion rate of the outcome based on the number of observations
 #'
-#' * Model results:
-#'   * Estimated Odds Ratio, standard error and p-value
-#'   * Calculated confidence interval for the specified confidence level
+#' - **Model Results**:
+#'   - Estimated Odds Ratio, standard error, and p-value
+#'   - Calculated confidence interval for the specified confidence level
 #'
-#' * A visualisation of the OR plot is also provided for an at-a-glance view of
-#' the model results
-#'
-#' Includes details on the characteristics of the covariates, such as:
-#' * the number of observations for each characteristic,
-#' * the number of observations resulting in the outcome of interest,
-#' * the conversion rate of outcome by the number of observations,
-#'
-#' Details are calculated showing the:
-#' * estimated Odds Ratio, standard error and p-value,
-#' * calculated confidence interval for the confidence level,
-#'
-#' Also included is a visualisation of the OR plot to provide an at-a-glance
+#' A visualisation of the Odds Ratio plot is also provided for an at-a-glance
 #' view of the model results.
+#'
+#' If `anonymise_counts` is set to `TRUE`, counts below 10 are suppressed as
+#' `<10`, and other counts are rounded to the nearest multiple of 5. This
+#' feature is helpful when working with sensitive data.
 #'
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
-#' @param output String describing of the output type (default = 'tibble'). Options include 'tibble' and 'gt'.
+#' @param output String describing the output type (default = 'tibble'). Options include 'tibble' and 'gt'.
 #' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
 #' @param assumption_checks Boolean (default = `TRUE`) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.
+#' @param anonymise_counts Boolean (default = `FALSE`) indicating whether to anonymise counts in the output table. If `TRUE`, counts less than 10 are suppressed and otherwise rounded to the nearest multiple of 5.
 #'
 #' @returns
 #' The returned object depends on the `output` parameter:
-#' * If `output = 'tibble'`, the function returns an object of class "tbl_df", "tbl" and "data.frame".
-#' * If `output = 'gt'`, the function returns an object of class "gt_tbl" and "list"
+#' - If `output = 'tibble'`, the function returns an object of class "tbl_df", "tbl", and "data.frame".
+#' - If `output = 'gt'`, the function returns an object of class "gt_tbl" and "list".
+#'
 #' @export
 #'
 #' @examples
@@ -167,7 +162,8 @@ table_or <- function(
   conf_level = 0.95,
   output = 'tibble',
   confint_fast_estimate = FALSE,
-  assumption_checks = TRUE
+  assumption_checks = TRUE,
+  anonymise_counts = FALSE
 ) {
   # data and input checks ----
   # check the model is logistic regression
@@ -224,6 +220,18 @@ table_or <- function(
     # work out the rate of 'outcome'
     dplyr::mutate(outcome_rate = .data$outcome / .data$rows) |>
     dplyr::relocate('outcome_rate', .after = 'outcome')
+
+  # anonymise count data if requested
+  if (anonymise_counts) {
+    df <-
+      df |>
+      dplyr::mutate(
+        dplyr::across(
+          .cols = dplyr::any_of(c("outcome", "rows")),
+          .fns = ~ anonymise_count_values(.x)
+        )
+      )
+  }
 
   # decide what object to return
   obj_return <-
@@ -843,6 +851,36 @@ suggest_check_or <- function(
       wrap = TRUE
     )
   }
+}
+
+#' Anonymise Count Values
+#'
+#' @description
+#' Anonymises counts within a supplied numeric vector by applying specific formatting rules.
+#'
+#' @details
+#' This function provides a vectorised approach to data anonymisation that:
+#' - Suppresses counts below 10 by replacing them with the string "<10".
+#' - Rounds counts of 10 or more to the nearest multiple of 5.
+#' - Formats counts using `scales::label_number_auto()` to include thousands separators, which repects the locale settings for choice of the big mark.
+#'
+#' The function returns a vector of strings representing the anonymised counts.
+#'
+#' @param var A numeric vector containing count data.
+#'
+#' @return A character vector of anonymised counts.
+anonymise_count_values <- function(var) {
+  # Ensure `var` is a numeric vector
+  var <- as.numeric(var)
+
+  # Suppress counts below 10 and round the rest to the nearest multiple of 5
+  vec_return <- dplyr::case_when(
+    var < 10 ~ "<10",
+    TRUE ~ scales::label_number_auto()(round(var / 5) * 5) # Round to nearest multiple of 5 and format the number
+  )
+
+  # Return the result
+  return(vec_return)
 }
 
 ## validation funcs -----
