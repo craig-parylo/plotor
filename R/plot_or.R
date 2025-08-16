@@ -64,6 +64,15 @@ plot_or <- function(
       details = FALSE,
       confint_fast_estimate = confint_fast_estimate
     )
+
+    # recommend to the user to use `check_or` for more feedback if at least one
+    # test fails
+    suggest_check_or(
+      # pass in the name of the model
+      glm_name = deparse(substitute(glm_model_results)),
+      valid_assumptions = valid_assumptions,
+      assumption_checks = assumption_checks
+    )
   }
 
   # limit conf_level to between 0.001 and 0.999
@@ -170,6 +179,15 @@ table_or <- function(
       glm = glm_model_results,
       details = FALSE,
       confint_fast_estimate = confint_fast_estimate
+    )
+
+    # recommend to the user to use `check_or` for more feedback if at least one
+    # test fails
+    suggest_check_or(
+      # pass in the name of the model
+      glm_name = deparse(substitute(glm_model_results)),
+      valid_assumptions = valid_assumptions,
+      assumption_checks = assumption_checks
     )
   }
 
@@ -784,6 +802,47 @@ use_var_labels <- function(df, lr) {
     dplyr::arrange('label', 'level')
 
   return(df_return)
+}
+
+#' Suggest the Use of check_or()
+#'
+#' @description
+#' This function suggests using the check_or() function for more detailed
+#' feedback if any of the assumption tests fail.
+#'
+#' @details
+#' The function outputs a console message that, when any assumption checks
+#' fail, recommends that the user run the check_or() function with the details
+#' argument set to TRUE. This provides additional insights into the cause of
+#' the failed tests.
+#'
+#' Using the {cli} package, the console message includes a special .run
+#' argument to construct a valid function call using the name of the logistic
+#' regression model, which is passed in via a parameter. This allows
+#' the check_or() function to be executed from the console with a single click.
+#'
+#' @param glm_name String: The name of the GLM model passed to the package.
+#' @param valid_assumptions List: A named list of assumptions and outcomes from the tests of the assumptions, represented as boolean values.
+#' @param assumption_checks Boolean: Indicates whether the user requested their model to be tested for logistic regression assumptions.
+#'
+#' @returns Nothing; this function is used solely to output console feedback to the user.
+#' @noRd
+suggest_check_or <- function(
+  glm_name,
+  valid_assumptions,
+  assumption_checks
+) {
+  # have all assumption checks passed?
+  all_passed <- all(unlist(valid_assumptions))
+
+  # only progress if at least one test failed and the user requested tests of logistic regression assumptions
+  if (!all_passed & assumption_checks) {
+    # suggest the user find out more from `check_or()`
+    cli::cli_alert_info(
+      "One or more assumptions for logistic regression have failed. To gain further insights, consider calling the {.fn plotor::check_or} function. For example, you can run {.run plotor::check_or({glm_name}, details = TRUE)}.",
+      wrap = TRUE
+    )
+  }
 }
 
 ## validation funcs -----
@@ -1617,8 +1676,8 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
   df <- glm$model
   outcome <- glm$formula[[2]]
   predictors <-
-    plotor:::summarise_rows_per_variable_in_model(glm) |>
-    dplyr::select(group, class) |>
+    summarise_rows_per_variable_in_model(glm) |>
+    dplyr::select(dplyr::all_of(c("group", "class"))) |>
     dplyr::distinct()
 
   # test each predictor for separation
@@ -1652,13 +1711,13 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
             # put the outcome as columns
             tidyr::pivot_wider(
               names_from = {{ outcome }},
-              values_from = n,
+              values_from = "n",
               values_fill = 0
             ) |>
-            dplyr::rename(n0 = 2, n1 = 3) |>
-            dplyr::filter(n0 == 0 | n1 == 0) |>
+            dplyr::rename("n0" = 2, "n1" = 3) |>
+            dplyr::filter("n0" == 0 | "n1" == 0) |>
             dplyr::summarise(separated = dplyr::n() > 0) |>
-            dplyr::pull(separated)
+            dplyr::pull("separated")
         }
 
         # return the result
@@ -1675,8 +1734,8 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
 
   # list predictors where there are signs of separation
   var_separation <- results |>
-    dplyr::filter(separation == TRUE) |>
-    dplyr::pull(predictor)
+    dplyr::filter("separation" == TRUE) |>
+    dplyr::pull("predictor")
 
   # alert details ---
 
@@ -1749,7 +1808,6 @@ assumption_sample_size <- function(
   min_events_per_predictor = 10,
   details = FALSE
 ) {
-
   # get the model data
   glm_df <- glm$model
 
@@ -1833,15 +1891,17 @@ assumption_sample_size <- function(
             tidyr::pivot_wider(
               names_from = dplyr::any_of("outcome"),
               values_from = "n"
-            ) |> 
+            ) |>
             # replace any NA values with zeroes (in cases of complete separation)
             dplyr::mutate(
-              .event = dplyr::coalesce(.event, 0L),
-              .nonevent = dplyr::coalesce(.nonevent, 0L)
+              dplyr::across(
+                .cols = c(".event", ".nonevent"),
+                .fns = ~ dplyr::coalesce(.x, 0L)
+              )
             )
         }
       )
-    
+
     # test the condition
     result_factors <-
       (min(predictor_factor_level_count$.nonevent) >=
