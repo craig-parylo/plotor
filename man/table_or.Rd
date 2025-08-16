@@ -8,7 +8,8 @@ table_or(
   glm_model_results,
   conf_level = 0.95,
   output = "tibble",
-  confint_fast_estimate = FALSE
+  confint_fast_estimate = FALSE,
+  assumption_checks = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ table_or(
 \item{output}{String describing of the output type (default = 'tibble'). Options include 'tibble' and 'gt'.}
 
 \item{confint_fast_estimate}{Boolean (default = \code{FALSE}) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.}
+
+\item{assumption_checks}{Boolean (default = \code{TRUE}) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.}
 }
 \value{
 The returned object depends on the \code{output} parameter:
