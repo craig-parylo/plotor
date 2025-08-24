@@ -1016,13 +1016,14 @@ validate_output_table_input <- function(output) {
 #'
 #' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
 #'
 #' @returns Tibble providing a summary of the logistic regression model.
 #' @noRd
 get_summary_table <- function(
   glm_model_results,
-  conf_level,
-  confint_fast_estimate
+  conf_level = 0.95,
+  confint_fast_estimate = FALSE
 ) {
   # get the data from the model object
   df <- summarise_rows_per_variable_in_model(model_results = glm_model_results)
@@ -1246,6 +1247,119 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
   } else {
     return(model_outcome)
   }
+}
+
+
+#' Get a Summary Table of Univariable Analysis
+#'
+#' @description
+#' Performs univariable logistic regression for each predictor in a
+#' multivariable model, generating a summary table with odds ratios, confidence
+#' intervals and p-values.
+#'
+#' @details
+#' This function systematically:
+#' - Extracts predictors from a multivariable logistic regression model
+#' - Runs individual logistic regression models for each predictor
+#' - Calculates odds ratios, confidence intervals and statistical significance
+#'
+#' Key features:
+#' - Flexible confidence interval estimation
+#' - Option to use full or model-specific dataset
+#' - Comprehensive output for comparative analysis
+#'
+#' @param glm A binomial Generalised Linear Model (GLM) object from [stats::glm()].
+#' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
+#' @param use_model_data_only Boolean (default = `FALSE`) indicating whether to use only the subset of data that was used as part of the multivariable model, or set to `TRUE` to use the full set of data provided to the multivariable model. Note, any records (rows) containing missing values for any of the outcome or predictor variables is automatically excluded from the multivariable model by {stats::glm}, so the overall number of records used in multivariable models can be much lower than the total number of records supplied to the function. Set to `TRUE` to increase comparability between the univariable and multivariable models, set to `FALSE` to gain a more holistic view of the invididual relationships between predictors and outcome.
+#'
+#' @returns Tibble providing a summary of the univariable logistic regression model.
+#'
+#' @examples
+#' # prepare the data
+#' df <-
+#'   # get the dataset
+#'   datasets::Titanic |>
+#'   # convert to a tibble
+#'   tibble::as_tibble() |>
+#'   # convert the aggregate counts to individual observations
+#'   tidyr::uncount(weights = n) |>
+#'   # convert categorical variables to factors
+#'   dplyr::mutate_if(
+#'     .predicate = is.character,
+#'     .funs = as.factor
+#'   )
+#'
+#' # create a model from the data
+#' model <-
+#'   stats::glm(
+#'     formula = Survived ~ Age + Class + Sex,
+#'     family = "binomial",
+#'     data = df
+#'   )
+#'
+#' # get a univariable summary from all the data
+#' plotor:::get_univariable_summary_table(
+#'   glm =  model,
+#'   confint_fast_estimate = TRUE
+#' )
+#'
+#' @seealso [get_summary_table()] to produce a multivariable summary
+get_univariable_summary_table <- function(
+  glm,
+  conf_level = 0.95,
+  confint_fast_estimate = FALSE,
+  use_model_data_only = FALSE
+) {
+  # prepare the univariable data
+  if (use_model_data_only) {
+    # only use data that went into the model
+    var_data <- glm$model
+  } else {
+    # use all data given as part of the multivariable model
+    var_data <- glm$data
+  }
+
+  # get the outcome variable
+  var_outcome <- get_outcome_variable_name(model = glm, return_var_name = TRUE)
+
+  # get a list of the multivariable predictor variables
+  var_predictors <-
+    get_model_variables_and_levels(model_results = glm) |>
+    dplyr::pull(dplyr::any_of("variable")) |>
+    unique()
+
+  # iterate over each predictor and perform univariable analysis
+  df_return <-
+    purrr::map_dfr(
+      .x = var_predictors,
+      .f = \(.predictor) {
+        # get a formula
+        uni_formula <- as.formula(
+          glue::glue("{var_outcome} ~ {.predictor}")
+        )
+
+        # get a model
+        uni_glm <-
+          stats::glm(
+            formula = uni_formula,
+            family = "binomial",
+            data = var_data
+          )
+
+        # summarise the model
+        df_summary <- get_summary_table(
+          glm_model_results = uni_glm,
+          conf_level = conf_level,
+          confint_fast_estimate = confint_fast_estimate
+        )
+
+        # return the result for collation by {purrr}
+        return(df_summary)
+      }
+    )
+  # return the result
+  return(df_return)
 }
 
 
