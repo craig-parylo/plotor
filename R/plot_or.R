@@ -1271,7 +1271,7 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
 #' @param glm A binomial Generalised Linear Model (GLM) object from [stats::glm()].
 #' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
 #' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
-#' @param use_model_data_only Boolean (default = `FALSE`) indicating whether to use only the subset of data that was used as part of the multivariable model, or set to `TRUE` to use the full set of data provided to the multivariable model. Note, any records (rows) containing missing values for any of the outcome or predictor variables is automatically excluded from the multivariable model by {stats::glm}, so the overall number of records used in multivariable models can be much lower than the total number of records supplied to the function. Set to `TRUE` to increase comparability between the univariable and multivariable models, set to `FALSE` to gain a more holistic view of the invididual relationships between predictors and outcome.
+#' @param use_model_data_only Boolean (default = `FALSE`) indicating whether to use only the subset of data that was used as part of the multivariable model, or set to `TRUE` to use the full set of data provided to the multivariable model. Note, any records containing missing values for any of the outcome or predictor variables is automatically excluded from the multivariable model by {stats::glm}, so the overall number of records used in multivariable models can be much lower than the total number of records supplied to the function. Set to `TRUE` to increase comparability between the univariable and multivariable models, set to `FALSE` to gain a more holistic view of the invididual relationships between predictors and outcome.
 #'
 #' @returns Tibble providing a summary of the univariable logistic regression model.
 #'
@@ -1303,8 +1303,7 @@ get_outcome_variable_name <- function(model, return_var_name = FALSE) {
 #'   glm =  model,
 #'   confint_fast_estimate = TRUE
 #' )
-#'
-#' @seealso [get_summary_table()] to produce a multivariable summary
+#' @noRd
 get_univariable_summary_table <- function(
   glm,
   conf_level = 0.95,
@@ -1335,7 +1334,7 @@ get_univariable_summary_table <- function(
       .x = var_predictors,
       .f = \(.predictor) {
         # get a formula
-        uni_formula <- as.formula(
+        uni_formula <- stats::as.formula(
           glue::glue("{var_outcome} ~ {.predictor}")
         )
 
