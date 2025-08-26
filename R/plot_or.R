@@ -1362,6 +1362,99 @@ get_univariable_summary_table <- function(
 }
 
 
+#' Get combined univariable and multivariable summaries
+#'
+#' @description
+#' Produces a combined summary of univariable and multivariable summaries.
+#'
+#' @details
+#' The function starts by getting separate univariable and multivariable summary tables. A combined view is created from variables common to both summaries and the remaining variables prefixed with either 'uv_' for univariable variables or 'mv_' for multivariable variables.
+#' These prefixed variables are then left-joined to the combined view to give a single tibble containing details for univariable and multivariable summaries.
+#'
+#' @param model A binomial Generalised Linear Model (GLM) object from [stats::glm()].
+#' @param conf_level Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
+#' @param use_model_data_only Boolean (default = `FALSE`) indicating whether to use only the subset of data that was used as part of the multivariable model, or set to `TRUE` to use the full set of data provided to the multivariable model. Note, any records containing missing values for any of the outcome or predictor variables is automatically excluded from the multivariable model by {stats::glm}, so the overall number of records used in multivariable models can be much lower than the total number of records supplied to the function. Set to `TRUE` to increase comparability between the univariable and multivariable models, set to `FALSE` to gain a more holistic view of the invididual relationships between predictors and outcome.
+#'
+#' @returns Tibble providing a combined summary table of univariable and multivariable summaries
+#' @noRd
+get_combined_summaries <- function(
+  model,
+  conf_level = 0.95,
+  confint_fast_estimate = FALSE,
+  use_model_data_only = TRUE
+) {
+  # gather some data ----
+  # define a list of variables common to both datasets, which varies depending
+  # on whether the univariable summary is based on model data only
+  if (use_model_data_only) {
+    common_vars <- c("group", "label", "level", "class", "rows", "outcome")
+  } else {
+    common_vars <- c("group", "label", "level", "class")
+  }
+
+  # get a multivariable summary
+  mv_summary <-
+    get_summary_table(
+      glm_model_results = model,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+
+  # get a univariable summary
+  uv_summary <-
+    get_univariable_summary_table(
+      glm = model,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate,
+      use_model_data_only = use_model_data_only
+    )
+
+  # main ----
+  # start the table with the common variables plus 'term' as the common field for subsequent table joins
+  combined_summary <-
+    mv_summary |>
+    dplyr::select(c("term", dplyr::any_of(common_vars)))
+
+  # combine uv and mv summaries to a list
+  summary_list <- list("uv" = uv_summary, "mv" = mv_summary)
+
+  # iterate over each summary and prefix variable names with either 'uv_'
+  # or 'mv_', depending on whether the summary is univariable or multivariable
+  summary_list <-
+    purrr::imap(
+      .x = summary_list,
+      .f = \(.summary, .name) {
+        # process the tibble
+        df <-
+          .summary |>
+          # exclude the common variables
+          dplyr::select(!dplyr::any_of(common_vars)) |>
+          # prefix variables with the name of the list item,
+          # (e.g. 'uv' or 'mv') except 'term'
+          dplyr::rename_with(
+            .cols = !dplyr::all_of("term"),
+            .fn = ~ glue::glue("{.name}_{.x}")
+          )
+      }
+    )
+
+  # left-join these summaries to the combined summary
+  combined_summary <-
+    combined_summary |>
+    dplyr::left_join(
+      y = summary_list[[1]],
+      by = dplyr::join_by("term" == "term")
+    ) |>
+    dplyr::left_join(
+      y = summary_list[[2]],
+      by = dplyr::join_by("term" == "term")
+    )
+
+  # return the result
+  return(combined_summary)
+}
+
 ## assumptions funcs -----------------------------------------------------------
 
 #' Check assumptions
