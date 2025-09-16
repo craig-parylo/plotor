@@ -2,37 +2,53 @@
 
 ## test successful ----
 testthat::test_that("`plot_or()` does not produce messages or warnings", {
-  # titanic lr model
-  testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::plot_or(lr)
-  })
-
-  # nhanes
-  testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_nhanes.Rds'))
-    plotor::plot_or(lr)
-  })
+  # iterate over some datasets that should not cause issues
+  purrr::walk(
+    .x = c("lr_titanic.Rds", "lr_nhanes.Rds"),
+    .f = \(.x) {
+      # load the data
+      lr <- readRDS(file = testthat::test_path("test_data", .x))
+      # test that it runs without causing issue
+      testthat::expect_silent(plotor::plot_or(lr))
+    }
+  )
 })
 
 testthat::test_that("`table_or()` does not produce messages or warnings", {
-  # titanic lr model
-  testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::table_or(lr)
-  })
+  # iterate over some datasets that should not cause issue
+  purrr::walk(
+    .x = c("lr_titanic.Rds", "lr_nhanes.Rds"),
+    .f = \(.x) {
+      # load the data
+      lr <- readRDS(file = testthat::test_path("test_data", .x))
 
-  # nhanes
-  testthat::expect_silent({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_nhanes.Rds'))
-    plotor::table_or(lr)
-  })
+      # regular tibble output
+      testthat::expect_silent({
+        plotor::table_or(lr, output = "tibble")
+      })
+
+      # regular gt output
+      testthat::expect_silent({
+        plotor::table_or(lr, output = "gt")
+      })
+
+      # combined uni- and multivariable summary as tibble
+      testthat::expect_silent({
+        plotor::table_or(lr, output = "tibble", output_type = "uni_and_multi")
+      })
+
+      # combined uni- and multivariable summary as gt
+      testthat::expect_silent({
+        plotor::table_or(lr, output = "gt", output_type = "uni_and_multi")
+      })
+    }
+  )
 })
 
 ## snapshots -------
 
 # IMPORTANT NOTE
-# These tests are suspended because different versions of {ggplot2} in
+# These tests are suspended because different versions of {ggplot2}
 # produce identical-looking plots but are somehow different internally which
 # results in these tests failing if they don't use the same version of {ggplot2}
 # which produced the snapshot. See issue #68 for details.
@@ -62,36 +78,25 @@ testthat::test_that("`table_or()` does not produce messages or warnings", {
 
 testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
   # not a binomial glm model
-  testthat::expect_error({
-    lr <- readRDS(file = testthat::test_path('test_data', 'nonlr_streptb.Rds'))
-    plotor::plot_or(lr)
-  })
-  testthat::expect_error({
-    lr <- readRDS(file = testthat::test_path('test_data', 'nonlr_streptb.Rds'))
-    plotor::table_or(lr)
-  })
+  lr <- readRDS(file = testthat::test_path('test_data', 'nonlr_streptb.Rds'))
+  testthat::expect_error(plotor::plot_or(lr))
+  testthat::expect_error(plotor::table_or(lr))
 
   # non-valid conf_level
-  testthat::expect_error({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::plot_or(lr, conf_level = "95")
-  })
-  testthat::expect_error({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::table_or(lr, conf_level = "95")
-  })
+  lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
+  testthat::expect_error(plotor::plot_or(lr, conf_level = "95"))
+  testthat::expect_error(plotor::table_or(lr, conf_level = "95"))
 
-  # non-valid output type requested
-  testthat::expect_error({
-    lr <- readRDS(file = testthat::test_path('test_data', 'lr_titanic.Rds'))
-    plotor::table_or(lr, output = "pink_elephant")
-  })
+  # non-valid output requested
+  testthat::expect_error(plotor::table_or(lr, output = "pink_elephant"))
+
+  # non-vaild output_type requested
+  testthat::expect_error(plotor::table_or(lr, output_type = "pink_elephant"))
 })
 
 ## test `assumption_checks` parameter works
 # setting to `FALSE` with models with known issues should not result in warnings
 testthat::test_that("`assumption_checks` parameter works as expected", {
-
   # 1. list some models that result in at least one warning for assumptions
   list_models <- c(
     'lr_diabetes.Rds',
@@ -117,7 +122,7 @@ testthat::test_that("`assumption_checks` parameter works as expected", {
 })
 
 # validation functions ---------------------------------------------------------
-## conf_level_input() ----
+## `conf_level` input ----
 testthat::test_that("`validate_conf_level_input()` works as expected", {
   # inputs which are not single value and numeric
   testthat::expect_error(plotor:::validate_conf_level_input("0.95"))
@@ -140,6 +145,48 @@ testthat::test_that("`validate_conf_level_input()` works as expected", {
   testthat::expect_message(plotor:::validate_conf_level_input(100))
   testthat::expect_message(plotor:::validate_conf_level_input(95))
   testthat::expect_message(plotor:::validate_conf_level_input(99))
+})
+
+## `output` input ----
+testthat::test_that("`validate_output_table_input()` works as expected", {
+  # inputs within allowed type
+  inputs <- c("tibble", "gt")
+  purrr::walk(
+    .x = inputs,
+    .f = \(.x) testthat::expect_true(plotor:::validate_output_table_input(.x))
+  )
+
+  # inputs not in the expected list - expect a warning
+  inputs <- c("pink_elephants", "", TRUE)
+  purrr::walk(
+    .x = inputs,
+    .f = \(.x) testthat::expect_error(plotor:::validate_output_table_input(.x))
+  )
+})
+
+## `output_type` input ----
+testthat::test_that("`validate_output_table_type_input()` works as expected", {
+  # inputs within the allowed range
+  inputs <- c("multivariable", "uni_and_multi")
+  purrr::walk(
+    .x = inputs,
+    .f = \(.x) {
+      testthat::expect_true(
+        plotor:::validate_output_table_type_input(.x)
+      )
+    }
+  )
+
+  # inputs outside the allowed range
+  inputs <- c("pink_elephants", "", NA)
+  purrr::walk(
+    .x = inputs,
+    .f = \(.x) {
+      testthat::expect_error(
+        plotor:::validate_output_table_type_input(.x)
+      )
+    }
+  )
 })
 
 ## assumption_binary_outcome() ----
@@ -263,4 +310,3 @@ testthat::test_that("`assumption_linearity()` works as expected", {
     }
   )
 })
-
