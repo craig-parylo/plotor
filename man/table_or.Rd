@@ -7,10 +7,12 @@
 table_or(
   glm_model_results,
   conf_level = 0.95,
-  output = "tibble",
+  output = c("tibble", "gt"),
+  output_type = c("multivariable", "uni_and_multi"),
   confint_fast_estimate = FALSE,
   assumption_checks = TRUE,
-  anonymise_counts = FALSE
+  anonymise_counts = FALSE,
+  use_model_data_only = TRUE
 )
 }
 \arguments{
@@ -18,13 +20,17 @@ table_or(
 
 \item{conf_level}{Numeric value between 0.001 and 0.999 (default = 0.95) specifying the confidence level for the confidence interval.}
 
-\item{output}{String describing the output type (default = 'tibble'). Options include 'tibble' and 'gt'.}
+\item{output}{String describing the output type (default = "tibble"). Options include "tibble" and "gt".}
+
+\item{output_type}{String description of the output type (default = "multivariable"). Options include "multivariable" and "uni_and_multi". Selecting "multivariable" will produce a summary table of the supplied multivariable model. Selecting "uni_and_multi" will produce a summary table showing estimates of the Odds Ratio, Confidence Intervals and p-values produced using a univariable logistic regression model for each predctor along with the adjusted Odds Ratio, Confidence Intervals and p-values from the supplied multivariable model.}
 
 \item{confint_fast_estimate}{Boolean (default = \code{FALSE}) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.}
 
 \item{assumption_checks}{Boolean (default = \code{TRUE}) indicating whether to conduct checks to ensure that the assumptions of logistic regression are met.}
 
 \item{anonymise_counts}{Boolean (default = \code{FALSE}) indicating whether to anonymise counts in the output table. If \code{TRUE}, counts less than 10 are suppressed and otherwise rounded to the nearest multiple of 5.}
+
+\item{use_model_data_only}{Boolean (default = \code{FALSE}) indicating whether to use only the subset of data that was used as part of the multivariable model, or set to \code{TRUE} to use the full set of data provided to the multivariable model. Note, any records containing missing values for any of the outcome or predictor variables are automatically excluded from the multivariable model by \code{stats::glm}, so the overall number of records used in multivariable models can be much lower than the total number of records supplied to the function. Set to \code{TRUE} to increase comparability between the univariable and multivariable models, set to \code{FALSE} to gain a more holistic view of the invididual relationships between predictors and outcome.}
 }
 \value{
 The returned object depends on the \code{output} parameter:
