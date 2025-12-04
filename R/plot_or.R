@@ -859,6 +859,7 @@ suggest_check_or <- function(
 #' @param var A numeric vector containing count data.
 #'
 #' @return A character vector of anonymised counts.
+#' @noRd
 anonymise_count_values <- function(var) {
   # Ensure `var` is a numeric vector
   var <- as.numeric(var)
