@@ -1,7 +1,7 @@
 Package: plotor
 Type: Package
 Title: Produces an Odds Ratio Plot from a Logistic Regression Model
-Version: 0.7.0
+Version: 0.8.0
 Authors@R:
   person(
     'Craig', 'Parylo', 
@@ -39,7 +39,7 @@ Imports:
     tidyr,
     tidyselect
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: 
     datasets,
     knitr,

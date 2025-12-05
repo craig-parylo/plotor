@@ -1,3 +1,42 @@
+# plotor v0.8.0 (2025-12-04)
+
+## Enhancements
+
+- **Univariable Odds Ratios**  
+  Added functionality to produce univariable odds ratios alongside multivariate model odds ratios in `plot_or()` and `table_or()`. This allows for direct comparison between predictors in isolation and as part of a full model.  
+  ([#59](https://github.com/craig-parylo/plotor/issues/59))
+
+- **Assumption Checks Control**  
+  Both `plot_or()` and `table_or()` now include a parameter to enable or disable assumption checks, giving experienced analysts more control over feedback from these functions.  
+  ([#75](https://github.com/craig-parylo/plotor/issues/75))
+
+- **Check for Linearity**  
+  Continuous predictors are now checked for linearity in relation to the log-odds of the outcome, improving model diagnostics.  
+  ([#21](https://github.com/craig-parylo/plotor/issues/21))
+
+- **Privacy Options**  
+  A new option in `table_or()` allows suppression of low counts (below a user-defined threshold) and rounding of other counts, to help protect sensitive data.  
+  ([#58](https://github.com/craig-parylo/plotor/issues/58))
+
+- **Contextual Guidance for Model Assumptions**  
+  Now, when assumption checks fail in `plot_or()` or `table_or()`, users are prompted to run `check_or()` for detailed diagnostics (unless it has just been used).  
+  ([#76](https://github.com/craig-parylo/plotor/issues/76))
+
+
+## Bug Fixes
+
+- **Performance of Confidence Interval Calculation**  
+  Improved processing speed of the `confint_fast_estimate` parameter for large datasets by optimizing the assumption check functions.  
+  ([#57](https://github.com/craig-parylo/plotor/issues/57))
+
+- **Sample Size Check with Complete Separation**  
+  Resolved errors in `assumption_sample_size()` when the model exhibits complete separation by better handling of `NA` values in outcome counts.  
+  ([#73](https://github.com/craig-parylo/plotor/issues/73))
+
+- **Documentation Correction**  
+  Documentation for `anonymise_count_values()` has been corrected: this internal function is no longer exported in the help files.  
+  ([#84](https://github.com/craig-parylo/plotor/issues/84))
+
 # plotor 0.7.0
 
 ### Compatibility and testing fixes:
