@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,39 @@
       <small>Source: <a href="https://github.com/craig-parylo/plotor/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.8.0" id="plotor-v080-2025-12-04">plotor v0.8.0 (2025-12-04)<a class="anchor" aria-label="anchor" href="#plotor-v080-2025-12-04"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-0-8-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-8-0"></a></h3>
+<ul><li><p><strong>Univariable Odds Ratios</strong><br>
+Added functionality to produce univariable odds ratios alongside multivariate model odds ratios in <code><a href="../reference/plot_or.html">plot_or()</a></code> and <code><a href="../reference/table_or.html">table_or()</a></code>. This allows for direct comparison between predictors in isolation and as part of a full model.<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/59" class="external-link">#59</a>)</p></li>
+<li><p><strong>Assumption Checks Control</strong><br>
+Both <code><a href="../reference/plot_or.html">plot_or()</a></code> and <code><a href="../reference/table_or.html">table_or()</a></code> now include a parameter to enable or disable assumption checks, giving experienced analysts more control over feedback from these functions.<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/75" class="external-link">#75</a>)</p></li>
+<li><p><strong>Check for Linearity</strong><br>
+Continuous predictors are now checked for linearity in relation to the log-odds of the outcome, improving model diagnostics.<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/21" class="external-link">#21</a>)</p></li>
+<li><p><strong>Privacy Options</strong><br>
+A new option in <code><a href="../reference/table_or.html">table_or()</a></code> allows suppression of low counts (below a user-defined threshold) and rounding of other counts, to help protect sensitive data.<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/58" class="external-link">#58</a>)</p></li>
+<li><p><strong>Contextual Guidance for Model Assumptions</strong><br>
+Now, when assumption checks fail in <code><a href="../reference/plot_or.html">plot_or()</a></code> or <code><a href="../reference/table_or.html">table_or()</a></code>, users are prompted to run <code><a href="../reference/check_or.html">check_or()</a></code> for detailed diagnostics (unless it has just been used).<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/76" class="external-link">#76</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-8-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-0"></a></h3>
+<ul><li><p><strong>Performance of Confidence Interval Calculation</strong><br>
+Improved processing speed of the <code>confint_fast_estimate</code> parameter for large datasets by optimizing the assumption check functions.<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/57" class="external-link">#57</a>)</p></li>
+<li><p><strong>Sample Size Check with Complete Separation</strong><br>
+Resolved errors in <code>assumption_sample_size()</code> when the model exhibits complete separation by better handling of <code>NA</code> values in outcome counts.<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/73" class="external-link">#73</a>)</p></li>
+<li><p><strong>Documentation Correction</strong><br>
+Documentation for <code><a href="../reference/anonymise_count_values.html">anonymise_count_values()</a></code> has been corrected: this internal function is no longer exported in the help files.<br>
+(<a href="https://github.com/craig-parylo/plotor/issues/84" class="external-link">#84</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.0" id="plotor-070">plotor 0.7.0<a class="anchor" aria-label="anchor" href="#plotor-070"></a></h2><p class="text-muted">CRAN release: 2025-07-01</p>
 <div class="section level4">
