@@ -60,10 +60,8 @@
   ([\#73](https://github.com/craig-parylo/plotor/issues/73))
 
 - **Documentation Correction**  
-  Documentation for
-  [`anonymise_count_values()`](https://craig-parylo.github.io/plotor/reference/anonymise_count_values.md)
-  has been corrected: this internal function is no longer exported in
-  the help files.  
+  Documentation for `anonymise_count_values()` has been corrected: this
+  internal function is no longer exported in the help files.  
   ([\#84](https://github.com/craig-parylo/plotor/issues/84))
 
 ## plotor 0.7.0

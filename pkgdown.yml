@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   using_plotor: using_plotor.html
-last_built: 2025-12-05T07:54Z
+last_built: 2025-12-05T08:39Z
 urls:
   reference: https://craig-parylo.github.io/plotor/reference
   article: https://craig-parylo.github.io/plotor/articles
