@@ -10,12 +10,11 @@
 Source:
 [`DESCRIPTION`](https://github.com/craig-parylo/plotor/blob/main/DESCRIPTION)
 
-Parylo C (2025). *plotor: Produces an Odds Ratio Plot from a Logistic
-Regression Model*. R package version 0.8.0,
-<https://github.com/craig-parylo/plotor>.
+Parylo C (2025). *plotor: Odds Ratio Tools for Logistic Regression*. R
+package version 0.8.0, <https://github.com/craig-parylo/plotor>.
 
     @Manual{,
-      title = {plotor: Produces an Odds Ratio Plot from a Logistic Regression Model},
+      title = {plotor: Odds Ratio Tools for Logistic Regression},
       author = {Craig Parylo},
       year = {2025},
       note = {R package version 0.8.0},
