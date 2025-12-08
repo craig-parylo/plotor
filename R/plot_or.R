@@ -757,7 +757,7 @@ label_groups <- function(group, level) {
 #'
 #' Where variables have been given a label attribute then the label is used in the plot
 #'
-#' @param df Tibble of data expanded with variables to aid plotting - as outputted from [prepare_df_for_plotting()]
+#' @param df Tibble of data expanded with variables to aid plotting - as outputted from `prepare_df_for_plotting()`
 #' @param lr Results from a Generalised Linear Model (GLM) binomial model, as produced by [stats::glm()].
 #'
 #' @return Tibble of data with group labels used where available
