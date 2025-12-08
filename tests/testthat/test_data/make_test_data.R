@@ -142,29 +142,29 @@ get_df_streptb <- function() {
   return(df)
 }
 
-get_df_diabetes <- function() {
-  df <-
-    medicaldata::diabetes |>
-    janitor::clean_names()
+# get_df_diabetes <- function() {
+#   df <-
+#     medicaldata::diabetes |>
+#     janitor::clean_names()
 
-  # create a list of variable = labels
-  var_labels <- list(
-    pregnancy_num = 'Number of pregnancies',
-    glucose_mg_dl = 'Plasma glucose concentration (mg per dl)',
-    dbp_mm_hg = 'Diastolic blood pressure (mmHg)',
-    triceps_mm = 'Triceps skin fold thickness (mm)',
-    insulin_microiu_ml = 'Serum insulin (microIU per ml)',
-    bmi = 'Body mass index',
-    pedigree = 'Diabetes pedigree score',
-    age = 'Age (years)',
-    diabetes_5y = 'Diagnosis of diabetes in following 5 years'
-  )
+#   # create a list of variable = labels
+#   var_labels <- list(
+#     pregnancy_num = 'Number of pregnancies',
+#     glucose_mg_dl = 'Plasma glucose concentration (mg per dl)',
+#     dbp_mm_hg = 'Diastolic blood pressure (mmHg)',
+#     triceps_mm = 'Triceps skin fold thickness (mm)',
+#     insulin_microiu_ml = 'Serum insulin (microIU per ml)',
+#     bmi = 'Body mass index',
+#     pedigree = 'Diabetes pedigree score',
+#     age = 'Age (years)',
+#     diabetes_5y = 'Diagnosis of diabetes in following 5 years'
+#   )
 
-  # apply the labels
-  labelled::var_label(df) <- var_labels
+#   # apply the labels
+#   labelled::var_label(df) <- var_labels
 
-  return(df)
-}
+#   return(df)
+# }
 
 get_df_correlated <- function() {
   set.seed(123)
@@ -510,21 +510,21 @@ get_lr_infert <- function() {
   return(lr)
 }
 
-get_lr_diabetes <- function() {
-  df <- get_df_diabetes()
-  lr <- stats::glm(
-    data = df,
-    family = 'binomial',
-    formula = diabetes_5y ~
-      age +
-        bmi +
-        pregnancy_num +
-        glucose_mg_dl +
-        dbp_mm_hg +
-        triceps_mm +
-        insulin_microiu_ml
-  )
-}
+# get_lr_diabetes <- function() {
+#   df <- get_df_diabetes()
+#   lr <- stats::glm(
+#     data = df,
+#     family = 'binomial',
+#     formula = diabetes_5y ~
+#       age +
+#         bmi +
+#         pregnancy_num +
+#         glucose_mg_dl +
+#         dbp_mm_hg +
+#         triceps_mm +
+#         insulin_microiu_ml
+#   )
+# }
 
 get_lr_streptb <- function() {
   df <- get_df_streptb()
@@ -533,11 +533,11 @@ get_lr_streptb <- function() {
     family = 'binomial',
     formula = improved ~
       gender +
-        dose_strep_g +
-        baseline_condition +
-        baseline_temp +
-        baseline_esr +
-        baseline_cavitation
+      dose_strep_g +
+      baseline_condition +
+      baseline_temp +
+      baseline_esr +
+      baseline_cavitation
   )
 }
 
@@ -625,19 +625,19 @@ get_lr_framingham <- function() {
     family = binomial,
     formula = tenyearchd ~
       sex +
-        age +
-        education +
-        currentsmoker +
-        bpmeds +
-        prevalentstroke +
-        prevalenthyp +
-        diabetes +
-        totchol +
-        sysbp +
-        diabp +
-        bmi +
-        heartrate +
-        glucose
+      age +
+      education +
+      currentsmoker +
+      bpmeds +
+      prevalentstroke +
+      prevalenthyp +
+      diabetes +
+      totchol +
+      sysbp +
+      diabp +
+      bmi +
+      heartrate +
+      glucose
   )
 }
 
@@ -655,7 +655,7 @@ get_lr_nhanes <- function() {
 df_titanic <- get_df_titanic()
 df_infert <- get_df_infert()
 df_streptb <- get_df_streptb()
-df_diabetes <- get_df_diabetes()
+# df_diabetes <- get_df_diabetes()
 df_triple_outcome <- get_df_triple_outcome()
 df_correlated <- get_df_correlated()
 df_separated <- get_df_separated()

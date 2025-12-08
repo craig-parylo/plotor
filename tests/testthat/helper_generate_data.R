@@ -141,30 +141,30 @@ get_df_streptb <- function() {
   return(df)
 }
 
-get_df_diabetes <- function() {
-  cli::cli_alert_warning("This dataset does not play well with CRAN.")
-  df <-
-    medicaldata::diabetes |>
-    janitor::clean_names()
+# get_df_diabetes <- function() {
+#   cli::cli_alert_warning("This dataset does not play well with CRAN.")
+#   df <-
+#     medicaldata::diabetes |>
+#     janitor::clean_names()
 
-  # create a list of variable = labels
-  var_labels <- list(
-    pregnancy_num = 'Number of pregnancies',
-    glucose_mg_dl = 'Plasma glucose concentration (mg per dl)',
-    dbp_mm_hg = 'Diastolic blood pressure (mmHg)',
-    triceps_mm = 'Triceps skin fold thickness (mm)',
-    insulin_microiu_ml = 'Serum insulin (microIU per ml)',
-    bmi = 'Body mass index',
-    pedigree = 'Diabetes pedigree score',
-    age = 'Age (years)',
-    diabetes_5y = 'Diagnosis of diabetes in following 5 years'
-  )
+#   # create a list of variable = labels
+#   var_labels <- list(
+#     pregnancy_num = 'Number of pregnancies',
+#     glucose_mg_dl = 'Plasma glucose concentration (mg per dl)',
+#     dbp_mm_hg = 'Diastolic blood pressure (mmHg)',
+#     triceps_mm = 'Triceps skin fold thickness (mm)',
+#     insulin_microiu_ml = 'Serum insulin (microIU per ml)',
+#     bmi = 'Body mass index',
+#     pedigree = 'Diabetes pedigree score',
+#     age = 'Age (years)',
+#     diabetes_5y = 'Diagnosis of diabetes in following 5 years'
+#   )
 
-  # apply the labels
-  labelled::var_label(df) <- var_labels
+#   # apply the labels
+#   labelled::var_label(df) <- var_labels
 
-  return(df)
-}
+#   return(df)
+# }
 
 get_df_correlated <- function(seed = 123, n = 1000) {
   set.seed(seed)
@@ -511,21 +511,21 @@ get_lr_infert <- function() {
   return(lr)
 }
 
-get_lr_diabetes <- function() {
-  df <- get_df_diabetes()
-  lr <- stats::glm(
-    data = df,
-    family = 'binomial',
-    formula = diabetes_5y ~
-      age +
-      bmi +
-      pregnancy_num +
-      glucose_mg_dl +
-      dbp_mm_hg +
-      triceps_mm +
-      insulin_microiu_ml
-  )
-}
+# get_lr_diabetes <- function() {
+#   df <- get_df_diabetes()
+#   lr <- stats::glm(
+#     data = df,
+#     family = 'binomial',
+#     formula = diabetes_5y ~
+#       age +
+#       bmi +
+#       pregnancy_num +
+#       glucose_mg_dl +
+#       dbp_mm_hg +
+#       triceps_mm +
+#       insulin_microiu_ml
+#   )
+# }
 
 get_lr_streptb <- function() {
   cli::cli_alert_warning("This dataset does not play well with CRAN")
