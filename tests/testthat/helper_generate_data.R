@@ -597,8 +597,8 @@ get_lr_separated_quasi <- function() {
     )
 }
 
-get_lr_separated_large <- function(seed = 123) {
-  df <- get_df_separated(seed = seed, rows = 1e5)
+get_lr_separated_large <- function(seed = 123, rows = 1e5) {
+  df <- get_df_separated(seed = seed, rows = rows)
   lr <- stats::glm(
     data = df,
     formula = outcome ~ pred1 + pred2,
