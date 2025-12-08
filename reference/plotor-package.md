@@ -1,9 +1,10 @@
-# plotor: Produces an Odds Ratio Plot from a Logistic Regression Model
+# plotor: Odds Ratio Tools for Logistic Regression
 
-Produces an odds‐ratio (OR) plot to visualise the results of a logistic
-regression model fitted with \`glm(..., family = binomial)\`. Estimates
-are converted to ORs with configurable confidence intervals (default is
-95
+Produces odds ratio analyses with comprehensive reporting tools.
+Generates plots, summary tables, and diagnostic checks for logistic
+regression models fitted with 'glm()' using binomial family. Provides
+visualisation methods, formatted reporting tables via 'gt', and tools to
+assess logistic regression model assumptions.
 
 ## See also
 
