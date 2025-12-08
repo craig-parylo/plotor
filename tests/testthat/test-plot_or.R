@@ -94,7 +94,7 @@ testthat::test_that("`table_or()` does not produce messages or warnings", {
 
 testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
   # not a binomial glm model
-  testthat::expect_silent(lr <- get_nonlr_streptb())
+  testthat::expect_silent(lr <- get_nonlr_nhanes())
   testthat::expect_error(plotor::plot_or(lr))
   testthat::expect_error(plotor::table_or(lr))
 

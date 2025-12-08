@@ -84,6 +84,7 @@ get_df_streptb <- function() {
         as.character() |>
         forcats::fct(levels = c('1_Good', '2_Fair', '3_Poor')),
       baseline_temp = baseline_temp |>
+        as.character() |>
         dplyr::case_match(
           '1_<=98.9F/37.2C' ~ '<= 37.2C',
           '2_99-99.9F/37.3-37.7C' ~ '37.3 - 37.7C',
@@ -141,6 +142,7 @@ get_df_streptb <- function() {
 }
 
 get_df_diabetes <- function() {
+  cli::cli_alert_warning("This dataset does not play well with CRAN.")
   df <-
     medicaldata::diabetes |>
     janitor::clean_names()
@@ -526,6 +528,8 @@ get_lr_diabetes <- function() {
 }
 
 get_lr_streptb <- function() {
+  cli::cli_alert_warning("This dataset does not play well with CRAN")
+
   df <- get_df_streptb()
   lr <- stats::glm(
     data = df,
@@ -546,6 +550,14 @@ get_nonlr_streptb <- function() {
   lr <- stats::glm(
     data = df,
     formula = rad_num ~ baseline_temp
+  )
+}
+
+get_nonlr_nhanes <- function() {
+  df <- get_df_nhanes()
+  lr <- stats::glm(
+    data = df,
+    formula = HomeRooms ~ Age
   )
 }
 
