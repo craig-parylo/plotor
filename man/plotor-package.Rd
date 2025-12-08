@@ -4,11 +4,11 @@
 \name{plotor-package}
 \alias{plotor}
 \alias{plotor-package}
-\title{plotor: Produces an Odds Ratio Plot from a Logistic Regression Model}
+\title{plotor: Odds Ratio Tools for Logistic Regression}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Produces an odds‐ratio (OR) plot to visualise the results of a logistic regression model fitted with `glm(..., family = binomial)`. Estimates are converted to ORs with configurable confidence intervals (default is 95%). The package can return either a `ggplot2`-based plot, a formatted table via `gt`, or a set of diagnostic checks for model assumptions.
+Produces odds ratio analyses with comprehensive reporting tools. Generates plots, summary tables, and diagnostic checks for logistic regression models fitted with 'glm()' using binomial family. Provides visualisation methods, formatted reporting tables via 'gt', and tools to assess logistic regression model assumptions.
 }
 \seealso{
 Useful links:
