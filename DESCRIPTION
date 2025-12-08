@@ -44,8 +44,9 @@ Suggests:
     datasets,
     knitr,
     labelled,
+    magrittr,
     MASS,
-    medicaldata (>= 0.2.0.9001),
+    medicaldata,
     NHANES,
     R4HCR,
     rmarkdown,
@@ -58,5 +59,3 @@ BugReports: https://github.com/craig-parylo/plotor/issues
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.1.0)
-Remotes: 
-    higgi13425/medicaldata

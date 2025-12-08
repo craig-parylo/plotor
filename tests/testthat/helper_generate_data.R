@@ -1,10 +1,8 @@
 #' -----------------------------------------------------------------------------
-#' MAKE TEST DATA
+#' GENERATE TEST DATA
 #'
 #' This script is used to make the files used as part of the test suite.
 #' -----------------------------------------------------------------------------
-
-flag_save_data <- FALSE
 
 # Data functions ---------------------------------------------------------------
 get_df_titanic <- function() {
@@ -86,6 +84,7 @@ get_df_streptb <- function() {
         as.character() |>
         forcats::fct(levels = c('1_Good', '2_Fair', '3_Poor')),
       baseline_temp = baseline_temp |>
+        as.character() |>
         dplyr::case_match(
           '1_<=98.9F/37.2C' ~ '<= 37.2C',
           '2_99-99.9F/37.3-37.7C' ~ '37.3 - 37.7C',
@@ -143,6 +142,7 @@ get_df_streptb <- function() {
 }
 
 # get_df_diabetes <- function() {
+#   cli::cli_alert_warning("This dataset does not play well with CRAN.")
 #   df <-
 #     medicaldata::diabetes |>
 #     janitor::clean_names()
@@ -166,9 +166,10 @@ get_df_streptb <- function() {
 #   return(df)
 # }
 
-get_df_correlated <- function() {
-  set.seed(123)
-  n <- 1000
+get_df_correlated <- function(seed = 123, n = 1000) {
+  set.seed(seed)
+  # set.seed(123)
+  # n <- 1000
   df <- tibble::tibble(
     outcome = sample(0:1, size = n, replace = TRUE) |>
       factor(
@@ -213,9 +214,10 @@ get_df_correlated <- function() {
   return(df)
 }
 
-get_df_triple_outcome <- function() {
-  set.seed(123)
-  n <- 1000
+get_df_triple_outcome <- function(seed = 123, n = 1000) {
+  set.seed(seed)
+  # set.seed(123)
+  # n <- 1000
   df <- tibble::tibble(
     outcome = sample(0:2, size = n, replace = TRUE) |>
       factor(
@@ -240,9 +242,8 @@ get_df_triple_outcome <- function() {
   return(df)
 }
 
-get_df_separated <- function(rows = 1000) {
-  set.seed(123)
-  #n <- 1000
+get_df_separated <- function(seed = 123, rows = 1000) {
+  set.seed(seed)
   n <- rows
   df <- tibble::tibble(
     # an outcome variable with 20:80 distribution of 'alive' vs 'died'
@@ -517,16 +518,18 @@ get_lr_infert <- function() {
 #     family = 'binomial',
 #     formula = diabetes_5y ~
 #       age +
-#         bmi +
-#         pregnancy_num +
-#         glucose_mg_dl +
-#         dbp_mm_hg +
-#         triceps_mm +
-#         insulin_microiu_ml
+#       bmi +
+#       pregnancy_num +
+#       glucose_mg_dl +
+#       dbp_mm_hg +
+#       triceps_mm +
+#       insulin_microiu_ml
 #   )
 # }
 
 get_lr_streptb <- function() {
+  cli::cli_alert_warning("This dataset does not play well with CRAN")
+
   df <- get_df_streptb()
   lr <- stats::glm(
     data = df,
@@ -547,6 +550,14 @@ get_nonlr_streptb <- function() {
   lr <- stats::glm(
     data = df,
     formula = rad_num ~ baseline_temp
+  )
+}
+
+get_nonlr_nhanes <- function() {
+  df <- get_df_nhanes()
+  lr <- stats::glm(
+    data = df,
+    formula = HomeRooms ~ Age
   )
 }
 
@@ -579,8 +590,8 @@ get_lr_correlated_four <- function() {
   )
 }
 
-get_lr_separated <- function() {
-  df <- get_df_separated()
+get_lr_separated <- function(seed = 123) {
+  df <- get_df_separated(seed = seed)
   lr <- stats::glm(
     data = df,
     formula = outcome ~ pred1 + pred2 + pred3 + pred4,
@@ -598,8 +609,8 @@ get_lr_separated_quasi <- function() {
     )
 }
 
-get_lr_separated_large <- function() {
-  df <- get_df_separated(rows = 1e5)
+get_lr_separated_large <- function(seed = 123, rows = 1e5) {
+  df <- get_df_separated(seed = seed, rows = rows)
   lr <- stats::glm(
     data = df,
     formula = outcome ~ pred1 + pred2,
@@ -647,161 +658,5 @@ get_lr_nhanes <- function() {
     data = df,
     family = binomial,
     formula = Diabetes ~ Gender + BPSys3 + Education
-  )
-}
-
-# Get data ---------------------------------------------------------------------
-# df
-df_titanic <- get_df_titanic()
-df_infert <- get_df_infert()
-df_streptb <- get_df_streptb()
-# df_diabetes <- get_df_diabetes()
-df_triple_outcome <- get_df_triple_outcome()
-df_correlated <- get_df_correlated()
-df_separated <- get_df_separated()
-df_separated_large <- get_df_separated(rows = 1e5)
-df_birth_weight <- get_df_birth_weight()
-df_framingham <- get_df_framingham()
-df_nhanes <- get_df_nhanes()
-
-# lr
-lr_titanic <- get_lr_titanic()
-lr_infert <- get_lr_infert()
-lr_diabetes <- get_lr_diabetes()
-lr_streptb <- get_lr_streptb()
-lr_birth_weight <- get_lr_birth_weight()
-lr_framingham <- get_lr_framingham()
-lr_nhanes <- get_lr_nhanes()
-
-# non-lr
-nonlr_streptb <- get_nonlr_streptb()
-
-# non-binary outcome
-lr_triple_outcome <- get_lr_triple_outcome()
-
-# correlated
-lr_correlated_two <- get_lr_correlated_two()
-lr_correlated_four <- get_lr_correlated_four()
-
-# separated
-lr_separated <- get_lr_separated()
-lr_separated_large <- get_lr_separated_large()
-
-
-# Save data --------------------------------------------------------------------
-
-if (flag_save_data) {
-  # titanic
-  saveRDS(
-    object = df_titanic,
-    file = testthat::test_path('test_data', 'df_titanic.Rds')
-  )
-  saveRDS(
-    object = lr_titanic,
-    file = testthat::test_path('test_data', 'lr_titanic.Rds')
-  )
-
-  # infertility
-  saveRDS(
-    object = df_infert,
-    file = testthat::test_path('test_data', 'df_infert.Rds')
-  )
-  saveRDS(
-    object = lr_infert,
-    file = testthat::test_path('test_data', 'lr_infert.Rds')
-  )
-
-  # strep tb
-  saveRDS(
-    object = df_streptb,
-    file = testthat::test_path('test_data', 'df_streptb.Rds')
-  )
-  saveRDS(
-    object = lr_streptb,
-    file = testthat::test_path('test_data', 'lr_streptb.Rds')
-  )
-  saveRDS(
-    object = nonlr_streptb,
-    file = testthat::test_path('test_data', 'nonlr_streptb.Rds')
-  )
-
-  # diabetes
-  saveRDS(
-    object = df_diabetes,
-    file = testthat::test_path('test_data', 'df_diabetes.Rds')
-  )
-  saveRDS(
-    object = lr_diabetes,
-    file = testthat::test_path('test_data', 'lr_diabetes.Rds')
-  )
-
-  # triple outcomes
-  saveRDS(
-    object = df_triple_outcome,
-    file = testthat::test_path('test_data', 'df_triple_outcome.Rds')
-  )
-  saveRDS(
-    object = lr_triple_outcome,
-    file = testthat::test_path('test_data', 'lr_triple_outcome.Rds')
-  )
-
-  # correlated
-  saveRDS(
-    object = df_correlated,
-    file = testthat::test_path('test_data', 'df_correlated.Rds')
-  )
-  saveRDS(
-    object = lr_correlated_two,
-    file = testthat::test_path('test_data', 'lr_correlated_two.Rds')
-  )
-  saveRDS(
-    object = lr_correlated_four,
-    file = testthat::test_path('test_data', 'lr_correlated_four.Rds')
-  )
-
-  # separated
-  saveRDS(
-    object = df_separated,
-    file = testthat::test_path('test_data', 'df_separated.Rds')
-  )
-  saveRDS(
-    object = lr_separated,
-    file = testthat::test_path('test_data', 'lr_separated.Rds')
-  )
-
-  # separated large
-  saveRDS(
-    object = lr_separated_large,
-    file = testthat::test_path('test_data', 'lr_separated_large.Rds')
-  )
-
-  # framingham
-  saveRDS(
-    object = df_framingham,
-    file = testthat::test_path('test_data', 'df_framingham.Rds')
-  )
-  saveRDS(
-    object = lr_framingham,
-    file = testthat::test_path('test_data', 'lr_framingham.Rds')
-  )
-
-  # birth weight
-  saveRDS(
-    object = df_birth_weight,
-    file = testthat::test_path('test_data', 'df_birth_weight.Rds')
-  )
-  saveRDS(
-    object = lr_birth_weight,
-    file = testthat::test_path('test_data', 'lr_birth_weight.Rds')
-  )
-
-  # nhanes
-  saveRDS(
-    object = df_nhanes,
-    file = testthat::test_path('test_data', 'df_nhanes.Rds')
-  )
-  saveRDS(
-    object = lr_nhanes,
-    file = testthat::test_path('test_data', 'lr_nhanes.Rds')
   )
 }
