@@ -115,7 +115,9 @@ testthat::test_that("`table_or()` and `plot_or()` handle issues gracefully", {
 testthat::test_that("`assumption_checks` parameter works as expected", {
   # 1. list some models that result in at least one warning for assumptions
   testthat::expect_no_error({
-    list_models <- list(get_lr_diabetes(), get_lr_infert())
+    # NB, diabetes may not be an exported object from 'medicaldata'
+    # list_models <- list(get_lr_diabetes(), get_lr_infert())
+    list_models <- list(get_lr_infert())
   })
 
   # 2. iterate over these models and test
@@ -286,7 +288,8 @@ testthat::test_that("`assumption_sample_size()` works as expected", {
 
   # 1. list some models to test
   testthat::expect_silent({
-    list_models <- list(get_lr_titanic(), get_lr_infert(), get_lr_diabetes())
+    # list_models <- list(get_lr_titanic(), get_lr_infert(), get_lr_diabetes())
+    list_models <- list(get_lr_titanic(), get_lr_infert())
   })
 
   # 2. iterate over these models and test
