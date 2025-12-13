@@ -2,6 +2,8 @@
 
 ## plotor v0.8.0 (2025-12-04)
 
+CRAN release: 2025-12-08
+
 ### Enhancements
 
 - **Univariable Odds Ratios**  
