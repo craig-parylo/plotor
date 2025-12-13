@@ -26,7 +26,7 @@ Imports:
     detectseparation,
     dplyr,
     forcats,
-    ggplot2,
+    ggplot2 (>= 4.0.0),
     glue,
     gt,
     gtExtras (>= 0.6.1),
