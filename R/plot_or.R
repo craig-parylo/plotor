@@ -1220,21 +1220,15 @@ output_gt <- function(df, conf_level, title = "Odds Ratio Summary Table") {
       ))
     ) |>
     # add an OR plot to visualise the results
-    # gtExtras::gt_plt_conf_int(
-    #   column = 'plot_or',
-    #   ci_columns = c('plot_ci_l', 'plot_ci_u'),
-    #   ref_line = 0,
-    #   text_size = 0
-    # ) |>
-    gt_plt_conf_int_new(
-      column = 'plot_or',
-      ci_columns = c('plot_ci_l', 'plot_ci_u'),
+    gtExtras::gt_plt_conf_int(
+      column = "plot_or",
+      ci_columns = c("plot_ci_l", "plot_ci_u"),
       ref_line = 0,
       text_size = 0
     ) |>
     gt::cols_align(
       columns = .data$plot_or,
-      align = 'center'
+      align = "center"
     )
 }
 
