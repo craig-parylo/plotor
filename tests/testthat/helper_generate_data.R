@@ -487,6 +487,26 @@ get_df_nhanes <- function() {
     NHANES::NHANES
 }
 
+get_df_ordered_factor <- function(seed = 123, rows = 1000) {
+  # create a dataset with two predictors, one of which `pred1` is an ordered factor
+  df <- tibble::tibble(
+    outcome = sample(0:1, size = rows, replace = TRUE) |>
+      factor(levels = c(0, 1), labels = c("Alive", "Died")),
+    # ordered factor
+    pred1 = sample(0:5, size = rows, replace = TRUE) |>
+      factor(
+        levels = c(0, 1, 2, 3, 4, 5),
+        labels = c('zero', 'one', 'two', "three", "four", "five"),
+        ordered = TRUE
+      ),
+    # numeric
+    pred2 = rpois(n = rows, lambda = 5),
+    # factor
+    pred3 = sample(0:3, size = rows, replace = TRUE) |>
+      factor(levels = c(0, 1, 2, 3), labels = c("Zero", "One", "Two", "Three"))
+  )
+}
+
 
 # Model functions --------------------------------------------------------------
 get_lr_titanic <- function() {
@@ -658,5 +678,14 @@ get_lr_nhanes <- function() {
     data = df,
     family = binomial,
     formula = Diabetes ~ Gender + BPSys3 + Education
+  )
+}
+
+get_lr_ordered_factor <- function(seed = 123, rows = 1e3) {
+  df <- get_df_ordered_factor(seed = seed, rows = rows)
+  lr <- stats::glm(
+    data = df,
+    family = "binomial",
+    formula = outcome ~ pred1 + pred2 + pred3,
   )
 }

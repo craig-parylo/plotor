@@ -7,9 +7,18 @@
 
 ## test successful ----
 testthat::test_that("`plot_or()` does not produce messages or warnings", {
+  # get models that should not cause issues
+  testthat::expect_silent({
+    list_models <- list(
+      get_lr_titanic(),
+      get_lr_nhanes(),
+      get_lr_ordered_factor()
+    )
+  })
+
   # iterate over some datasets that should not cause issues
   purrr::walk(
-    .x = list(get_lr_titanic(), get_lr_nhanes()),
+    .x = list_models,
     .f = \(.x) {
       # test that it runs without causing issue using defaults
       testthat::expect_silent(plotor::plot_or(.x))
@@ -30,7 +39,11 @@ testthat::test_that("`plot_or()` does not produce messages or warnings", {
 testthat::test_that("`table_or()` does not produce messages or warnings", {
   # get models that should not cause issues
   testthat::expect_silent({
-    list_models <- list(get_lr_titanic(), get_lr_nhanes())
+    list_models <- list(
+      get_lr_titanic(),
+      get_lr_nhanes(),
+      get_lr_ordered_factor()
+    )
   })
 
   # iterate over these models
@@ -288,8 +301,11 @@ testthat::test_that("`assumption_sample_size()` works as expected", {
 
   # 1. list some models to test
   testthat::expect_silent({
-    # list_models <- list(get_lr_titanic(), get_lr_infert(), get_lr_diabetes())
-    list_models <- list(get_lr_titanic(), get_lr_infert())
+    list_models <- list(
+      get_lr_titanic(),
+      get_lr_infert(),
+      get_lr_ordered_factor(rows = 500)
+    )
   })
 
   # 2. iterate over these models and test
