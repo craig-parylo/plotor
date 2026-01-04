@@ -448,7 +448,8 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
 
   # calculate rows - split if categorical
   df <-
-    if (is.numeric(var_temp)) {
+    # numeric and ordered
+    if (is.numeric(var_temp) | is.ordered(var_temp)) {
       df |>
         dplyr::filter(!is.na(var_name)) |>
         dplyr::summarise(
@@ -464,6 +465,7 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
           'outcome'
         )))
     } else {
+      # cateogrical - split into each outcome level
       df |>
         dplyr::mutate(
           outcome = sum({{ outcome }} == outcome_txt),
@@ -502,19 +504,22 @@ count_rows_by_variable <- function(df, var_name, outcome_name) {
 #' @return Tibble summary of rows per variable used in the model
 #' @noRd
 summarise_rows_per_variable_in_model <- function(model_results) {
+  # get a character description for ordered factors
+  of_class <- get_class_for_ordered_factors()
+
   # get the data from the model object
   model_data <-
     model_results$model |>
     dplyr::as_tibble()
 
-  # get the model variables
-  model_vars = base::all.vars(stats::formula(model_results)[-2])
-
-  # get the outcome variable
-  model_outcome = base::all.vars(stats::formula(model_results))[1]
+  # formula parsing
+  model_formula <- stats::formula(model_results)
+  model_terms <- all.vars(model_formula)
+  model_vars <- model_terms[-1] # exclude the response variable
+  model_outcome <- model_terms[1]
 
   # get a summary of all model variables and levels (will be used as the spine)
-  df <- get_model_variables_and_levels(model_results = model_results)
+  df_test <- get_model_variables_and_levels(model_results = model_results)
 
   # count the number of rows used for each variable and level
   df_rows <-
@@ -529,23 +534,189 @@ summarise_rows_per_variable_in_model <- function(model_results) {
     # rescale rows (will be used to set the size of the dot in the plot)
     dplyr::mutate(
       rows_scale = dplyr::case_when(
-        .data$class == 'numeric' ~ 1,
+        .data$class == "numeric" ~ 1,
         .default = .data$rows |>
           scales::rescale(to = c(1, 5))
       )
     )
 
-  # combine the two data
-  df <-
-    df |>
+  # For non-ordered factors, expand the levels but keep the row counts
+  df_nof <-
+    df_test |>
+    # handle numeric and categorical
     dplyr::select(dplyr::any_of("term")) |>
     dplyr::left_join(
       y = df_rows,
-      by = dplyr::join_by('term' == 'term')
+      by = dplyr::join_by("term" == "term")
+    ) |>
+    dplyr::filter(class != of_class)
+
+  # for ordered factors, expand the levels for the overall row counts
+  if (of_class %in% df_rows$class) {
+    df_of <-
+      df_test |>
+      # rename the group
+      dplyr::rename("group" = "variable") |>
+      dplyr::left_join(
+        y = df_rows |>
+          dplyr::filter(class == of_class) |>
+          dplyr::select(!dplyr::any_of(c("level", "term"))),
+        by = dplyr::join_by("group" == "group")
+      ) |>
+      dplyr::filter(class == of_class)
+
+    # bind the two dfs
+    df_nof <-
+      dplyr::bind_rows(df_nof, df_of)
+  }
+
+  # ensure the variables are returned in the correct order
+  df_return <-
+    df_test |>
+    dplyr::select(dplyr::any_of(c("term"))) |>
+    dplyr::left_join(
+      y = df_nof,
+      by = dplyr::join_by("term" == "term")
+    ) |>
+    make_ordered_factors_compatible_with_broom() |>
+    # remove the reference 'zero' level for ordered factors
+    dplyr::filter(!(class == of_class & level == "zero"))
+  # order as factors
+  # dplyr::mutate(
+  #   term = term |> forcats::as_factor()
+  # )
+
+  # return
+  return(df_return)
+}
+
+#' Make ordered factors compatible with {broom}
+#'
+#' @description
+#' `summarise_rows_per_variable_in_model` creates term names for ordered-factor predictors that differ from the convention used by **broom** (`tidy()`).
+#' This function rewrites those term names (and their associcated labels) so that the resulting tibble can be merged wtih a `broom::tidy()` output without losing the correspondence between rows.
+#'
+#' @details
+#' For a logistic regression model (`lr`) with an ordered-factor predictor `pred1` that has four levels, the terms produced by `summarise_rows_per_variable_in_model` are `c("pred1zero", "pred1one", "pred1two", "pred1three")`. In contrast, `broom::tidy()` returns `c("pred1.L", "pred1.Q", "pred1.C")` - the "zero" (reference) level is omitted.
+#' Because the two outputs use different keys they cannot be combined directly. `make_ordered_factors_compatible_with_broom` maps the former naming scheme onto the latter, preserving the semantic meaning of each contrast.
+#' The function works for up to 20 ordered levels. It leaves non-ordered predictors untouched.
+#'
+#' @param df A tibble produced by `summarise_rows_per_variable_in_model` that contains at least the columns 'group', 'term' and 'level'. Each 'group' corresponds to a predictor name (e.g. 'pred1').
+#'
+#' @returns A tibble identical to 'df' except that:
+#'  * `term` is replaced by the broom-compatible term (e.g., 'pred1.L')
+#'  * `level` is replaced by a human-readable label (e.g., 'Linear (main)')
+#' Unmatched rows (e.g., reference levels) retain their original values.
+#'
+#' @noRd
+make_ordered_factors_compatible_with_broom <- function(df) {
+  # defensive checks
+  required_cols <- c("group", "term", "level")
+  missing_cols <- setdiff(required_cols, names(df))
+  if (length(missing_cols) > 0) {
+    cli::cli_abort("{.var df} must contain columns: {.val {required_cols}}")
+  }
+
+  # create a lookup tibble
+  df_lu <-
+    tibble::tibble(
+      index = 1:20,
+      in_word = c(
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+        "twenty"
+      ),
+      out_word = c(
+        ".L",
+        ".Q",
+        ".C",
+        "^4",
+        "^5",
+        "^6",
+        "^7",
+        "^8",
+        "^9",
+        "^10",
+        "^11",
+        "^12",
+        "^13",
+        "^14",
+        "^15",
+        "^16",
+        "^17",
+        "^18",
+        "^19",
+        "^20"
+      ),
+      out_label = c(
+        "Linear (main)",
+        "Quadratic",
+        "Cubic",
+        "Fourth order",
+        "Fifth order",
+        "Sixth order",
+        "Seventh order",
+        "Eighth order",
+        "Ninth order",
+        "Tenth order",
+        "Eleventh order",
+        "Twelfth order",
+        "Thirteenth order",
+        "Fourteenth order",
+        "Fifteenth order",
+        "Sixteenth order",
+        "Seventeenth order",
+        "Eighteenth order",
+        "Nineteenth order",
+        "Twentieth order"
+      )
     )
 
-  # return the table summary
-  return(df)
+  # iterate over each group in df and add broom-compatible terms and labels
+  df_lu_broom <-
+    purrr::map_dfr(
+      .x = df$group |> unique(),
+      .f = \(.x) {
+        df_lu |>
+          dplyr::mutate(
+            df_from = glue::glue("{.x}{in_word}"),
+            df_to = glue::glue("{.x}{out_word}")
+          ) |>
+          dplyr::select(dplyr::any_of(c("df_from", "df_to", "out_label")))
+      }
+    )
+
+  # return the input df with the new terms added
+  df <-
+    df |>
+    dplyr::left_join(
+      y = df_lu_broom,
+      by = dplyr::join_by("term" == "df_from")
+    ) |>
+    # use the new terms and levels
+    dplyr::mutate(
+      term = dplyr::coalesce(df_to, term),
+      level = dplyr::coalesce(out_label, level)
+    ) |>
+    # remove the surplus additional columns
+    dplyr::select(!dplyr::any_of(c("df_to", "out_label")))
 }
 
 #' Get a tibble of model variables and levels
@@ -638,7 +809,11 @@ prepare_df_for_plotting <- function(df) {
           # upper CI
           '{p_label})' # probability
         )
-      )
+      ),
+
+      # ensure the level variable is a factor to ensure plots have the
+      # correct order
+      level = .data$level |> forcats::as_factor()
     ) |>
     # position outcome rate following outcome
     dplyr::relocate("outcome_rate", .after = "outcome")
@@ -874,6 +1049,23 @@ anonymise_count_values <- function(var) {
   return(vec_return)
 }
 
+get_class_for_ordered_factors <- function() {
+  # create a vector of ordered factors
+  of_example <-
+    sample(0:5, size = 1000, replace = TRUE) |>
+    factor(
+      levels = c(0, 1, 2, 3, 4, 5),
+      labels = c("a", "b", "c", "d", "e", "f"),
+      ordered = TRUE
+    )
+
+  # how is it described
+  of_class <- paste(class(of_example), collapse = " ")
+
+  # return
+  return(of_class)
+}
+
 ## validation funcs -----
 #' Validate confidence level input
 #'
@@ -1059,7 +1251,7 @@ get_summary_table <- function(
     model_or <-
       glm_model_results |>
       # use broom to get or estimates but WITHOUT confidence intervals
-      broom::tidy(exponentiate = T, conf.int = F) |>
+      broom::tidy(exponentiate = TRUE, conf.int = FALSE) |>
       # add in confidence interval approximation using `stats::confint.default()`
       dplyr::left_join(
         y = glm_model_results |>
@@ -1072,12 +1264,14 @@ get_summary_table <- function(
   } else {
     # use the correct method to estimate the confidence interval
     model_or <- glm_model_results |>
-      broom::tidy(exponentiate = T, conf.int = T, conf.level = conf_level)
+      broom::tidy(exponentiate = TRUE, conf.int = TRUE, conf.level = conf_level)
   }
 
   # add the odds ratio and CIs to the summary dataframe
   df <- df |>
-    dplyr::left_join(y = model_or, by = base::c('term'))
+    dplyr::left_join(y = model_or, by = base::c('term')) |>
+    # format as factor
+    dplyr::mutate(term = term |> forcats::as_factor())
 
   # use variable labels
   df <- use_var_labels(df = df, lr = glm_model_results)
@@ -2544,21 +2738,27 @@ assumption_sample_size <- function(
   result_factors <- TRUE
 
   # get the name of the outcome variable
-  temp_outcome_var <- glm$terms[[2]]
+  temp_outcome_var <- glm$terms[[2]] |> as.character()
 
   # get a vector of predictor variables which are factors
   predictor_factors <-
-    # get the class of each term
-    sapply(glm$model, class) |>
-    # convert to a tibble and name terms as 'predictor'
-    tibble::as_tibble(rownames = c("predictor")) |>
+    # get the class of each term in the model
+    purrr::map(
+      .x = glm$model,
+      .f = \(.x) paste(class(.x), collapse = " ")
+    ) |>
+    # convert to a tibble
+    stack() |>
+    tibble::as_tibble() |>
     # remove the outcome and keep only predictors formatted as factors
     dplyr::filter(
-      .data$value == "factor",
-      .data$predictor != temp_outcome_var
+      # exclude the outcome
+      ind != temp_outcome_var,
+      # keep only factors
+      values %in% c("factor", "ordered factor")
     ) |>
     # pull a list of predictors
-    dplyr::pull(.data$predictor)
+    dplyr::pull(ind)
 
   # only proceed if there is at least one factor predictor
   if (length(predictor_factors) > 0) {
@@ -2581,32 +2781,27 @@ assumption_sample_size <- function(
           levels(.df$outcome)[2] <- ".event"
 
           # count the number of observations in each level of predictor
-          df <-
+          df_return <-
             .df |>
-            # tidyr::complete(outcome) |>
+            # need to cast the predictor as string to avoid issues in cases
+            # where predictors include both factors and ordered factors
+            dplyr::rename(predictor_level = {{ .var }}) |>
+            dplyr::mutate(
+              predictor_level = predictor_level |> as.character()
+            ) |>
             # count rows by the outcome for each predictor variable (.var) level
             dplyr::summarise(
-              predictor = {{ .var }},
+              predictor = {{ .var }} |> as.character(),
               n = dplyr::n(),
-              .by = c("outcome", {{ .var }})
+              .by = c("outcome", "predictor_level")
             ) |>
-            # rename var to level and move predictor to start of tibble
-            dplyr::rename(level = {{ .var }}) |>
-            dplyr::relocate("predictor", .before = "level") |>
             # sort by count (in case this needs displaying)
             dplyr::arrange(dplyr::desc(.data$n)) |>
             # pivot outcomes to their own columns
             tidyr::pivot_wider(
               names_from = dplyr::any_of("outcome"),
-              values_from = "n"
-            ) |>
-            # replace any NA values with zeroes (in cases of complete separation)
-            dplyr::mutate(
-              dplyr::across(
-                # .cols = c(".event", ".nonevent"),
-                .cols = dplyr::any_of(c(".event", ".nonevent")),
-                .fns = ~ dplyr::coalesce(.x, 0L)
-              )
+              values_from = dplyr::any_of("n"),
+              values_fill = 0 # in cases of complete separation
             )
         }
       )
