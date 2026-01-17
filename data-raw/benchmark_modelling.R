@@ -39,7 +39,6 @@ usethis::use_data(
 # predict time taken
 predict(
   object = model_time_taken,
-  # object = model_list$m8,
   newdata = tibble::tibble(
     n_seq = 300000L,
     n_fac_seq = 4L,
@@ -51,6 +50,22 @@ predict(
 ) |>
   exp() |>
   max()
+
+
+predict(
+  object = model_time_taken,
+  newdata = tibble::tibble(
+    n_seq = 300000L,
+    n_fac_seq = 2L,
+    n_fac_levels_seq = 5L,
+    n_num_seq = 0L
+  ),
+  interval = "prediction",
+  level = 0.95
+) |>
+  exp() |>
+  max() |>
+  floor()
 
 # lots of scratchpad activity ------------------------
 
