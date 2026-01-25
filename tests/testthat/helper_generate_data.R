@@ -514,7 +514,7 @@ get_df_large_synthetic <- function(seed = 123, rows = 1e6) {
   df <-
     tibble::tibble(
       outcome = sample(0:1, size = rows, replace = TRUE) |>
-        factor(levels = c(0, 1), labels = c("Alive", "Died")),
+        factor(levels = 0:1, labels = c("Alive", "Died")),
       # factor predictors
       pred1 = sample(0:5, size = rows, replace = TRUE) |>
         factor(
@@ -534,6 +534,7 @@ get_df_large_synthetic <- function(seed = 123, rows = 1e6) {
 
       # numeric predictors
       pred4 = rpois(n = rows, lambda = 10),
+      # pred4 = rnorm(n = rows, mean = 10, sd = 1),
       pred5 = rnorm(n = rows, mean = 100, sd = 10),
       pred6 = rnorm(n = rows, mean = 1, sd = 0.1)
     )
