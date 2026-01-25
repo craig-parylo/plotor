@@ -57,6 +57,12 @@ plot_or <- function(
   # check the model is logistic regression
   valid_glm_model <- validate_glm_model(glm_model_results)
 
+  # check whether a fast estimate is appropriate
+  confint_fast_estimate <- double_check_confint_fast_estimate(
+    glm = glm_model_results,
+    confint_fast_estimate = confint_fast_estimate
+  )
+
   # check logistic regression assumptions if the user requested it
   if (assumption_checks) {
     valid_assumptions <- check_assumptions(
@@ -172,6 +178,12 @@ table_or <- function(
   # data and input checks ----
   # check the model is logistic regression
   valid_glm_model <- validate_glm_model(glm_model_results)
+
+  # check whether a fast estimate is appropriate
+  confint_fast_estimate <- double_check_confint_fast_estimate(
+    glm = glm_model_results,
+    confint_fast_estimate = confint_fast_estimate
+  )
 
   # check logistic regression assumptions if the user requested it
   if (assumption_checks) {
@@ -3064,4 +3076,233 @@ assumption_linearity <- function(glm, details = FALSE, p_val_threshold = 0.05) {
 
   # return the result
   return(result)
+}
+
+#' Predict processing time
+#'
+#' @description
+#' Predict the upper bound of processing time (in milliseconds) required to
+#' compute a model summary table. The prediction is the upper prediction
+#' interval from a pre-trained linear model and is returned on the original
+#' milliseconds scale (the stored model predicts (log(milliseconds) and the
+#' result is exponentiated).
+#'
+#' @details
+#' A pre-trained linear regression model (internal data) is used to estimate
+#' processing time. The model expects these numeric predictors:
+#' - `n_seq` - total number of rows in the model data
+#' - `n_fac_seq` - number of factor predictor variables
+#' - `n_fac_levels_seq` - maximum number of levels among factor predictors
+#' - `n_num_seq` - number of numeric predictor variables
+#'
+#' The function returns the exponentiated upper bound of the prediction
+#' interval at the confidence level `pred_level`.
+#'
+#' @note
+#' Uses function uses an internal pre-trained model `model_time_taken` that is
+#' stored in R/sysdata.rda and made available in the package namespace.
+#' `model_time_taken` predicts log(milliseconds); this function exponentiates
+#' the upper prediction bound to return milliseconds.
+#'
+#' @param glm A fitted logistic regression model (a result of stats::glm). Preferably the model retains its model frame (i.e. was fit with model = TRUE) so row count can be determined.
+#' @param pred_level Numeric scalar in (0, 1). Confidence level for the prediction interval. Default: 0.95
+#'
+#' @returns Integer. Predicted milliseconds to run the process (non-negative).
+#'
+#' @examples
+#' \dontrun{
+#'   # Uses internal `model_time_taken` included in the package.
+#'   predict_process_time(glm_model, pred_level = 0.95)
+#' }
+#'
+#' @seealso Internal data: `model_time_taken` (pre-trained linear model saved in R/sysdata.rda)
+#'
+#' @noRd
+predict_process_time <- function(glm, pred_level = 0.95) {
+  # validate inputs
+  stopifnot(is.numeric(pred_level), pred_level > 0, pred_level < 1)
+
+  # get a tibble describing the predictor variables and
+  # levels of factor predictors
+  glm_levels <- get_model_variables_and_levels(model_results = glm)
+
+  # gather measurement for use in the predictor model
+  # row count
+  n <- glm$model |> nrow()
+
+  # number of numeric predictors
+  n_num <-
+    glm_levels |>
+    dplyr::filter(is.na(level)) |>
+    dplyr::summarise(rows = dplyr::n()) |>
+    dplyr::pull("rows")
+
+  # number of factor predictors
+  n_fac <-
+    glm_levels |>
+    dplyr::filter(!is.na(level)) |>
+    dplyr::distinct(variable) |>
+    dplyr::summarise(rows = dplyr::n()) |>
+    dplyr::pull("rows")
+
+  # maximum number of levels for factors predictors
+  # filter the df for any potential factor predictors
+  df_n_fac_levels <-
+    glm_levels |>
+    dplyr::filter(!is.na(level))
+
+  # determine the maximum number of levels, or, if there are no
+  # factor variables then return zero
+  n_fac_levels <-
+    if (df_n_fac_levels |> nrow() == 0L) {
+      0L
+    } else {
+      df_n_fac_levels |>
+        dplyr::summarise(rows = dplyr::n(), .by = "variable") |>
+        dplyr::summarise(max_rows = max(.data$rows)) |>
+        dplyr::pull(.data$max_rows)
+    }
+
+  # estimate the processing time in milliseconds
+  predicted_ms <-
+    predict(
+      object = model_time_taken, # pre-trained model
+      newdata = tibble::tibble(
+        n_seq = n,
+        n_fac_seq = n_fac,
+        n_fac_levels_seq = n_fac_levels,
+        n_num_seq = n_num
+      ),
+      interval = "prediction",
+      level = pred_level
+    ) |>
+    exp() |>
+    max() |>
+    floor()
+
+  # return the result
+  return(predicted_ms |> as.integer())
+}
+
+#' Double-check the setting for `confint_fast_estimate`
+#'
+#' @description
+#' Check whether the user's current setting for `confint_fast_estimate`
+#' should be changed to a faster (approximate) method for confidence intervals
+#' based on estimated processing time. In interactive sessions the user may be
+#' prompted to switch to the faster option when the estimated run time is long.
+#'
+#' @details
+#' The function uses `predict_process_time()`, which relies on the package's
+#' internal pre-trained model `model_time_taken`, to estimate the processing
+#' time for computing confidence intervals. If the estimate exceeds thresholds
+#' provided by the caller, the function will:
+#' - run silently to keep the supplied value in non-interactive mode,
+#' - in interactive mode, notify the user when the estimate surpasses
+#'   `inform_threshold`, and prompt to switch to the faster method when it
+#'   exceeds `recommend_threshold`.
+#'
+#' The function always returns a single logical scalar suitable for use as a
+#' value for `confint_fast_estimate`.
+#'
+#' @param glm A fitted logistic regression model (result of stats::glm). Ideally the model retains its model frame (model = TRUE) so the helper functions can determine row counts.
+#' @param confint_fast_estimate Logical scalar. Current value for the `confint_fast_estimate` parameter. If TRUE this function returns immediately.
+#' @param inform_threshold Integer scalar (milliseconds). If the estimated run time exceeds this value, the user will be informed that the process may take a while. Default: 5000 (5 seconds).
+#' @param recommend_threshold Integer scalar (milliseconds). If the estimated run time exceeds this value, the user will be warned and - in an interactive session - prompted to switch `confint_fast_estimate` to TRUE. Default 60000 (60 seconds).
+#'
+#' @return Logical scalar. The value to use for `confint_fast_estimate` (either the original value or TRUE if the user chose to switch).
+#'
+#' @examples
+#' \dontrun{
+#'   # In an interactive session this may prompt the user if the estimated
+#'   # run time is long
+#'   result <- double_check_confint_fast_estimate(
+#'     glm_model,
+#'     confint_fast_estimate = FALSE
+#'   )
+#' }
+#'
+#' @note
+#' - Thresholds are in milliseconds. Callers may override the defaults to
+#' change when notices / prompts occur.
+#' - In non-interactive usage (e.g., scripts, R CMD check) the function never
+#' prompts and simply returns the supplied `confint_fast_estimate`.
+#' - The function performs basic validation of inputs and will return the supplied value if it cannot obtain a finite time estimate.
+#'
+#' @seealso [predict_process_time()]
+#'
+#' @noRd
+double_check_confint_fast_estimate <- function(
+  glm,
+  confint_fast_estimate,
+  inform_threshold = 5e3L,
+  recommend_threshold = 6e4L
+) {
+  # validated inputs
+  if (
+    !is.logical(confint_fast_estimate) || length(confint_fast_estimate) != 1
+  ) {
+    cli::cli_abort(
+      "{.var confint_fast_estimate} must be a single logical value"
+    )
+  }
+  if (!is.numeric(inform_threshold) || inform_threshold < 0) {
+    cli::cli_abort("{.var inform_threshold} must be a non-negative integer")
+  }
+  if (!is.numeric(recommend_threshold) || recommend_threshold < 0) {
+    cli::cli_abort("{.var recommend_threshold} must be a non-negative integer.")
+  }
+  if (recommend_threshold < inform_threshold) {
+    cli::cli_alert(
+      "{.var recommend_threshold} should be larger than {.var inform_threshold}"
+    )
+  }
+
+  # if already set to TRUE, then just return the value
+  # there is no benefit from continuing with this function
+  if (confint_fast_estimate) {
+    return(confint_fast_estimate)
+  }
+
+  # `confint_fast_estimate` is FALSE:
+  # predict the processing time
+  predict_ms <- predict_process_time(glm = glm)
+  predict_desc <- (ceiling(predict_ms / 6e4) * 6e4) |> prettyunits::pretty_ms()
+
+  # decide what to do next
+  if (!interactive()) {
+    # non-interactive: go exactly with the called request
+    # don't want to second-guess the user
+    return(confint_fast_estimate)
+  } else {
+    if (predict_ms <= inform_threshold) {
+      # this will calculate quickly enough; continue
+      return(confint_fast_estimate)
+    } else if (predict_ms <= recommend_threshold) {
+      # display a general notice
+      cli::cli_alert_warning("Estimated run time: {predict_desc}")
+    } else {
+      # expected to take longer than upper threshold - alert the user
+      cli::cli_alert_danger("Estimated run time: {predict_desc}")
+      cli::cli_alert_warning(
+        "Recommend using {.code confint_fast_estimate = TRUE} for a faster (approximate) method of calculating confidence intervals."
+      )
+      # set up some choices
+      choices <- c(
+        "Switch to faster CI estimate (recommended)",
+        "Keep current (run full CI; may take a long time)"
+      )
+      # ask the user
+      choice <- utils::menu(
+        choices,
+        title = "Switch to faster CI estimate now? (recommended)"
+      )
+      # handle the response
+      if (choice == 1) {
+        return(TRUE)
+      } else {
+        return(confint_fast_estimate)
+      }
+    }
+  }
 }

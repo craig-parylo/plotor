@@ -16,3 +16,4 @@
 ^plotor_image
 ^secret$
 ^revdep$
+^data-raw$

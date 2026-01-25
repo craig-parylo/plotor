@@ -488,6 +488,7 @@ get_df_nhanes <- function() {
 }
 
 get_df_ordered_factor <- function(seed = 123, rows = 1000) {
+  set.seed(seed)
   # create a dataset with two predictors, one of which `pred1` is an ordered factor
   df <- tibble::tibble(
     outcome = sample(0:1, size = rows, replace = TRUE) |>
@@ -505,6 +506,37 @@ get_df_ordered_factor <- function(seed = 123, rows = 1000) {
     pred3 = sample(0:3, size = rows, replace = TRUE) |>
       factor(levels = c(0, 1, 2, 3), labels = c("Zero", "One", "Two", "Three"))
   )
+}
+
+get_df_large_synthetic <- function(seed = 123, rows = 1e6) {
+  set.seed(seed)
+  # create a dataset with ten predictors
+  df <-
+    tibble::tibble(
+      outcome = sample(0:1, size = rows, replace = TRUE) |>
+        factor(levels = c(0, 1), labels = c("Alive", "Died")),
+      # factor predictors
+      pred1 = sample(0:5, size = rows, replace = TRUE) |>
+        factor(
+          levels = 0:5,
+          labels = c("alpha", "beta", "gamma", "delta", "epsilon", "zeta")
+        ),
+      pred2 = sample(0:9, size = rows, replace = TRUE) |>
+        factor(
+          levels = 0:9,
+          labels = c("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9")
+        ),
+      pred3 = sample(0:3, size = rows, replace = TRUE) |>
+        factor(
+          levels = 0:3,
+          labels = c("Apple", "Banana", "Orange", "Grape")
+        ),
+
+      # numeric predictors
+      pred4 = rpois(n = rows, lambda = 10),
+      pred5 = rnorm(n = rows, mean = 100, sd = 10),
+      pred6 = rnorm(n = rows, mean = 1, sd = 0.1)
+    )
 }
 
 
@@ -687,5 +719,14 @@ get_lr_ordered_factor <- function(seed = 123, rows = 1e3) {
     data = df,
     family = "binomial",
     formula = outcome ~ pred1 + pred2 + pred3,
+  )
+}
+
+get_lr_large_synthetic <- function(seed = 123, rows = 1e6) {
+  df <- get_df_large_synthetic(seed = seed, rows = rows)
+  lr <- stats::glm(
+    data = df,
+    family = "binomial",
+    formula = outcome ~ pred1 + pred2 + pred3 + pred4 + pred5 + pred6
   )
 }
