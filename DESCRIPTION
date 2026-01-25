@@ -31,6 +31,7 @@ Imports:
     gt,
     gtExtras (>= 0.6.1),
     janitor,
+    prettyunits,
     purrr,
     rlang,
     scales,
