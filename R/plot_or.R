@@ -65,7 +65,7 @@ plot_or <- function(
 
   # check logistic regression assumptions if the user requested it
   if (assumption_checks) {
-    valid_assumptions <- check_assumptions(
+    valid_assumptions <- check_assumptions_with_spinner(
       glm = glm_model_results,
       details = FALSE,
       confint_fast_estimate = confint_fast_estimate
@@ -187,7 +187,7 @@ table_or <- function(
 
   # check logistic regression assumptions if the user requested it
   if (assumption_checks) {
-    valid_assumptions <- check_assumptions(
+    valid_assumptions <- check_assumptions_with_spinner(
       glm = glm_model_results,
       details = FALSE,
       confint_fast_estimate = confint_fast_estimate
@@ -291,7 +291,7 @@ check_or <- function(
 
   # get a summary of test results
   # NB, detailed feedback is handled by each of the test functions
-  test_results <- check_assumptions(
+  test_results <- check_assumptions_with_spinner(
     glm = glm_model_results,
     confint_fast_estimate = confint_fast_estimate,
     details = details
@@ -2196,6 +2196,7 @@ prepare_combined_table_object <- function(
 #'
 #' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#' @param confint_fast_estimate Boolean: TRUE = fast estimate for confidence interval, FALSE = default method for confidence interval calculation
 #'
 #' @returns Named list indicating the results of each assumption
 #' @noRd
@@ -2230,6 +2231,66 @@ check_assumptions <- function(
   }
 
   return(list_return)
+}
+
+#' Check assumptions with spinner
+#'
+#' Checks whether the supplied `glm` model satisfies assumptions of a binary
+#' logistic regression model.
+#'
+#' The assumptions tested are:
+#' * the outcome variable is binary encoded,
+#' * there is no multicollinearity among the predictor variables,
+#' * the outcome variable is not separated by any of the predictor variables,
+#' * the sample size is sufficient to avoid biased estimates
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#' @param confint_fast_estimate Boolean: TRUE = fast estimate for confidence interval, FALSE = default method for confidence interval calculation
+#'
+#' @returns Named list indicating the results of each assumption
+#' @noRd
+check_assumptions_with_spinner <- function(
+  glm,
+  details = FALSE,
+  confint_fast_estimate = FALSE
+) {
+  # instantiate a spinner
+  spinner <-
+    cli::make_spinner(
+      which = "simpleDotsScrolling",
+      template = "Checking assumptions {spin}"
+    )
+
+  # get a summary table for the model
+  list_return <-
+    callr::r_bg(
+      package = "plotor",
+      func = function(glm, details, confint_fast_estimate) {
+        check_assumptions(
+          glm = glm,
+          details = details,
+          confint_fast_estimate = confint_fast_estimate
+        )
+      },
+      args = list(
+        glm = glm,
+        details = details,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    )
+
+  # periodically update the spinner so long as the process is active
+  while (list_return$is_alive()) {
+    spinner$spin()
+    Sys.sleep(0.1) # the spinner is automatically throttled, so this setting isn't crucial
+  }
+
+  # finish the spinner
+  spinner$finish()
+
+  # return the result and raise erorrs if any occurred in the background
+  list_return$get_result()
 }
 
 
