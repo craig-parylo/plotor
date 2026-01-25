@@ -87,7 +87,7 @@ plot_or <- function(
   # main ----
 
   # get summary of the data and results
-  df <- get_summary_table(
+  df <- get_summary_table_with_spinner(
     glm_model_results = glm_model_results,
     conf_level = conf_level,
     confint_fast_estimate = confint_fast_estimate
@@ -1295,6 +1295,68 @@ get_summary_table <- function(
   return(df)
 }
 
+#' Get a table summarising the model results
+#'
+#' @description
+#' Get a summary table showing the number of rows in each group and of those
+#' who and a 'success' outcome. Then combine with details such as the OR
+#' estimate and confidence interval.
+#'
+#' @details
+#' This function calls the `get_summary_table()` in a background process and
+#' displays a spinner in the console to notify the user that the system is
+#' working.
+#'
+#' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
+#'
+#' @returns Tibble providing a summary of the logistic regression model.
+#'
+#' @noRd
+get_summary_table_with_spinner <- function(
+  glm_model_results,
+  conf_level = 0.95,
+  confint_fast_estimate = FALSE
+) {
+  # instantiate a spinner
+  spinner <-
+    cli::make_spinner(
+      which = "simpleDotsScrolling",
+      template = "Working {spin}"
+    )
+
+  # get a summary table for the model
+  p <-
+    callr::r_bg(
+      package = "plotor",
+      func = function(glm_model_results, conf_level, confint_fast_estimate) {
+        get_summary_table(
+          glm_model_results = glm_model_results,
+          conf_level = conf_level,
+          confint_fast_estimate = confint_fast_estimate
+        )
+      },
+      args = list(
+        glm_model_results = glm_model_results,
+        conf_level = conf_level,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    )
+
+  # periodically update the spinner so long as the process is active
+  while (p$is_alive()) {
+    spinner$spin()
+    Sys.sleep(0.1) # the spinner is automatically throttled, so this setting isn't crucial
+  }
+
+  # finish the spinner
+  spinner$finish()
+
+  # return the result and raise erorrs if any occurred in the background
+  p$get_result()
+}
+
 #' Output tibble as `gt`
 #'
 #' Outputs a publication-quality summary OR table with {gt} formatting.
@@ -1805,7 +1867,7 @@ get_univariable_summary_table <- function(
           )
 
         # summarise the model
-        df_summary <- get_summary_table(
+        df_summary <- get_summary_table_with_spinner(
           glm_model_results = uni_glm,
           conf_level = conf_level,
           confint_fast_estimate = confint_fast_estimate
@@ -1861,7 +1923,7 @@ get_combined_summaries <- function(
 
   # get a multivariable summary
   mv_summary <-
-    get_summary_table(
+    get_summary_table_with_spinner(
       glm_model_results = model,
       conf_level = conf_level,
       confint_fast_estimate = confint_fast_estimate
@@ -1969,7 +2031,7 @@ prepare_multivariable_table_object <- function(
   anonymise_counts = FALSE
 ) {
   # get summary of rows and estimate OR
-  df <- get_summary_table(
+  df <- get_summary_table_with_spinner(
     glm_model_results = glm_model_results,
     conf_level = conf_level,
     confint_fast_estimate = confint_fast_estimate
@@ -2623,9 +2685,12 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
               values_fill = 0
             ) |>
             dplyr::rename("n0" = 2, "n1" = 3) |>
-            dplyr::filter("n0" == 0 | "n1" == 0) |>
-            dplyr::summarise(separated = dplyr::n() > 0) |>
-            dplyr::pull("separated")
+            dplyr::filter("n0" == 0 | "n1" == 0)
+
+          # if result contains any rows it means there is separation
+          # if there are no rows then separation isn't detected and the
+          # assumption holds
+          result <- ifelse(test = result |> nrow() == 0, yes = TRUE, no = FALSE)
         }
 
         # return the result
@@ -2633,12 +2698,13 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
           predictor = .pred,
           separation = result
         )
+
         return(df_result)
       }
     )
 
   # consolidate the results to a single TRUE / FALSE
-  result <- !results$separation |> any(na.rm = TRUE)
+  result <- results$separation |> all(na.rm = TRUE)
 
   # list predictors where there are signs of separation
   var_separation <- results |>
@@ -2884,7 +2950,6 @@ assumption_sample_size <- function(
       "{nrow(predictor_factor_level_too_small)} predictor variable level{?s} in your model {?has/have} fewer than {.val {min_events_per_predictor}} events and / or non-events:",
       wrap = TRUE
     )
-    print(predictor_factor_level_too_small)
   }
 
   # provide general advice on this assumption
@@ -3078,6 +3143,7 @@ assumption_linearity <- function(glm, details = FALSE, p_val_threshold = 0.05) {
   return(result)
 }
 
+# predict processing funcs ----------------------------------------------------
 #' Predict processing time
 #'
 #' @description
@@ -3238,7 +3304,7 @@ double_check_confint_fast_estimate <- function(
   inform_threshold = 5e3L,
   recommend_threshold = 6e4L
 ) {
-  # validated inputs
+  # validate inputs
   if (
     !is.logical(confint_fast_estimate) || length(confint_fast_estimate) != 1
   ) {
@@ -3281,11 +3347,13 @@ double_check_confint_fast_estimate <- function(
     } else if (predict_ms <= recommend_threshold) {
       # display a general notice
       cli::cli_alert_warning("Estimated run time: {predict_desc}")
+      return(confint_fast_estimate)
     } else {
       # expected to take longer than upper threshold - alert the user
       cli::cli_alert_danger("Estimated run time: {predict_desc}")
-      cli::cli_alert_warning(
-        "Recommend using {.code confint_fast_estimate = TRUE} for a faster (approximate) method of calculating confidence intervals."
+      cli::cli_text(
+        "Recommend using {.code confint_fast_estimate = TRUE} for a faster (approximate) method of calculating confidence intervals (CI).
+        "
       )
       # set up some choices
       choices <- c(
@@ -3295,7 +3363,7 @@ double_check_confint_fast_estimate <- function(
       # ask the user
       choice <- utils::menu(
         choices,
-        title = "Switch to faster CI estimate now? (recommended)"
+        title = "Switch to faster CI estimate now?"
       )
       # handle the response
       if (choice == 1) {
