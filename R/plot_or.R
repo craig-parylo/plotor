@@ -70,6 +70,11 @@ plot_or <- function(
       details = FALSE,
       confint_fast_estimate = confint_fast_estimate
     )
+    # valid_assumptions <- check_assumptions(
+    #   glm = glm_model_results,
+    #   details = FALSE,
+    #   confint_fast_estimate = confint_fast_estimate
+    # )
 
     # recommend to the user to use `check_or` for more feedback if at least one
     # test fails
