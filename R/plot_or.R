@@ -65,16 +65,21 @@ plot_or <- function(
 
   # check logistic regression assumptions if the user requested it
   if (assumption_checks) {
-    valid_assumptions <- check_assumptions_with_spinner(
-      glm = glm_model_results,
-      details = FALSE,
-      confint_fast_estimate = confint_fast_estimate
-    )
-    # valid_assumptions <- check_assumptions(
-    #   glm = glm_model_results,
-    #   details = FALSE,
-    #   confint_fast_estimate = confint_fast_estimate
-    # )
+    if (use_spinner()) {
+      # run the process with a spinner
+      valid_assumptions <- check_assumptions_with_spinner(
+        glm = glm_model_results,
+        details = FALSE,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    } else {
+      # run directly
+      valid_assumptions <- check_assumptions(
+        glm = glm_model_results,
+        details = FALSE,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    }
 
     # recommend to the user to use `check_or` for more feedback if at least one
     # test fails
@@ -92,11 +97,21 @@ plot_or <- function(
   # main ----
 
   # get summary of the data and results
-  df <- get_summary_table_with_spinner(
-    glm_model_results = glm_model_results,
-    conf_level = conf_level,
-    confint_fast_estimate = confint_fast_estimate
-  )
+  if (use_spinner()) {
+    # run the function in the background with a spinner
+    df <- get_summary_table_with_spinner(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  } else {
+    # run the function directly
+    df <- get_summary_table(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  }
 
   # plot the results
   p <- plot_odds_ratio(
@@ -1872,11 +1887,19 @@ get_univariable_summary_table <- function(
           )
 
         # summarise the model
-        df_summary <- get_summary_table_with_spinner(
-          glm_model_results = uni_glm,
-          conf_level = conf_level,
-          confint_fast_estimate = confint_fast_estimate
-        )
+        if (use_spinner()) {
+          df_summary <- get_summary_table_with_spinner(
+            glm_model_results = uni_glm,
+            conf_level = conf_level,
+            confint_fast_estimate = confint_fast_estimate
+          )
+        } else {
+          df_summary <- get_summary_table(
+            glm_model_results = uni_glm,
+            conf_level = conf_level,
+            confint_fast_estimate = confint_fast_estimate
+          )
+        }
 
         # return the result for collation by {purrr}
         return(df_summary)
@@ -1927,12 +1950,21 @@ get_combined_summaries <- function(
   }
 
   # get a multivariable summary
-  mv_summary <-
-    get_summary_table_with_spinner(
-      glm_model_results = model,
-      conf_level = conf_level,
-      confint_fast_estimate = confint_fast_estimate
-    )
+  if (use_spinner()) {
+    mv_summary <-
+      get_summary_table_with_spinner(
+        glm_model_results = model,
+        conf_level = conf_level,
+        confint_fast_estimate = confint_fast_estimate
+      )
+  } else {
+    mv_summary <-
+      get_summary_table(
+        glm_model_results = model,
+        conf_level = conf_level,
+        confint_fast_estimate = confint_fast_estimate
+      )
+  }
 
   # get a univariable summary
   uv_summary <-
@@ -2036,11 +2068,19 @@ prepare_multivariable_table_object <- function(
   anonymise_counts = FALSE
 ) {
   # get summary of rows and estimate OR
-  df <- get_summary_table_with_spinner(
-    glm_model_results = glm_model_results,
-    conf_level = conf_level,
-    confint_fast_estimate = confint_fast_estimate
-  )
+  if (use_spinner()) {
+    df <- get_summary_table_with_spinner(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  } else {
+    df <- get_summary_table(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  }
 
   # get the outcome variable
   str_outcome <- get_outcome_variable_name(model = glm_model_results)
@@ -2260,18 +2300,28 @@ check_assumptions_with_spinner <- function(
   details = FALSE,
   confint_fast_estimate = FALSE
 ) {
-  # instantiate a spinner
-  spinner <-
-    cli::make_spinner(
-      which = "simpleDotsScrolling",
-      template = "Checking assumptions {spin}"
-    )
+  # identify whether we want to disable the spinner (e.g. non-interactive sessions)
+  spinner_allowed <- use_spinner()
+
+  # gather environmental information
+  env <- c(
+    Sys.getenv(),
+    PLOTOR_FORCE_SPINNER = if (spinner_allowed) "1" else "0"
+  )
 
   # get a summary table for the model
   list_return <-
     callr::r_bg(
       package = "plotor",
+      env = env,
       func = function(glm, details, confint_fast_estimate) {
+        # configure cli based on env
+        if (
+          !tolower(Sys.getenv("PLOTOR_FORCE_SPINNER", unset = "0")) %in%
+            c("1", "true", "t")
+        ) {
+          options(cli.dynamic = FALSE)
+        }
         check_assumptions(
           glm = glm,
           details = details,
@@ -2285,14 +2335,24 @@ check_assumptions_with_spinner <- function(
       )
     )
 
-  # periodically update the spinner so long as the process is active
-  while (list_return$is_alive()) {
-    spinner$spin()
-    Sys.sleep(0.1) # the spinner is automatically throttled, so this setting isn't crucial
+  if (spinner_allowed) {
+    # make sure a spinner is shown
+    spinner <-
+      cli::make_spinner(
+        which = "simpleDotsScrolling",
+        template = "Checking assumptions {spin}"
+      )
+    while (list_return$is_alive()) {
+      spinner$spin()
+      Sys.sleep(0.1)
+    }
+    spinner$finish()
+  } else {
+    # don't show the spinner
+    while (list_return$is_alive()) {
+      Sys.sleep(0.1)
+    }
   }
-
-  # finish the spinner
-  spinner$finish()
 
   # return the result and raise erorrs if any occurred in the background
   list_return$get_result()
@@ -3439,4 +3499,12 @@ double_check_confint_fast_estimate <- function(
       }
     }
   }
+}
+
+use_spinner <- function() {
+  override <- Sys.getenv("PLOTOR_FORCE_SPINNER", unset = NA)
+  if (!is.na(override)) {
+    return(tolower(override) %in% c("1", "true", "t"))
+  }
+  interactive() && identical(Sys.getenv("TESTTHAT"), "")
 }
