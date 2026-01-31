@@ -2798,12 +2798,14 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
             (range[[1, 2]] <= range[[2, 3]]) &
             (range[[2, 2]] <= range[[1, 3]])
         } else {
-          # a factor variable:
+          # convert string to a symbol
+          .pred_sym <- rlang::sym(.pred)
+
           # do any levels result in zero outcomes?
           result <-
             df |>
             # count the outcomes by the predictor
-            dplyr::count({{ outcome }}, {{ .pred }}) |>
+            dplyr::count({{ outcome }}, !!.pred_sym) |>
             # put the outcome as columns
             tidyr::pivot_wider(
               names_from = {{ outcome }},
@@ -2811,7 +2813,7 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
               values_fill = 0
             ) |>
             dplyr::rename("n0" = 2, "n1" = 3) |>
-            dplyr::filter("n0" == 0 | "n1" == 0)
+            dplyr::filter(.data$n0 == 0 | .data$n1 == 0)
 
           # if result contains any rows it means there is separation
           # if there are no rows then separation isn't detected and the
@@ -2824,7 +2826,6 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
           predictor = .pred,
           separation = result
         )
-
         return(df_result)
       }
     )
