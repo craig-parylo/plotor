@@ -476,8 +476,6 @@ table.
 
 ``` r
 table_or(lr, output = 'tibble')
-#> Warning: Some of your categorical predictor variables have levels with
-#> too few outcomes.
 #> ℹ One or more assumptions for logistic regression have failed. To gain further
 #> insights, consider calling the `plotor::check_or()` function. For example, you
 #> can run `plotor::check_or(lr, details = TRUE)`.
@@ -541,8 +539,6 @@ using the [gt](https://gt.rstudio.com) package.
 ``` r
 table_or(lr, output = 'gt') |> 
   gt::tab_options(container.width = 1100)
-#> Warning: Some of your categorical predictor variables have levels with
-#> too few outcomes.
 #> ℹ One or more assumptions for logistic regression have failed. To gain further
 #> insights, consider calling the `plotor::check_or()` function. For example, you
 #> can run `plotor::check_or(lr, details = TRUE)`.

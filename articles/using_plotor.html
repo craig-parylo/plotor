@@ -484,8 +484,6 @@ tables using the new function <code><a href="../reference/table_or.html">table_o
 <code>tibble</code> or a publication-ready <a href="https://gt.rstudio.com" class="external-link">gt</a> table.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table_or.html">table_or</a></span><span class="op">(</span><span class="va">lr</span>, output <span class="op">=</span> <span class="st">'tibble'</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Some of your categorical predictor variables have levels with</span></span>
-<span><span class="co">#&gt; too few outcomes.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> One or more assumptions for logistic regression have failed. To gain further</span></span>
 <span><span class="co">#&gt; insights, consider calling the `plotor::check_or()` function. For example, you</span></span>
 <span><span class="co">#&gt; can run `plotor::check_or(lr, details = TRUE)`.</span></span>
@@ -540,28 +538,26 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table_or.html">table_or</a></span><span class="op">(</span><span class="va">lr</span>, output <span class="op">=</span> <span class="st">'gt'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_options.html" class="external-link">tab_options</a></span><span class="op">(</span>container.width <span class="op">=</span> <span class="fl">1100</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Some of your categorical predictor variables have levels with</span></span>
-<span><span class="co">#&gt; too few outcomes.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> One or more assumptions for logistic regression have failed. To gain further</span></span>
 <span><span class="co">#&gt; insights, consider calling the `plotor::check_or()` function. For example, you</span></span>
 <span><span class="co">#&gt; can run `plotor::check_or(lr, details = TRUE)`.</span></span></code></pre></div>
-<div id="ziobrhhado" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:1100px;height:auto;">
-<style>#ziobrhhado table {
+<div id="znzsopurcy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:1100px;height:auto;">
+<style>#znzsopurcy table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ziobrhhado thead, #ziobrhhado tbody, #ziobrhhado tfoot, #ziobrhhado tr, #ziobrhhado td, #ziobrhhado th {
+#znzsopurcy thead, #znzsopurcy tbody, #znzsopurcy tfoot, #znzsopurcy tr, #znzsopurcy td, #znzsopurcy th {
   border-style: none;
 }
 
-#ziobrhhado p {
+#znzsopurcy p {
   margin: 0;
   padding: 0;
 }
 
-#ziobrhhado .gt_table {
+#znzsopurcy .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -587,12 +583,12 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-left-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_caption {
+#znzsopurcy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ziobrhhado .gt_title {
+#znzsopurcy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -604,7 +600,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-bottom-width: 0;
 }
 
-#ziobrhhado .gt_subtitle {
+#znzsopurcy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -616,7 +612,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-top-width: 0;
 }
 
-#ziobrhhado .gt_heading {
+#znzsopurcy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -628,13 +624,13 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-right-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_bottom_border {
+#znzsopurcy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_col_headings {
+#znzsopurcy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -649,7 +645,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-right-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_col_heading {
+#znzsopurcy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -669,7 +665,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   overflow-x: hidden;
 }
 
-#ziobrhhado .gt_column_spanner_outer {
+#znzsopurcy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -681,15 +677,15 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   padding-right: 4px;
 }
 
-#ziobrhhado .gt_column_spanner_outer:first-child {
+#znzsopurcy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ziobrhhado .gt_column_spanner_outer:last-child {
+#znzsopurcy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ziobrhhado .gt_column_spanner {
+#znzsopurcy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -701,11 +697,11 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   width: 100%;
 }
 
-#ziobrhhado .gt_spanner_row {
+#znzsopurcy .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ziobrhhado .gt_group_heading {
+#znzsopurcy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -731,7 +727,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   text-align: left;
 }
 
-#ziobrhhado .gt_empty_group_heading {
+#znzsopurcy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -746,15 +742,15 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   vertical-align: middle;
 }
 
-#ziobrhhado .gt_from_md > :first-child {
+#znzsopurcy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ziobrhhado .gt_from_md > :last-child {
+#znzsopurcy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ziobrhhado .gt_row {
+#znzsopurcy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -773,7 +769,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   overflow-x: hidden;
 }
 
-#ziobrhhado .gt_stub {
+#znzsopurcy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -786,7 +782,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   padding-right: 5px;
 }
 
-#ziobrhhado .gt_stub_row_group {
+#znzsopurcy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -800,15 +796,15 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   vertical-align: top;
 }
 
-#ziobrhhado .gt_row_group_first td {
+#znzsopurcy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ziobrhhado .gt_row_group_first th {
+#znzsopurcy .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ziobrhhado .gt_summary_row {
+#znzsopurcy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -818,16 +814,16 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   padding-right: 5px;
 }
 
-#ziobrhhado .gt_first_summary_row {
+#znzsopurcy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_first_summary_row.thick {
+#znzsopurcy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ziobrhhado .gt_last_summary_row {
+#znzsopurcy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -837,7 +833,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-bottom-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_grand_summary_row {
+#znzsopurcy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -847,7 +843,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   padding-right: 5px;
 }
 
-#ziobrhhado .gt_first_grand_summary_row {
+#znzsopurcy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -857,7 +853,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-top-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_last_grand_summary_row_top {
+#znzsopurcy .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -867,11 +863,11 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-bottom-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_striped {
+#znzsopurcy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ziobrhhado .gt_table_body {
+#znzsopurcy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -880,7 +876,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-bottom-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_footnotes {
+#znzsopurcy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -894,7 +890,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-right-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_footnote {
+#znzsopurcy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -903,7 +899,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   padding-right: 5px;
 }
 
-#ziobrhhado .gt_sourcenotes {
+#znzsopurcy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -917,7 +913,7 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   border-right-color: #D3D3D3;
 }
 
-#ziobrhhado .gt_sourcenote {
+#znzsopurcy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -925,72 +921,72 @@ table made using the <a href="https://gt.rstudio.com" class="external-link">gt</
   padding-right: 5px;
 }
 
-#ziobrhhado .gt_left {
+#znzsopurcy .gt_left {
   text-align: left;
 }
 
-#ziobrhhado .gt_center {
+#znzsopurcy .gt_center {
   text-align: center;
 }
 
-#ziobrhhado .gt_right {
+#znzsopurcy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ziobrhhado .gt_font_normal {
+#znzsopurcy .gt_font_normal {
   font-weight: normal;
 }
 
-#ziobrhhado .gt_font_bold {
+#znzsopurcy .gt_font_bold {
   font-weight: bold;
 }
 
-#ziobrhhado .gt_font_italic {
+#znzsopurcy .gt_font_italic {
   font-style: italic;
 }
 
-#ziobrhhado .gt_super {
+#znzsopurcy .gt_super {
   font-size: 65%;
 }
 
-#ziobrhhado .gt_footnote_marks {
+#znzsopurcy .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ziobrhhado .gt_asterisk {
+#znzsopurcy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ziobrhhado .gt_indent_1 {
+#znzsopurcy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ziobrhhado .gt_indent_2 {
+#znzsopurcy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ziobrhhado .gt_indent_3 {
+#znzsopurcy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ziobrhhado .gt_indent_4 {
+#znzsopurcy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ziobrhhado .gt_indent_5 {
+#znzsopurcy .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ziobrhhado .katex-display {
+#znzsopurcy .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ziobrhhado div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#znzsopurcy div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
