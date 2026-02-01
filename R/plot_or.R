@@ -65,11 +65,21 @@ plot_or <- function(
 
   # check logistic regression assumptions if the user requested it
   if (assumption_checks) {
-    valid_assumptions <- check_assumptions(
-      glm = glm_model_results,
-      details = FALSE,
-      confint_fast_estimate = confint_fast_estimate
-    )
+    if (use_spinner()) {
+      # run the process with a spinner
+      valid_assumptions <- check_assumptions_with_spinner(
+        glm = glm_model_results,
+        details = FALSE,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    } else {
+      # run directly
+      valid_assumptions <- check_assumptions(
+        glm = glm_model_results,
+        details = FALSE,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    }
 
     # recommend to the user to use `check_or` for more feedback if at least one
     # test fails
@@ -87,11 +97,21 @@ plot_or <- function(
   # main ----
 
   # get summary of the data and results
-  df <- get_summary_table(
-    glm_model_results = glm_model_results,
-    conf_level = conf_level,
-    confint_fast_estimate = confint_fast_estimate
-  )
+  if (use_spinner()) {
+    # run the function in the background with a spinner
+    df <- get_summary_table_with_spinner(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  } else {
+    # run the function directly
+    df <- get_summary_table(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  }
 
   # plot the results
   p <- plot_odds_ratio(
@@ -187,7 +207,7 @@ table_or <- function(
 
   # check logistic regression assumptions if the user requested it
   if (assumption_checks) {
-    valid_assumptions <- check_assumptions(
+    valid_assumptions <- check_assumptions_with_spinner(
       glm = glm_model_results,
       details = FALSE,
       confint_fast_estimate = confint_fast_estimate
@@ -291,7 +311,7 @@ check_or <- function(
 
   # get a summary of test results
   # NB, detailed feedback is handled by each of the test functions
-  test_results <- check_assumptions(
+  test_results <- check_assumptions_with_spinner(
     glm = glm_model_results,
     confint_fast_estimate = confint_fast_estimate,
     details = details
@@ -1295,6 +1315,68 @@ get_summary_table <- function(
   return(df)
 }
 
+#' Get a table summarising the model results
+#'
+#' @description
+#' Get a summary table showing the number of rows in each group and of those
+#' who and a 'success' outcome. Then combine with details such as the OR
+#' estimate and confidence interval.
+#'
+#' @details
+#' This function calls the `get_summary_table()` in a background process and
+#' displays a spinner in the console to notify the user that the system is
+#' working.
+#'
+#' @param glm_model_results Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param conf_level Numeric between 0.001 and 0.999 (default = 0.95). The confidence level to use when setting the confidence interval, most commonly will be 0.95 or 0.99 but can be set otherwise.
+#' @param confint_fast_estimate Boolean (default = `FALSE`) indicating whether to use a faster estimate of the confidence interval. Note: this assumes normally distributed data, which may not be suitable for your data.
+#'
+#' @returns Tibble providing a summary of the logistic regression model.
+#'
+#' @noRd
+get_summary_table_with_spinner <- function(
+  glm_model_results,
+  conf_level = 0.95,
+  confint_fast_estimate = FALSE
+) {
+  # instantiate a spinner
+  spinner <-
+    cli::make_spinner(
+      which = "simpleDotsScrolling",
+      template = "Working {spin}"
+    )
+
+  # get a summary table for the model
+  p <-
+    callr::r_bg(
+      package = "plotor",
+      func = function(glm_model_results, conf_level, confint_fast_estimate) {
+        get_summary_table(
+          glm_model_results = glm_model_results,
+          conf_level = conf_level,
+          confint_fast_estimate = confint_fast_estimate
+        )
+      },
+      args = list(
+        glm_model_results = glm_model_results,
+        conf_level = conf_level,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    )
+
+  # periodically update the spinner so long as the process is active
+  while (p$is_alive()) {
+    spinner$spin()
+    Sys.sleep(0.1) # the spinner is automatically throttled, so this setting isn't crucial
+  }
+
+  # finish the spinner
+  spinner$finish()
+
+  # return the result and raise erorrs if any occurred in the background
+  p$get_result()
+}
+
 #' Output tibble as `gt`
 #'
 #' Outputs a publication-quality summary OR table with {gt} formatting.
@@ -1805,11 +1887,19 @@ get_univariable_summary_table <- function(
           )
 
         # summarise the model
-        df_summary <- get_summary_table(
-          glm_model_results = uni_glm,
-          conf_level = conf_level,
-          confint_fast_estimate = confint_fast_estimate
-        )
+        if (use_spinner()) {
+          df_summary <- get_summary_table_with_spinner(
+            glm_model_results = uni_glm,
+            conf_level = conf_level,
+            confint_fast_estimate = confint_fast_estimate
+          )
+        } else {
+          df_summary <- get_summary_table(
+            glm_model_results = uni_glm,
+            conf_level = conf_level,
+            confint_fast_estimate = confint_fast_estimate
+          )
+        }
 
         # return the result for collation by {purrr}
         return(df_summary)
@@ -1860,12 +1950,21 @@ get_combined_summaries <- function(
   }
 
   # get a multivariable summary
-  mv_summary <-
-    get_summary_table(
-      glm_model_results = model,
-      conf_level = conf_level,
-      confint_fast_estimate = confint_fast_estimate
-    )
+  if (use_spinner()) {
+    mv_summary <-
+      get_summary_table_with_spinner(
+        glm_model_results = model,
+        conf_level = conf_level,
+        confint_fast_estimate = confint_fast_estimate
+      )
+  } else {
+    mv_summary <-
+      get_summary_table(
+        glm_model_results = model,
+        conf_level = conf_level,
+        confint_fast_estimate = confint_fast_estimate
+      )
+  }
 
   # get a univariable summary
   uv_summary <-
@@ -1969,11 +2068,19 @@ prepare_multivariable_table_object <- function(
   anonymise_counts = FALSE
 ) {
   # get summary of rows and estimate OR
-  df <- get_summary_table(
-    glm_model_results = glm_model_results,
-    conf_level = conf_level,
-    confint_fast_estimate = confint_fast_estimate
-  )
+  if (use_spinner()) {
+    df <- get_summary_table_with_spinner(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  } else {
+    df <- get_summary_table(
+      glm_model_results = glm_model_results,
+      conf_level = conf_level,
+      confint_fast_estimate = confint_fast_estimate
+    )
+  }
 
   # get the outcome variable
   str_outcome <- get_outcome_variable_name(model = glm_model_results)
@@ -2134,6 +2241,7 @@ prepare_combined_table_object <- function(
 #'
 #' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
 #' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#' @param confint_fast_estimate Boolean: TRUE = fast estimate for confidence interval, FALSE = default method for confidence interval calculation
 #'
 #' @returns Named list indicating the results of each assumption
 #' @noRd
@@ -2168,6 +2276,86 @@ check_assumptions <- function(
   }
 
   return(list_return)
+}
+
+#' Check assumptions with spinner
+#'
+#' Checks whether the supplied `glm` model satisfies assumptions of a binary
+#' logistic regression model.
+#'
+#' The assumptions tested are:
+#' * the outcome variable is binary encoded,
+#' * there is no multicollinearity among the predictor variables,
+#' * the outcome variable is not separated by any of the predictor variables,
+#' * the sample size is sufficient to avoid biased estimates
+#'
+#' @param glm Results from a binomial Generalised Linear Model (GLM), as produced by [stats::glm()].
+#' @param details Boolean: TRUE = additional details will be printed to the Console if this assumption fails, FALSE = additional details will be suppressed.
+#' @param confint_fast_estimate Boolean: TRUE = fast estimate for confidence interval, FALSE = default method for confidence interval calculation
+#'
+#' @returns Named list indicating the results of each assumption
+#' @noRd
+check_assumptions_with_spinner <- function(
+  glm,
+  details = FALSE,
+  confint_fast_estimate = FALSE
+) {
+  # identify whether we want to disable the spinner (e.g. non-interactive sessions)
+  spinner_allowed <- use_spinner()
+
+  # gather environmental information
+  env <- c(
+    Sys.getenv(),
+    PLOTOR_FORCE_SPINNER = if (spinner_allowed) "1" else "0"
+  )
+
+  # get a summary table for the model
+  list_return <-
+    callr::r_bg(
+      package = "plotor",
+      env = env,
+      func = function(glm, details, confint_fast_estimate) {
+        # configure cli based on env
+        if (
+          !tolower(Sys.getenv("PLOTOR_FORCE_SPINNER", unset = "0")) %in%
+            c("1", "true", "t")
+        ) {
+          options(cli.dynamic = FALSE)
+        }
+        check_assumptions(
+          glm = glm,
+          details = details,
+          confint_fast_estimate = confint_fast_estimate
+        )
+      },
+      args = list(
+        glm = glm,
+        details = details,
+        confint_fast_estimate = confint_fast_estimate
+      )
+    )
+
+  if (spinner_allowed) {
+    # make sure a spinner is shown
+    spinner <-
+      cli::make_spinner(
+        which = "simpleDotsScrolling",
+        template = "Checking assumptions {spin}"
+      )
+    while (list_return$is_alive()) {
+      spinner$spin()
+      Sys.sleep(0.1)
+    }
+    spinner$finish()
+  } else {
+    # don't show the spinner
+    while (list_return$is_alive()) {
+      Sys.sleep(0.1)
+    }
+  }
+
+  # return the result and raise erorrs if any occurred in the background
+  list_return$get_result()
 }
 
 
@@ -2610,12 +2798,14 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
             (range[[1, 2]] <= range[[2, 3]]) &
             (range[[2, 2]] <= range[[1, 3]])
         } else {
-          # a factor variable:
+          # convert string to a symbol
+          .pred_sym <- rlang::sym(.pred)
+
           # do any levels result in zero outcomes?
           result <-
             df |>
             # count the outcomes by the predictor
-            dplyr::count({{ outcome }}, {{ .pred }}) |>
+            dplyr::count({{ outcome }}, !!.pred_sym) |>
             # put the outcome as columns
             tidyr::pivot_wider(
               names_from = {{ outcome }},
@@ -2623,9 +2813,12 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
               values_fill = 0
             ) |>
             dplyr::rename("n0" = 2, "n1" = 3) |>
-            dplyr::filter("n0" == 0 | "n1" == 0) |>
-            dplyr::summarise(separated = dplyr::n() > 0) |>
-            dplyr::pull("separated")
+            dplyr::filter(.data$n0 == 0 | .data$n1 == 0)
+
+          # if result contains any rows it means there is separation
+          # if there are no rows then separation isn't detected and the
+          # assumption holds
+          result <- ifelse(test = result |> nrow() == 0, yes = TRUE, no = FALSE)
         }
 
         # return the result
@@ -2638,7 +2831,7 @@ assumption_no_separation_fast <- function(glm, details = FALSE) {
     )
 
   # consolidate the results to a single TRUE / FALSE
-  result <- !results$separation |> any(na.rm = TRUE)
+  result <- results$separation |> all(na.rm = TRUE)
 
   # list predictors where there are signs of separation
   var_separation <- results |>
@@ -2884,7 +3077,6 @@ assumption_sample_size <- function(
       "{nrow(predictor_factor_level_too_small)} predictor variable level{?s} in your model {?has/have} fewer than {.val {min_events_per_predictor}} events and / or non-events:",
       wrap = TRUE
     )
-    print(predictor_factor_level_too_small)
   }
 
   # provide general advice on this assumption
@@ -3078,6 +3270,7 @@ assumption_linearity <- function(glm, details = FALSE, p_val_threshold = 0.05) {
   return(result)
 }
 
+# predict processing funcs ----------------------------------------------------
 #' Predict processing time
 #'
 #' @description
@@ -3238,7 +3431,7 @@ double_check_confint_fast_estimate <- function(
   inform_threshold = 5e3L,
   recommend_threshold = 6e4L
 ) {
-  # validated inputs
+  # validate inputs
   if (
     !is.logical(confint_fast_estimate) || length(confint_fast_estimate) != 1
   ) {
@@ -3281,11 +3474,13 @@ double_check_confint_fast_estimate <- function(
     } else if (predict_ms <= recommend_threshold) {
       # display a general notice
       cli::cli_alert_warning("Estimated run time: {predict_desc}")
+      return(confint_fast_estimate)
     } else {
       # expected to take longer than upper threshold - alert the user
       cli::cli_alert_danger("Estimated run time: {predict_desc}")
-      cli::cli_alert_warning(
-        "Recommend using {.code confint_fast_estimate = TRUE} for a faster (approximate) method of calculating confidence intervals."
+      cli::cli_text(
+        "Recommend using {.code confint_fast_estimate = TRUE} for a faster (approximate) method of calculating confidence intervals (CI).
+        "
       )
       # set up some choices
       choices <- c(
@@ -3295,7 +3490,7 @@ double_check_confint_fast_estimate <- function(
       # ask the user
       choice <- utils::menu(
         choices,
-        title = "Switch to faster CI estimate now? (recommended)"
+        title = "Switch to faster CI estimate now?"
       )
       # handle the response
       if (choice == 1) {
@@ -3305,4 +3500,12 @@ double_check_confint_fast_estimate <- function(
       }
     }
   }
+}
+
+use_spinner <- function() {
+  override <- Sys.getenv("PLOTOR_FORCE_SPINNER", unset = NA)
+  if (!is.na(override)) {
+    return(tolower(override) %in% c("1", "true", "t"))
+  }
+  interactive() && identical(Sys.getenv("TESTTHAT"), "")
 }
