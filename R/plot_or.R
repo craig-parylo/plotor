@@ -3422,7 +3422,6 @@ predict_process_time <- function(glm, pred_level = 0.95) {
 #' prompts and simply returns the supplied `confint_fast_estimate`.
 #' - The function performs basic validation of inputs and will return the supplied value if it cannot obtain a finite time estimate.
 #'
-#' @seealso [predict_process_time()]
 #'
 #' @noRd
 double_check_confint_fast_estimate <- function(
@@ -3502,6 +3501,34 @@ double_check_confint_fast_estimate <- function(
   }
 }
 
+#' Determine whether to use a spinner in output
+#'
+#' @description
+#' This helper function decides whether a spinner should be displayed during
+#' processing. The behaviour can be overridden by setting the environment
+#' variable `PLOTOR_FORCE_SPINNER`. If this variable is set to `"true"` or
+#' `"t"` (case-insensitive), the function returns `TRUE`; any other value
+#' returns `FALSE`.
+#'
+#' If no override is provided, the function enables the spinner only when the
+#' session is interactive and not running under {testthat} (i.e., when the
+#' `TESTTHAT` environment variable is unset or empty).
+#'
+#' @return A logical value indicating whether a spinner should be used.
+#'
+#' @examples
+#' # Use default behvaiour
+#' use_spinner()
+#'
+#' # Force spinner 'on'
+#' Sys.setenv(PLOTOR_FORCE_SPINNER = "true")
+#' use_spinner()
+#'
+#' # Force spinner 'off'
+#' Sys.setenv(PLOTOR_FORCE_SPINNER = "0")
+#' use_spinner()
+#'
+#' @noRd
 use_spinner <- function() {
   override <- Sys.getenv("PLOTOR_FORCE_SPINNER", unset = NA)
   if (!is.na(override)) {
