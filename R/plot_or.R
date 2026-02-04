@@ -612,7 +612,7 @@ summarise_rows_per_variable_in_model <- function(model_results) {
     ) |>
     make_ordered_factors_compatible_with_broom() |>
     # remove the reference 'zero' level for ordered factors
-    dplyr::filter(!(class == of_class & level == "zero"))
+    dplyr::filter(!(.data$class == of_class & .data$level == "zero"))
   # order as factors
   # dplyr::mutate(
   #   term = term |> forcats::as_factor()
@@ -744,8 +744,8 @@ make_ordered_factors_compatible_with_broom <- function(df) {
     ) |>
     # use the new terms and levels
     dplyr::mutate(
-      term = dplyr::coalesce(df_to, term),
-      level = dplyr::coalesce(out_label, level)
+      term = dplyr::coalesce(.data$df_to, .data$term),
+      level = dplyr::coalesce(.data$out_label, .data$level)
     ) |>
     # remove the surplus additional columns
     dplyr::select(!dplyr::any_of(c("df_to", "out_label")))
@@ -1303,7 +1303,7 @@ get_summary_table <- function(
   df <- df |>
     dplyr::left_join(y = model_or, by = base::c('term')) |>
     # format as factor
-    dplyr::mutate(term = term |> forcats::as_factor())
+    dplyr::mutate(term = .data$term |> forcats::as_factor())
 
   # use variable labels
   df <- use_var_labels(df = df, lr = glm_model_results)
@@ -2958,12 +2958,12 @@ assumption_sample_size <- function(
     # remove the outcome and keep only predictors formatted as factors
     dplyr::filter(
       # exclude the outcome
-      ind != temp_outcome_var,
+      .data$ind != temp_outcome_var,
       # keep only factors
-      values %in% c("factor", "ordered factor")
+      .data$values %in% c("factor", "ordered factor")
     ) |>
     # pull a list of predictors
-    dplyr::pull(ind)
+    dplyr::pull(.data$ind)
 
   # only proceed if there is at least one factor predictor
   if (length(predictor_factors) > 0) {
@@ -2992,7 +2992,7 @@ assumption_sample_size <- function(
             # where predictors include both factors and ordered factors
             dplyr::rename(predictor_level = {{ .var }}) |>
             dplyr::mutate(
-              predictor_level = predictor_level |> as.character()
+              predictor_level = .data$predictor_level |> as.character()
             ) |>
             # count rows by the outcome for each predictor variable (.var) level
             dplyr::summarise(
@@ -3326,15 +3326,15 @@ predict_process_time <- function(glm, pred_level = 0.95) {
   # number of numeric predictors
   n_num <-
     glm_levels |>
-    dplyr::filter(is.na(level)) |>
+    dplyr::filter(is.na(.data$level)) |>
     dplyr::summarise(rows = dplyr::n()) |>
     dplyr::pull("rows")
 
   # number of factor predictors
   n_fac <-
     glm_levels |>
-    dplyr::filter(!is.na(level)) |>
-    dplyr::distinct(variable) |>
+    dplyr::filter(!is.na(.data$level)) |>
+    dplyr::distinct(.data$variable) |>
     dplyr::summarise(rows = dplyr::n()) |>
     dplyr::pull("rows")
 
@@ -3342,7 +3342,7 @@ predict_process_time <- function(glm, pred_level = 0.95) {
   # filter the df for any potential factor predictors
   df_n_fac_levels <-
     glm_levels |>
-    dplyr::filter(!is.na(level))
+    dplyr::filter(!is.na(.data$level))
 
   # determine the maximum number of levels, or, if there are no
   # factor variables then return zero
