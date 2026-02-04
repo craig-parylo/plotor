@@ -2953,7 +2953,7 @@ assumption_sample_size <- function(
       .f = \(.x) paste(class(.x), collapse = " ")
     ) |>
     # convert to a tibble
-    stack() |>
+    utils::stack() |>
     tibble::as_tibble() |>
     # remove the outcome and keep only predictors formatted as factors
     dplyr::filter(
@@ -3358,7 +3358,7 @@ predict_process_time <- function(glm, pred_level = 0.95) {
 
   # estimate the processing time in milliseconds
   predicted_ms <-
-    predict(
+    stats::predict(
       object = model_time_taken, # pre-trained model
       newdata = tibble::tibble(
         n_seq = n,
