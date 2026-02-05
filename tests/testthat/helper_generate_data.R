@@ -44,13 +44,13 @@ get_df_infert <- function() {
     datasets::infert |>
     dplyr::mutate(
       case = case |>
-        dplyr::case_match(1 ~ 'Case', 0 ~ 'Control') |>
+        dplyr::recode_values(1 ~ "Case", 0 ~ "Control") |>
         forcats::fct(levels = c('Control', 'Case')),
       induced = induced |>
-        dplyr::case_match(0 ~ '0', 1 ~ '1', 2 ~ '2 or more') |>
+        dplyr::recode_values(0 ~ "0", 1 ~ "1", 2 ~ "2 or more") |>
         forcats::fct(levels = c('0', '1', '2 or more')),
       spontaneous = spontaneous |>
-        dplyr::case_match(0 ~ '0', 1 ~ '1', 2 ~ '2 or more') |>
+        dplyr::recode_values(0 ~ "0", 1 ~ "1", 2 ~ "2 or more") |>
         forcats::fct(levels = c('0', '1', '2 or more'))
     )
 
@@ -85,7 +85,7 @@ get_df_streptb <- function() {
         forcats::fct(levels = c('1_Good', '2_Fair', '3_Poor')),
       baseline_temp = baseline_temp |>
         as.character() |>
-        dplyr::case_match(
+        dplyr::recode_values(
           '1_<=98.9F/37.2C' ~ '<= 37.2C',
           '2_99-99.9F/37.3-37.7C' ~ '37.3 - 37.7C',
           '2_99-99.9F/37.3-37.7C/37.3-37.7C' ~ '37.3 - 37.7C',
@@ -98,7 +98,7 @@ get_df_streptb <- function() {
         ), #|>
       #forcats::fct_inorder(ordered = TRUE),
       baseline_esr = baseline_esr |>
-        dplyr::case_match(
+        dplyr::recode_values(
           '2_11-20' ~ '11-20',
           '3_21-50' ~ '21-50',
           '4_51+' ~ '51+',

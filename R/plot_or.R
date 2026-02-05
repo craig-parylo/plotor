@@ -612,7 +612,7 @@ summarise_rows_per_variable_in_model <- function(model_results) {
     ) |>
     make_ordered_factors_compatible_with_broom() |>
     # remove the reference 'zero' level for ordered factors
-    dplyr::filter(!(class == of_class & level == "zero"))
+    dplyr::filter(!(.data$class == of_class & .data$level == "zero"))
   # order as factors
   # dplyr::mutate(
   #   term = term |> forcats::as_factor()
@@ -744,8 +744,8 @@ make_ordered_factors_compatible_with_broom <- function(df) {
     ) |>
     # use the new terms and levels
     dplyr::mutate(
-      term = dplyr::coalesce(df_to, term),
-      level = dplyr::coalesce(out_label, level)
+      term = dplyr::coalesce(.data$df_to, .data$term),
+      level = dplyr::coalesce(.data$out_label, .data$level)
     ) |>
     # remove the surplus additional columns
     dplyr::select(!dplyr::any_of(c("df_to", "out_label")))
@@ -1303,7 +1303,7 @@ get_summary_table <- function(
   df <- df |>
     dplyr::left_join(y = model_or, by = base::c('term')) |>
     # format as factor
-    dplyr::mutate(term = term |> forcats::as_factor())
+    dplyr::mutate(term = .data$term |> forcats::as_factor())
 
   # use variable labels
   df <- use_var_labels(df = df, lr = glm_model_results)
@@ -2953,17 +2953,17 @@ assumption_sample_size <- function(
       .f = \(.x) paste(class(.x), collapse = " ")
     ) |>
     # convert to a tibble
-    stack() |>
+    utils::stack() |>
     tibble::as_tibble() |>
     # remove the outcome and keep only predictors formatted as factors
     dplyr::filter(
       # exclude the outcome
-      ind != temp_outcome_var,
+      .data$ind != temp_outcome_var,
       # keep only factors
-      values %in% c("factor", "ordered factor")
+      .data$values %in% c("factor", "ordered factor")
     ) |>
     # pull a list of predictors
-    dplyr::pull(ind)
+    dplyr::pull(.data$ind)
 
   # only proceed if there is at least one factor predictor
   if (length(predictor_factors) > 0) {
@@ -2992,7 +2992,7 @@ assumption_sample_size <- function(
             # where predictors include both factors and ordered factors
             dplyr::rename(predictor_level = {{ .var }}) |>
             dplyr::mutate(
-              predictor_level = predictor_level |> as.character()
+              predictor_level = .data$predictor_level |> as.character()
             ) |>
             # count rows by the outcome for each predictor variable (.var) level
             dplyr::summarise(
@@ -3326,15 +3326,15 @@ predict_process_time <- function(glm, pred_level = 0.95) {
   # number of numeric predictors
   n_num <-
     glm_levels |>
-    dplyr::filter(is.na(level)) |>
+    dplyr::filter(is.na(.data$level)) |>
     dplyr::summarise(rows = dplyr::n()) |>
     dplyr::pull("rows")
 
   # number of factor predictors
   n_fac <-
     glm_levels |>
-    dplyr::filter(!is.na(level)) |>
-    dplyr::distinct(variable) |>
+    dplyr::filter(!is.na(.data$level)) |>
+    dplyr::distinct(.data$variable) |>
     dplyr::summarise(rows = dplyr::n()) |>
     dplyr::pull("rows")
 
@@ -3342,7 +3342,7 @@ predict_process_time <- function(glm, pred_level = 0.95) {
   # filter the df for any potential factor predictors
   df_n_fac_levels <-
     glm_levels |>
-    dplyr::filter(!is.na(level))
+    dplyr::filter(!is.na(.data$level))
 
   # determine the maximum number of levels, or, if there are no
   # factor variables then return zero
@@ -3358,7 +3358,7 @@ predict_process_time <- function(glm, pred_level = 0.95) {
 
   # estimate the processing time in milliseconds
   predicted_ms <-
-    predict(
+    stats::predict(
       object = model_time_taken, # pre-trained model
       newdata = tibble::tibble(
         n_seq = n,
@@ -3422,7 +3422,6 @@ predict_process_time <- function(glm, pred_level = 0.95) {
 #' prompts and simply returns the supplied `confint_fast_estimate`.
 #' - The function performs basic validation of inputs and will return the supplied value if it cannot obtain a finite time estimate.
 #'
-#' @seealso [predict_process_time()]
 #'
 #' @noRd
 double_check_confint_fast_estimate <- function(
@@ -3502,6 +3501,34 @@ double_check_confint_fast_estimate <- function(
   }
 }
 
+#' Determine whether to use a spinner in output
+#'
+#' @description
+#' This helper function decides whether a spinner should be displayed during
+#' processing. The behaviour can be overridden by setting the environment
+#' variable `PLOTOR_FORCE_SPINNER`. If this variable is set to `"true"` or
+#' `"t"` (case-insensitive), the function returns `TRUE`; any other value
+#' returns `FALSE`.
+#'
+#' If no override is provided, the function enables the spinner only when the
+#' session is interactive and not running under {testthat} (i.e., when the
+#' `TESTTHAT` environment variable is unset or empty).
+#'
+#' @return A logical value indicating whether a spinner should be used.
+#'
+#' @examples
+#' # Use default behvaiour
+#' use_spinner()
+#'
+#' # Force spinner 'on'
+#' Sys.setenv(PLOTOR_FORCE_SPINNER = "true")
+#' use_spinner()
+#'
+#' # Force spinner 'off'
+#' Sys.setenv(PLOTOR_FORCE_SPINNER = "0")
+#' use_spinner()
+#'
+#' @noRd
 use_spinner <- function() {
   override <- Sys.getenv("PLOTOR_FORCE_SPINNER", unset = NA)
   if (!is.na(override)) {

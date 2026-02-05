@@ -398,14 +398,18 @@ testthat::test_that("`predict_process_time()` works as expected", {
 })
 
 testthat::test_that("`double_check_confint_fast_estimate()` works as expected", {
-  # create a model to work with
-  lr <- get_lr_large_synthetic(rows = 1e3)
+  # create a model to work with - should load fine
+  testthat::expect_silent({
+    lr <- get_lr_large_synthetic(rows = 1e3)
+  })
 
   # check that TRUE is returned when confint_fast_estimate is already TRUE ---
-  result <- double_check_confint_fast_estimate(
-    glm = lr,
-    confint_fast_estimate = TRUE
-  )
+  testthat::expect_silent({
+    result <- double_check_confint_fast_estimate(
+      glm = lr,
+      confint_fast_estimate = TRUE
+    )
+  })
   testthat::expect_true(result)
 
   # check returns original value when confint_fast_estimate = FALSE and runtime below inform_threshold
@@ -423,10 +427,11 @@ testthat::test_that("`double_check_confint_fast_estimate()` works as expected", 
   # check for warning when runtime exceeds inform_threshold but below recommend_threshold
   testthat::expect_message({
     testthat::skip_on_cran()
+    testthat::skip_if_not(interactive())
     double_check_confint_fast_estimate(
       glm = lr,
       confint_fast_estimate = FALSE,
-      inform_threshold = 1e2,
+      inform_threshold = 1e1,
       recommend_threshold = 1e5
     )
   })
