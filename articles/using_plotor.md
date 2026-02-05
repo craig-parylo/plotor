@@ -307,6 +307,11 @@ df <- datasets::esoph |>
     alcgp = alcgp |> factor(ordered = F),
     tobgp = tobgp |> factor(ordered = F)
   )
+#> Warning: There was 1 warning in `mutate()`.
+#> ℹ In argument: `Group = fct(...)`.
+#> Caused by warning:
+#> ! `case_match()` was deprecated in dplyr 1.2.0.
+#> ℹ Please use `recode_values()` instead.
 
 # preview the data
 df |> glimpse()

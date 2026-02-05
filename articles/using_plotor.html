@@ -338,6 +338,11 @@ cancer we can perform logistic regression against these variables.</p>
 <span>    alcgp <span class="op">=</span> <span class="va">alcgp</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span>ordered <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>,</span>
 <span>    tobgp <span class="op">=</span> <span class="va">tobgp</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span>ordered <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: There was 1 warning in `mutate()`.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `Group = fct(...)`.</span></span>
+<span><span class="co">#&gt; Caused by warning:</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `case_match()` was deprecated in dplyr 1.2.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `recode_values()` instead.</span></span>
 <span></span>
 <span><span class="co"># preview the data</span></span>
 <span><span class="va">df</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
