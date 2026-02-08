@@ -3363,14 +3363,49 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
   mod_ncol <- ncol(mod_matrix)
   mod_nrow <- nrow(mod_matrix)
 
+  # define thresholds
+  # cook's distance
+  # cooks_cutoff <- 4 / mod_nrow # this is a standard rule of thumb
+  cooks_theory <- 4 / max(mod_nrow - mod_ncol, 10) # avoid division by tiny df
+  cooks_cutoff <- max(cooks_theory, 1e-3) # absolute floor to avoid ~0 cutoffs
+  cooks_quantile <- stats::quantile(
+    model_diag$.cooksd,
+    probs = 0.999,
+    na.rm = TRUE
+  )
+
+  # leverage
+  leverage_median <- stats::median(model_diag$.hat, na.rm = TRUE)
+  leverage_theory <- (mod_ncol + 1) / mod_nrow
+  # choose the larger of the two cut-offs, with a floor of 0.02
+  leverage_cutoff <- max(2.5 * leverage_median, 2.5 * leverage_theory, 0.02)
+
+  # standardised Pearson's residual
+  resid_abs <- abs(model_diag$.std.resid)
+  resid_cutoff_abs <- 3
+  resid_quantile <- stats::quantile(resid_abs, probs = 0.999, na.rm = TRUE)
+  resid_cutoff_final <- max(resid_cutoff_abs, resid_quantile)
+
   # define multiple threshold critieria
   model_diag <-
     model_diag |>
     dplyr::mutate(
-      cooks_criterion = .cooksd > (4 / mod_nrow),
-      leverage_criterion = .hat > (2 * mean(.hat)),
-      resid_criterion = abs(.std.resid) > 2,
-      raw_resid_criterion = abs(.resid) > (2 * sd(.resid, na.rm = TRUE))
+      # convert standardised residuals to absolute values
+      abs_std_resid = abs(.std.resid),
+
+      # add in thresholds (for reference)
+      thr_cooks_cutoff = cooks_cutoff,
+      thr_cooks_quantile = cooks_quantile,
+      thr_leverage_cutoff = leverage_cutoff,
+      thr_resid_cutoff_final = resid_cutoff_final,
+      thr_resid_quantile = resid_quantile,
+
+      # criteria
+      cooks_criterion = (.cooksd > cooks_cutoff) &
+        (.cooksd > cooks_quantile),
+      leverage_criterion = (.hat > leverage_cutoff),
+      resid_criterion = (abs_std_resid > resid_cutoff_final) |
+        (abs_std_resid > resid_quantile)
     )
 
   # identify potentially influential observations
@@ -3385,6 +3420,15 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
         rowSums()
     ) |>
     dplyr::filter(criteria_count >= 2)
+
+  # debugging ---
+  test_model_diag <<- model_diag |>
+    dplyr::arrange(
+      dplyr::desc(cooks_criterion),
+      dplyr::desc(leverage_criterion),
+      dplyr::desc(resid_criterion)
+    )
+  test_inf_obs <<- influential_obs
 
   # assumption details ---
 
@@ -3431,17 +3475,17 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
   if (!result & details) {
     cli::cli_h1("No influential observations assumption")
     cli::cli_alert_warning(
-      "Signs of influential observations detected in {lbl_n} rows of your model's data."
+      "Signs of influential observations detected in {lbl_n}rows of your model's data."
     )
     # highlight key metrics
     cli::cli_ul()
     cli::cli_li(
-      "Observations flagged: {lbl_n} (each meeting at least two diagnostic criteria)"
+      "{.emph Observations flagged:} {lbl_n} (each meeting at least two diagnostic criteria)"
     )
-    cli::cli_li("Maximum observed Cook's Distance: {lbl_max_cooks}")
-    cli::cli_li("Maximum observed Leverage: {lbl_max_hat}")
+    cli::cli_li("{.emph Maximum observed Cook's Distance:} {lbl_max_cooks}")
+    cli::cli_li("{.emph Maximum observed Leverage:} {lbl_max_hat}")
     cli::cli_li(
-      "Maximum observed Absolute Standardised Residual: {lbl_max_stdresid}"
+      "{.emph Maximum observed Absolute Standardised Residual:} {lbl_max_stdresid}"
     )
     cli::cli_end()
 
