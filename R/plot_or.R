@@ -3181,8 +3181,10 @@ assumption_linearity <- function(glm, details = FALSE, p_val_threshold = 0.05) {
     interaction_terms <-
       purrr::map(
         .x = predictors_continuous,
-        # NB, using log1p in case there are any zeroes
-        .f = \(.x) glue::glue("I({.x} * log1p({.x}))")
+        # NB, using asinh() as an alternative to log() or log1p() as it is
+        # defined for all real x and behaves like log for large |x| while
+        # staying finite near -1
+        .f = \(.x) glue::glue("I({.x} * asinh({.x}))")
       )
 
     # convert the list to a vector
