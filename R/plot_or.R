@@ -3393,7 +3393,7 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
     model_diag |>
     dplyr::mutate(
       # convert standardised residuals to absolute values
-      abs_std_resid = abs(.std.resid),
+      abs_std_resid = abs(.data$.std.resid),
 
       # add in thresholds (for reference)
       thr_cooks_cutoff = cooks_cutoff,
@@ -3403,11 +3403,11 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
       thr_resid_quantile = resid_quantile,
 
       # criteria
-      cooks_criterion = (.cooksd > cooks_cutoff) &
-        (.cooksd > cooks_quantile),
-      leverage_criterion = (.hat > leverage_cutoff),
-      resid_criterion = (abs_std_resid > resid_cutoff_final) |
-        (abs_std_resid > resid_quantile)
+      cooks_criterion = (.data$.cooksd > cooks_cutoff) &
+        (.data$.cooksd > cooks_quantile),
+      leverage_criterion = (.data$.hat > leverage_cutoff),
+      resid_criterion = (.data$abs_std_resid > resid_cutoff_final) |
+        (.data$abs_std_resid > resid_quantile)
     )
 
   # identify potentially influential observations
@@ -3421,7 +3421,7 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
       ) |>
         rowSums()
     ) |>
-    dplyr::filter(criteria_count >= 2)
+    dplyr::filter(.data$criteria_count >= 2)
 
   # debugging ---
   # test_model_diag <<- model_diag |>
@@ -3444,9 +3444,9 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
       influential_obs |>
       dplyr::summarise(
         total_obs = dplyr::n(),
-        max_cooks = max(.cooksd, na.rm = TRUE),
-        max_leverage = max(.hat, na.rm = TRUE),
-        max_stdresid = max(abs(.std.resid), na.rm = TRUE)
+        max_cooks = max(.data$.cooksd, na.rm = TRUE),
+        max_leverage = max(.data$.hat, na.rm = TRUE),
+        max_stdresid = max(abs(.data$.std.resid), na.rm = TRUE)
       )
 
     # format these for display
