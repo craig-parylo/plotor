@@ -3424,13 +3424,13 @@ assumption_no_extreme_values <- function(glm, details = FALSE) {
     dplyr::filter(criteria_count >= 2)
 
   # debugging ---
-  test_model_diag <<- model_diag |>
-    dplyr::arrange(
-      dplyr::desc(cooks_criterion),
-      dplyr::desc(leverage_criterion),
-      dplyr::desc(resid_criterion)
-    )
-  test_inf_obs <<- influential_obs
+  # test_model_diag <<- model_diag |>
+  #   dplyr::arrange(
+  #     dplyr::desc(cooks_criterion),
+  #     dplyr::desc(leverage_criterion),
+  #     dplyr::desc(resid_criterion)
+  # test_inf_obs <<- influential_obs
+  # debugging end ---
 
   # assumption details ---
 
