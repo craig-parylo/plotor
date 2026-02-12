@@ -64,6 +64,7 @@ check_or(lr)
 #> ✔ The sample size is large enough
 #> ✔ Continuous variables either have a linear relationship with the log-odds of
 #> the outcome or are absent
+#> ✔ No observations unduly influence model estimates
 #> 
 #> Your model was checked for logistic regression assumptions in the following
 #> areas:
@@ -89,6 +90,15 @@ check_or(lr)
 #> compared to a model using Box-Tidwell power transformations on continuous
 #> predictors. Any observed improvement likely indicates non-linear relationships
 #> between the continuous predictors and the log-odds of the outcome.
+#> 
+#> Influential observations:
+#> A test to identify observations that could disproportionately influence model
+#> statistics was applied. The test simultaneously examined three metrics: Cook's
+#> distance (measuring overall observation impact), leverage (quantifying an
+#> observation's distance from the data centre), and standardised residuals
+#> (indicating how unusual an observation is relative to the model). To minimise
+#> false positive, an observation was flagged only if it met at least two of these
+#> diagnostic criteria.
 #> 
 #> ✔ These tests found no issues with your model.
 #> 

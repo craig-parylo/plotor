@@ -100,6 +100,7 @@ are met, with optional detailed feedback if any tests fail.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> The sample size is large enough</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Continuous variables either have a linear relationship with the log-odds of</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> the outcome or are absent</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No observations unduly influence model estimates</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Your model was checked for logistic regression assumptions in the following</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> areas:</span>
@@ -125,6 +126,15 @@ are met, with optional detailed feedback if any tests fail.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> compared to a model using Box-Tidwell power transformations on continuous</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> predictors. Any observed improvement likely indicates non-linear relationships</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> between the continuous predictors and the log-odds of the outcome.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">Influential observations:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A test to identify observations that could disproportionately influence model</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> statistics was applied. The test simultaneously examined three metrics: Cook's</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> distance (measuring overall observation impact), leverage (quantifying an</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> observation's distance from the data centre), and standardised residuals</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (indicating how unusual an observation is relative to the model). To minimise</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> false positive, an observation was flagged only if it met at least two of these</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> diagnostic criteria.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> These tests found no issues with your model.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
