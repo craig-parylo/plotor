@@ -67,221 +67,115 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p>The goal of <code>plotor</code> is to generate Odds Ratio plots from logistic regression models.</p>
+<p><strong>plotor</strong> makes it easy to generate clear, publication-ready <strong>odds-ratio plots</strong> and <strong>tables</strong> from logistic regression models.</p>
+<p>If you work with binary outcomes, plotor helps you go from model → interpretation in seconds.</p>
+<div class="section level2">
+<h2 id="what-plotor-does">What plotor does<a class="anchor" aria-label="anchor" href="#what-plotor-does"></a>
+</h2>
+<ul>
+<li>Produces clean, ggplot2-based <strong>odds ratio plots</strong>
+</li>
+<li>Generates <strong>tidy odds ratio tables</strong> (with optional mini-plots)</li>
+<li>Provides <strong>automated assumption checks</strong> for logistic regression</li>
+<li>Works seamlessly with the tidyverse</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="example-outputs">Example outputs<a class="anchor" aria-label="anchor" href="#example-outputs"></a>
+</h2>
+<div class="section level3">
+<h3 id="odds-ratio-plot">Odds ratio plot<a class="anchor" aria-label="anchor" href="#odds-ratio-plot"></a>
+</h3>
+<p>A single function call gives you a polished OR plot:</p>
+<!-- <br> -->
+<div style="
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: inline-block;
+  padding: 12px;
+  max-width: 100%;
+">
+<p><img src="reference/figures/readme_plot_or.png" alt="Odds ratio plot showing likelihood of survival of the Titanic disaster by class, sex and age" style="max-width: 100%; height: auto;"></p>
+</div>
+<p><br></p>
+<p><a href="https://craig-parylo.github.io/plotor/reference/plot_or.html">See full plot options →</a></p>
+</div>
+<div class="section level3">
+<h3 id="odds-ratio-table-with-mini-plot">Odds ratio table with mini-plot<a class="anchor" aria-label="anchor" href="#odds-ratio-table-with-mini-plot"></a>
+</h3>
+<p>Perfect for reports and publications:</p>
+<div style="
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: inline-block;
+  padding: 12px;
+  max-width: 100%;
+">
+<p><img src="reference/figures/readme_table_or.png" alt="Odds ratio table showing likelihood of survival of the Titanic disaster by class, sex and age" style="max-width: 100%; height: auto;"></p>
+</div>
+<p><br></p>
+<p><a href="https://craig-parylo.github.io/plotor/reference/table_or.html">See full table output options →</a></p>
+</div>
+<div class="section level3">
+<h3 id="automated-assumption-checks">Automated assumption checks<a class="anchor" aria-label="anchor" href="#automated-assumption-checks"></a>
+</h3>
+<p><strong>plotor</strong> includes built-in checks to help validate your logistic regression model:</p>
+<div style="
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: inline-block;
+  padding: 12px;
+  max-width: 100%;
+">
+<p><img src="reference/figures/readme_check_or.png" alt="Console output showing the results of logistic regression assumption checks" style="max-width: 100%; height: auto;"></p>
+</div>
+<p><br></p>
+<p><a href="https://craig-parylo.github.io/plotor/reference/check_or.html">See full assumption check output →</a></p>
+</div>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of <code>plotor</code> from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>Stable release (CRAN):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"craig-parylo/plotor"</span><span class="op">)</span></span></code></pre></div>
-<p>You can also install the latest released version from <a href="https://CRAN.R-project.org/package=plotor" class="external-link">CRAN</a> with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"plotor"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
-</h2>
-<p>In this example we will explore the likelihood of surviving the Titanic disaster based on passenger economic status (class), sex, and age group.</p>
-<p>In addition to <code>plotor</code> the packages we will use include <code>dplyr</code>, <code>tidyr</code> and <code>forcats</code> for general data wrangling, the <code>stats</code> package to conduct the logistic regression followed by <code>broom</code> to tidy the output and convert the results to Odds Ratios and confidence intervals, then <code>ggplot2</code> to visualise the plot.</p>
+<p>Using {pak}:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"plotor"</span><span class="op">)</span></span></code></pre></div>
+<p>Development version:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/craig-parylo/plotor" class="external-link">plotor</a></span><span class="op">)</span>      <span class="co"># generates Odds Ratio plots</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">datasets</span><span class="op">)</span>    <span class="co"># source of example data</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>       <span class="co"># data wrangling</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>       <span class="co"># data wrangling - uncounting aggregated data</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span>     <span class="co"># data wrangling - handling factor variables</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">stats</span><span class="op">)</span>       <span class="co"># perform logistic regression using glm function</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/" class="external-link">broom</a></span><span class="op">)</span>       <span class="co"># tidying glm model and producing OR and CI</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>     <span class="co"># data visualisation</span></span></code></pre></div>
-<p>Start with getting the data from the datasets package.</p>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"craig-parylo/plotor"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="minimal-example">Minimal example<a class="anchor" aria-label="anchor" href="#minimal-example"></a>
+</h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/Titanic.html" class="external-link">Titanic</a></span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># convert counts to observations</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/uncount.html" class="external-link">uncount</a></span><span class="op">(</span>weights <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># convert categorical variables to factors.</span></span>
-<span>  <span class="co"># we specify an order for levels in Class and Survival, otherwise ordering</span></span>
-<span>  <span class="co"># in descending order of frequency</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    Class <span class="op">=</span> <span class="va">Class</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct.html" class="external-link">fct</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1st'</span>, <span class="st">'2nd'</span>, <span class="st">'3rd'</span>, <span class="st">'Crew'</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    Sex <span class="op">=</span> <span class="va">Sex</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_inorder.html" class="external-link">fct_infreq</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    Age <span class="op">=</span> <span class="va">Age</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_inorder.html" class="external-link">fct_infreq</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    Survived <span class="op">=</span> <span class="va">Survived</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct.html" class="external-link">fct</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'No'</span>, <span class="st">'Yes'</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p>We now have a tibble of data containing four columns:</p>
-<ul>
-<li><p><code>Survived</code> - our outcome variable describing whether the passenger survived <code>Yes</code> or died <code>No</code>,</p></li>
-<li><p><code>Class</code> - the passenger class, either <code>1st</code>, <code>2nd</code>, <code>3rd</code> or <code>Crew</code>,</p></li>
-<li><p><code>Sex</code> - the gender of the passenger, either <code>Male</code> or <code>Female</code>,</p></li>
-<li><p><code>Age</code> - whether the passenger was an <code>Adult</code> or <code>Child</code>.</p></li>
-</ul>
-<p>We next conduct a logistic regression of survival (as a binary factor: ‘yes’ and ‘no’) against the characteristics of passenger class, sex and age group. For this we use the Generalised Linear Model function (<code>glm</code>) from the <code>stats</code> package, specifying:</p>
-<ul>
-<li><p>the family as ‘binomial’, and</p></li>
-<li><p>the formula as survival being a function of <code>Class</code>, <code>Sex</code> and <code>Age</code>.</p></li>
-</ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># conduct a logistic regression of survival against the other variables</span></span>
-<span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">df</span>, </span>
-<span>  family <span class="op">=</span> <span class="st">'binomial'</span>, </span>
-<span>  formula <span class="op">=</span> <span class="va">Survived</span> <span class="op">~</span> <span class="va">Class</span> <span class="op">+</span> <span class="va">Sex</span> <span class="op">+</span> <span class="va">Age</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p>Finally, we can plot the Odds Ratio of survival using the <code>plot_or</code> function.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># using plot_or </span></span>
-<span><span class="fu"><a href="reference/plot_or.html">plot_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
-<p>This plot makes it clear that:</p>
-<ul>
-<li><p>Children were 2.89 times more likely to survive than Adults,</p></li>
-<li><p>Passengers in <code>2nd</code>, <code>3rd</code> class as well as <code>Crew</code> were all less likely to survive than those in <code>1st</code> class,</p></li>
-<li><p>Women were 11.25 times more likely to survive than men.</p></li>
-</ul>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/craig-parylo/plotor" class="external-link">plotor</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># load the titanic dataset from the package</span></span>
+<span><span class="va">df_titanic</span> <span class="op">&lt;-</span> <span class="fu">get_df_titanic</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a logistic regression model using this data</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df_titanic</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">Survived</span> <span class="op">~</span> <span class="va">Class</span> <span class="op">+</span> <span class="va">Sex</span> <span class="op">+</span> <span class="va">Age</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"binomial"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot the odds ratios</span></span>
+<span><span class="fu"><a href="reference/plot_or.html">plot_or</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="table-outputs">Table outputs<a class="anchor" aria-label="anchor" href="#table-outputs"></a>
+<h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
 </h2>
-<p>While an odds ratio plot can effectively visualise the direction and magnitude of relationships, a table of results offers additional information such as the value of the odds ratio, p-values and confidence intervals.</p>
-<p>Use the <code><a href="reference/table_or.html">table_or()</a></code> function to return a tibble of details about our Titanic analysis:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># using table_or</span></span>
-<span><span class="fu"><a href="reference/table_or.html">table_or</a></span><span class="op">(</span>glm_model_results <span class="op">=</span> <span class="va">lr</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 8 × 14</span></span>
-<span><span class="co">#&gt;   label level   rows outcome outcome_rate class  estimate std.error statistic</span></span>
-<span><span class="co">#&gt;   &lt;fct&gt; &lt;fct&gt;  &lt;int&gt;   &lt;int&gt;        &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Class 1st      325     203        0.625 factor   NA        NA         NA   </span></span>
-<span><span class="co">#&gt; 2 Class 2nd      285     118        0.414 factor    0.361     0.196     -5.19</span></span>
-<span><span class="co">#&gt; 3 Class 3rd      706     178        0.252 factor    0.169     0.172    -10.4 </span></span>
-<span><span class="co">#&gt; 4 Class Crew     885     212        0.240 factor    0.424     0.157     -5.45</span></span>
-<span><span class="co">#&gt; 5 Sex   Male    1731     367        0.212 factor   NA        NA         NA   </span></span>
-<span><span class="co">#&gt; 6 Sex   Female   470     344        0.732 factor   11.2       0.140     17.2 </span></span>
-<span><span class="co">#&gt; 7 Age   Adult   2092     654        0.313 factor   NA        NA         NA   </span></span>
-<span><span class="co">#&gt; 8 Age   Child    109      57        0.523 factor    2.89      0.244      4.35</span></span>
-<span><span class="co">#&gt; # ℹ 5 more variables: p.value &lt;dbl&gt;, conf.low &lt;dbl&gt;, conf.high &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   significance &lt;chr&gt;, comparator &lt;dbl&gt;</span></span></code></pre></div>
-<p>You can also output these details into a formatted table complete with a mini OR plot, which is ideal for inclusion in reports and publications. To do this, add <code>output = "gt"</code> as part of the <code><a href="reference/table_or.html">table_or()</a></code> function call.</p>
-<p><img src="inst/img/table_or.png"></p>
-</div>
-<div class="section level2">
-<h2 id="assumption-checks">Assumption checks<a class="anchor" aria-label="anchor" href="#assumption-checks"></a>
-</h2>
-<p>New to <code>plotor</code> is a new suite of automated checks. These checks verify the data used in your logistic regression analysis upholds the required assumptions, providing an added layer of confidence in your results.</p>
-<table style="width:90%;" class="table">
-<caption>
-Assumptions for logistic regression
-</caption>
-<colgroup>
-<col style="width: 23%">
-<col style="width: 45%">
-<col style="width: 20%">
-</colgroup>
-<thead><tr>
-<th>
-Assumption
-</th>
-<th>
-Description
-</th>
-<th>
-Status
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>
-The outcome variable is <strong>binary</strong>
-</td>
-<td>
-<code>plotor</code> is designed to work with an outcome variable that has only two possible values, i.e. outcome is <strong>binary</strong>.
-</td>
-<td>
-✅
-</td>
-</tr>
-<tr>
-<td>
-The predictor variables should <strong>not be highly correlated</strong> with each other
-</td>
-<td>
-<p>
-Predictor variables which have high levels of correlation with each other is known as <strong>multicollinearity</strong>.
-</p>
-<p>
-Where this is the case the odds ratio estimates are likely to be unstable, confidence intervals are likely to be much larger, both of which make it difficult to interpret the results.
-</p>
-</td>
-<td>
-✅
-</td>
-</tr>
-<tr>
-<td>
-The outcome is <strong>not separated</strong> by predictors
-</td>
-<td>
-<p>
-In logistic regression, <strong>separation</strong> occurs when a predictor variable (or a combination of predictor variables) perfectly predicts the outcome variable.
-</p>
-<p>
-Separation results in infinite or extremely large odds ratios and possibly issues with non-convergence of the logistic regression model, making it difficult for the model to estimate the coefficients.
-</p>
-</td>
-<td>
-✅
-</td>
-</tr>
-<tr>
-<td>
-The sample size is large enough
-</td>
-<td>
-The sample size should be large enough to provide reliable estimates of the odds ratio. A general rule of thumb is to have at least 10 events (or outcomes of interest) per predictor variable.
-</td>
-<td>
-✅
-</td>
-</tr>
-<tr>
-<td>
-The observations are independent
-</td>
-<td>
-Each observation should be independent of the others. This means that the outcome for one observation should not be influenced by the outcome of another observation.
-</td>
-<td>
-In development
-</td>
-</tr>
-<tr>
-<td>
-There are no extreme outlier values
-</td>
-<td>
-The data should not contain outliers or influential observations that can significantly affect the estimates of the odds ratio.
-</td>
-<td>
-In development
-</td>
-</tr>
-<tr>
-<td>
-There is a linear relationship between continuous predictors and the logit
-</td>
-<td>
-The relationship between continuous predictor variables and the log odds of the outcome should be linear.
-</td>
-<td>
-✅
-</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li>Plotting odds ratios: <code><a href="reference/plot_or.html">?plot_or</a></code>
+</li>
+<li>Tabulating odds ratios: <code><a href="reference/table_or.html">?table_or</a></code>
+</li>
+<li>Assumption checks: <code><a href="reference/check_or.html">?check_or</a></code>
+</li>
+</ul>
+<p>Full documentation: <a href="https://craig-parylo.github.io/plotor/" class="uri">https://craig-parylo.github.io/plotor/</a></p>
 </div>
 </div>
 
@@ -322,6 +216,7 @@ The relationship between continuous predictor variables and the log odds of the 
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=plotor" class="external-link"><img src="https://www.r-pkg.org/badges/version/plotor" alt="CRAN status"></a></li>
 <li><a href="https://cran.r-project.org/package=plotor" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/plotor"></a></li>
+<li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></li>
 </ul>
 </div>
 
