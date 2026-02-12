@@ -387,6 +387,19 @@ check_or <- function(
     )
   }
 
+  # no influential observations
+  if (test_results$assume_no_extreme) {
+    cli::cli_alert_success(
+      "No observations unduly influence model estimates",
+      wrap = TRUE
+    )
+  } else {
+    cli::cli_alert_danger(
+      "Some observations significantly distort model estimates",
+      wrap = TRUE
+    )
+  }
+
   # summary text
   cli::cli_par()
   cli::cli_end()
@@ -431,6 +444,14 @@ check_or <- function(
     "A likelihood ratio test was conducted to assess improvements in model fit compared to a model using Box-Tidwell power transformations on continuous predictors. Any observed improvement likely indicates non-linear relationships between the continuous predictors and the log-odds of the outcome."
   )
   cli::cli_end()
+
+  cli::cli_par()
+  cli::cli_text("{.emph Influential observations:}")
+  cli::cli_text(
+    "A test to identify observations that could disproportionately influence model statistics was applied. The test simultaneously examined three metrics: Cook's distance (measuring overall observation impact), leverage (quantifying an observation's distance from the data centre), and standardised residuals (indicating how unusual an observation is relative to the model). To minimise false positive, an observation was flagged only if it met at least two of these diagnostic criteria."
+  )
+  cli::cli_end()
+
   cli::cli_par()
   if (all(unlist(test_results))) {
     cli::cli_alert_success(
@@ -2267,7 +2288,12 @@ check_assumptions <- function(
 
     assume_sample_size = assumption_sample_size(glm = glm, details = details),
 
-    assume_linearity = assumption_linearity(glm = glm, details = details)
+    assume_linearity = assumption_linearity(glm = glm, details = details),
+
+    assume_no_extreme = assumption_no_extreme_values(
+      glm = glm,
+      details = details
+    )
   )
 
   # aborting assumptions
@@ -2354,7 +2380,7 @@ check_assumptions_with_spinner <- function(
     }
   }
 
-  # return the result and raise erorrs if any occurred in the background
+  # return the result and raise errors if any occurred in the background
   list_return$get_result()
 }
 
@@ -3155,8 +3181,10 @@ assumption_linearity <- function(glm, details = FALSE, p_val_threshold = 0.05) {
     interaction_terms <-
       purrr::map(
         .x = predictors_continuous,
-        # NB, using log1p in case there are any zeroes
-        .f = \(.x) glue::glue("I({.x} * log1p({.x}))")
+        # NB, using asinh() as an alternative to log() or log1p() as it is
+        # defined for all real x and behaves like log for large |x| while
+        # staying finite near -1
+        .f = \(.x) glue::glue("I({.x} * asinh({.x}))")
       )
 
     # convert the list to a vector
@@ -3262,6 +3290,218 @@ assumption_linearity <- function(glm, details = FALSE, p_val_threshold = 0.05) {
     )
     cli::cli_alert_info(
       "Your data was analysed using a Box-Tidwell power transformation with interaction terms between continuous predictors and their log. A likelihood ratio test found the transformed model a better fit to the data, indicating there are non-linear relationships in your model data",
+      wrap = TRUE
+    )
+  }
+
+  # return the result
+  return(result)
+}
+
+#' Test for influential observations in logistic regression
+#'
+#' @description
+#' Performs a diagnostic test to identify potentially influential observations
+#' in a binomial logistic regression model. The function uses multiple
+#' statistical criteria to minimise false positives.
+#'
+#' @details
+#' Influential observations can substantially distort model estimates,
+#' particularly in logistic regression where the non-linear link function makes
+#' the model sensitive to outliers. This function assesses potential
+#' influential points using three key metrics:
+#' 1. **Cook's distance**: measures the overall influence of an observation
+#' 2. **Leverage**: assesses the extremity of predictor variable combinations
+#' 3. **Standardised residuals**: evaluates the deviation of observations from the model
+#'
+#' The test is intentionally conservative to minimise the number of false
+#' positive reports, using thresholds derived from:
+#' - F-distribution quantile for Cook's distance
+#' - Bonferroni-like correction for leverage
+#' - Reduced standard deviation threshold for residuals
+#'
+#' @param glm A binomial logistic regression model created using [stats::glm()]
+#' @param details Logical. If `TRUE` prints detailed information about potentially influential observations using {cli} formatting
+#'
+#' @returns A logical value:
+#' - `TRUE` if no influential observations are detected
+#' - `FALSE` if potentially influential observations are found
+#'
+#' @section Warnings:
+#' - This diagnostic is not definitive and should not be the sole method for
+#' identifying problematic observations
+#' - Always combine with domain expertise and visual inspection of the data
+#' - Requires careful interpretation by a domain expert
+#'
+#' @section Thresholds:
+#' The function uses the following conservative thresholds:
+#' - Cook's Distance: based on F-distribution quantile
+#' - Leverage: `(2 * number of predictors) / sample size`
+#' - Standardised residuals: absolute value < 2.5
+#'
+#' @examples
+#' \dontrun{
+#' # Basic usage with a logistic regression model
+#' model <- stats::glm(
+#'   formula = outcome ~ predictor1 + predictor2,
+#'   family = "binomial",
+#'   data = your_data
+#' )
+#'
+#' # check for influential observations
+#' plotor:::assumption_no_extreme_values(model)
+#'
+#' # get detailed output about potential influential observations
+#' plotor:::assumption_no_extreme_values(glm = model, details = TRUE)
+#' }
+#'
+#' @noRd
+assumption_no_extreme_values <- function(glm, details = FALSE) {
+  # compute model diagnostics with robust methods
+  model_diag <- glm |> broom::augment()
+
+  # model dimensions
+  mod_matrix <- stats::model.matrix(glm)
+  mod_ncol <- ncol(mod_matrix)
+  mod_nrow <- nrow(mod_matrix)
+
+  # define thresholds
+  # cook's distance
+  # cooks_cutoff <- 4 / mod_nrow # this is a standard rule of thumb
+  cooks_theory <- 4 / max(mod_nrow - mod_ncol, 10) # avoid division by tiny df
+  cooks_cutoff <- max(cooks_theory, 1e-3) # absolute floor to avoid ~0 cutoffs
+  cooks_quantile <- stats::quantile(
+    model_diag$.cooksd,
+    probs = 0.999,
+    na.rm = TRUE
+  )
+
+  # leverage
+  leverage_median <- stats::median(model_diag$.hat, na.rm = TRUE)
+  leverage_theory <- (mod_ncol + 1) / mod_nrow
+  # choose the larger of the two cut-offs, with a floor of 0.02
+  leverage_cutoff <- max(2.5 * leverage_median, 2.5 * leverage_theory, 0.02)
+
+  # standardised Pearson's residual
+  resid_abs <- abs(model_diag$.std.resid)
+  resid_cutoff_abs <- 3
+  resid_quantile <- stats::quantile(resid_abs, probs = 0.999, na.rm = TRUE)
+  resid_cutoff_final <- max(resid_cutoff_abs, resid_quantile)
+
+  # define multiple threshold critieria
+  model_diag <-
+    model_diag |>
+    dplyr::mutate(
+      # convert standardised residuals to absolute values
+      abs_std_resid = abs(.data$.std.resid),
+
+      # add in thresholds (for reference)
+      thr_cooks_cutoff = cooks_cutoff,
+      thr_cooks_quantile = cooks_quantile,
+      thr_leverage_cutoff = leverage_cutoff,
+      thr_resid_cutoff_final = resid_cutoff_final,
+      thr_resid_quantile = resid_quantile,
+
+      # criteria
+      cooks_criterion = (.data$.cooksd > cooks_cutoff) &
+        (.data$.cooksd > cooks_quantile),
+      leverage_criterion = (.data$.hat > leverage_cutoff),
+      resid_criterion = (.data$abs_std_resid > resid_cutoff_final) |
+        (.data$abs_std_resid > resid_quantile)
+    )
+
+  # identify potentially influential observations
+  influential_obs <-
+    model_diag |>
+    dplyr::mutate(
+      # require at least 2 criteria to be true
+      criteria_count = dplyr::select(
+        .data = model_diag,
+        dplyr::ends_with("_criterion")
+      ) |>
+        rowSums()
+    ) |>
+    dplyr::filter(.data$criteria_count >= 2)
+
+  # debugging ---
+  # test_model_diag <<- model_diag |>
+  #   dplyr::arrange(
+  #     dplyr::desc(cooks_criterion),
+  #     dplyr::desc(leverage_criterion),
+  #     dplyr::desc(resid_criterion)
+  # test_inf_obs <<- influential_obs
+  # debugging end ---
+
+  # assumption details ---
+
+  # are all observations within bounds?
+  result <- nrow(influential_obs) == 0
+
+  # context details ---
+  # provide some summary statistics
+  if (!result) {
+    summary_stats <-
+      influential_obs |>
+      dplyr::summarise(
+        total_obs = dplyr::n(),
+        max_cooks = max(.data$.cooksd, na.rm = TRUE),
+        max_leverage = max(.data$.hat, na.rm = TRUE),
+        max_stdresid = max(abs(.data$.std.resid), na.rm = TRUE)
+      )
+
+    # format these for display
+    lbl_n <- prettyunits::pretty_num(summary_stats$total_obs)
+    lbl_max_cooks <- prettyunits::pretty_round(
+      x = summary_stats$max_cooks,
+      digits = 4
+    )
+    lbl_max_hat <- prettyunits::pretty_round(
+      x = summary_stats$max_leverage,
+      digits = 4
+    )
+    lbl_max_stdresid <- prettyunits::pretty_round(
+      x = summary_stats$max_stdresid,
+      digits = 4
+    )
+  }
+
+  # alert details ---
+  # alert the user if this assumption is not held
+  if (!result) {
+    cli::cli_warn(
+      "Signs of influential observations detected in {lbl_n} of your observations."
+    )
+  }
+
+  # provide additional details if requested
+  if (!result & details) {
+    cli::cli_h1("No influential observations assumption")
+    cli::cli_alert_warning(
+      "Signs of influential observations detected in {lbl_n}rows of your model's data."
+    )
+    # highlight key metrics
+    cli::cli_ul()
+    cli::cli_li(
+      "{.emph Observations flagged:} {lbl_n} (each meeting at least two diagnostic criteria)"
+    )
+    cli::cli_li("{.emph Maximum observed Cook's Distance:} {lbl_max_cooks}")
+    cli::cli_li("{.emph Maximum observed Leverage:} {lbl_max_hat}")
+    cli::cli_li(
+      "{.emph Maximum observed Absolute Standardised Residual:} {lbl_max_stdresid}"
+    )
+    cli::cli_end()
+
+    # provide general advice on this assumption
+    cli::cli_h3("About")
+    cli::cli_alert_info(
+      "Influential observations in logistic regression can disproportionately skew model estimates, dramatically altering the decision boundary and coefficient estimates. Due to the non-linear nature of logistic regression, even a single observation can substantially change the probability predictions, potentially leading to misleading conclusions about predictor effects and compromising the model's reliability and generalisability",
+      wrap = TRUE
+    )
+    cli::cli_alert_info(
+      "This diagnostic assessed your logistic regression model by simultaneously examining three key influence metrics: 
+      1) Cook's distance (measuring overall observation impact), 
+      2) leverage (quantifying an observation's distance from the data centre), and 
+      3) standardised residuals (indicating how unusual an observation is relative to the model). By requiring observations to meet at least two diagnostic criteria, the test provides a conservative approach to identifying points that could substantially distort your model's estimates and predictive performance.",
       wrap = TRUE
     )
   }

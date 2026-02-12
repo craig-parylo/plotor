@@ -540,6 +540,25 @@ get_df_large_synthetic <- function(seed = 123, rows = 1e6) {
     )
 }
 
+get_df_influential <- function(seed = 123, rows = 1e3, influential = TRUE) {
+  set.seed(seed)
+
+  # create a dataset without influential observations
+  df <-
+    tibble::tibble(
+      outcome = rbinom(n = rows, size = 1, prob = 0.5),
+      pred1 = rnorm(n = rows, mean = 0, sd = 0.5),
+      pred2 = rnorm(n = rows, mean = 0, sd = 0.5)
+    )
+
+  if (influential) {
+    # modify it to become extreme
+    df[1, "pred1"] <- 10 # extreme value
+  }
+
+  return(df)
+}
+
 
 # Model functions --------------------------------------------------------------
 get_lr_titanic <- function() {
@@ -730,4 +749,15 @@ get_lr_large_synthetic <- function(seed = 123, rows = 1e6) {
     family = "binomial",
     formula = outcome ~ pred1 + pred2 + pred3 + pred4 + pred5 + pred6
   )
+}
+
+get_lr_influential <- function(seed = 123, rows = 1e3, influential = TRUE) {
+  df <- get_df_influential(seed = seed, rows = rows, influential = influential)
+  lr <- stats::glm(
+    data = df,
+    family = "binomial",
+    formula = outcome ~ pred1 + pred2
+  )
+
+  return(lr)
 }
