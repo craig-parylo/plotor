@@ -45,6 +45,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggests: 
     datasets,
+    here,
     knitr,
     labelled,
     magrittr,
@@ -55,7 +56,8 @@ Suggests:
     rmarkdown,
     svglite,
     testthat (>= 3.0.0),
-    vdiffr
+    vdiffr,
+    webshot2
 VignetteBuilder: knitr
 URL: https://github.com/craig-parylo/plotor, https://craig-parylo.github.io/plotor/
 BugReports: https://github.com/craig-parylo/plotor/issues
