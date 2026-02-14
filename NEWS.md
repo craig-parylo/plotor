@@ -1,3 +1,41 @@
+
+# plotor v0.9.0 (2026-01-06) - GitHub release
+
+## Enhancements
+
+- **Support for ordered-factor predictors**  
+  Formula parsing and model-summary utilities now recognise and correctly handle ordered factors ([#91](https://github.com/craig-parylo/plotor/pull/91))
+
+- **New helper**  
+  `make_ordered_factors_compatible_with_broom()` aligns term names and labels with `broom::tidy()` ([#91](https://github.com/craig-parylo/plotor/pull/91))
+
+- **Tests and examples**  
+  Tests, example data and models covering ordered-factor predictors, including a truncated example that verifies the sample-size assumption warning ([#91](https://github.com/craig-parylo/plotor/pull/91))
+
+## Changes
+- **Revert to gtExtras for CI mini-plots**  
+  Replaced hard-coded copies with `gtExtras` code for confidence-interval plots produced by `table_or()` and require `gtExtras >= 0.6.1` to reduce duplication and use upstream fixes ([#90](https://github.com/craig-parylo/plotor/pull/90))
+
+- **Bump ggplot2 requirement**  
+  Update dependency to `ggplot2 >= 4.0.0` ([#90](https://github.com/craig-parylo/plotor/pull/90))
+
+- **Refined predictor-type detection**  
+  Refactored to return more detailed classes (e.g. "ordered factor", "factor", "numeric") for improved downstream handling and displays ([#91](https://github.com/craig-parylo/plotor/pull/91))
+
+- **Version bump**  
+  Bumped package version to 0.9.0 to support a GitHub release ([#93](https://github.com/craig-parylo/plotor/pull/93))
+
+## Fixed
+- **Ordered-factor row counts**  
+  Added dedicated row-count logic for ordered-factor levels to ensure correct summarisation and avoid miscounts in summaries and tables ([#91](https://github.com/craig-parylo/plotor/pull/91))
+
+## Notes / migration
+- **Dependency updates required**  
+  Users must have `gtExtras >= 0.6.1` and `ggplot2 >= 4.0.0` installed; older versions may cause plot failures ([#90](https://github.com/craig-parylo/plotor/pull/90))
+
+- **No external API changes**  
+  Plotting and table functions should behave as before while preserving ordered-factor level ordering. ([#90](https://github.com/craig-parylo/plotor/pull/90))([#91](https://github.com/craig-parylo/plotor/pull/91))
+
 # plotor v0.8.0 (2025-12-04)
 
 ## Enhancements
