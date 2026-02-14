@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,85 @@
       <small>Source: <a href="https://github.com/craig-parylo/plotor/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="plotor-v100-2026-02-14">plotor v1.0.0 (2026-02-14)<a class="anchor" aria-label="anchor" href="#plotor-v100-2026-02-14"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-1-0-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-0-0"></a></h3>
+<ul><li><p><strong>Runtime benchmarking &amp; prediction</strong><br>
+Benchmarks measuring plot / table runtime across dataset sizes and predictor mixes, plus a packaged regression model and lightweight wrapper <code>predict_process_time()</code> that returns an estimated runtime (ms) with uncertainty bounds. Benchmark outputs and the fitted model are stored as .rds assets for package use (<a href="https://github.com/craig-parylo/plotor/pull/94" class="external-link">#94</a>)</p></li>
+<li><p><strong>Confirm before long runs</strong><br><code>double_check_confint_fast_estimate()</code> prompts users before running slower confidence-interval computations when the predictored runtime exceeds the default threshold (60s). Reduces unexpected long operations in interactive sessions (<a href="https://github.com/craig-parylo/plotor/pull/94" class="external-link">#94</a>)</p></li>
+<li><p><strong>Background processing with spinner</strong><br>
+Long-running work now runs in background R processes (<code><a href="https://callr.r-lib.org/reference/r_bg.html" class="external-link">callr::r_bg()</a></code>), while the main process shows a <a href="https://cli.r-lib.org" class="external-link">cli</a> spinner. Helpers include <code>get_summary_table_with_spinner()</code>, <code>check_assumptions_with_spinner()</code>, and <code>user_spinner()</code>. Spinners are suppressed in tests / CI (<a href="https://github.com/craig-parylo/plotor/pull/96" class="external-link">#96</a>) (<a href="https://github.com/craig-parylo/plotor/pull/97" class="external-link">#97</a>)</p></li>
+<li><p><strong>Influential-observation diagnostics</strong><br>
+New <code>assumption_no_extreme_values()</code> detects influential observations using Cook’s distance, leverage and standardised residuals with adaptive thresholds and conservative flagging. Test-data generators <code>get_df_influential()</code> and <code>get_lr_influential()</code> added (<a href="https://github.com/craig-parylo/plotor/pull/98" class="external-link">#98</a>)</p></li>
+<li><p><strong>Reproducible README figures</strong><br>
+Script <code>tools/generate_readme_figures.R</code>, refreshed figures assets in <code>man/figures</code> and added Suggests dependencies for their reproduction (<code>here</code>, <code>webshot2</code>) so README builds are reproducible (<a href="https://github.com/craig-parylo/plotor/pull/100" class="external-link">#100</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="changed-1-0-0">Changed<a class="anchor" aria-label="anchor" href="#changed-1-0-0"></a></h3>
+<ul><li><p><strong>Runtime prediction integrated into UI</strong><br><code><a href="../reference/plot_or.html">plot_or()</a></code> and <code><a href="../reference/table_or.html">table_or()</a></code> call <code>predict_process_time()</code> and prompt via the double-check helper when long runs are predicted. Benchmark code moved to <code>data-raw/</code>; serialised assets are shipped for app use (no re-benchmarking at runtime) (<a href="https://github.com/craig-parylo/plotor/pull/94" class="external-link">#94</a>)</p></li>
+<li><p><strong>Safe background wrappers</strong><br>
+Wrapper functions run heavy work in background processes and return identical results while surfacing errors / warnings. Spinner display is controlled by <code>use_spinner()</code> (<a href="https://github.com/craig-parylo/plotor/pull/96" class="external-link">#96</a>)</p></li>
+<li><p><strong>Namespace and tidy-eval hardening</strong><br>
+Explicit qualifications (<code><a href="https://rdrr.io/r/utils/stack.html" class="external-link">utils::stack()</a></code>, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">stats::predict()</a></code>), use of <code>.data$</code> pronoun and improved Roxygen for <code>use_spinner()</code> reduce R CMD check notes and improve compatibility with <code>dplyr</code> v1.2+. <code>callr</code> added to Imports (<a href="https://github.com/craig-parylo/plotor/pull/97" class="external-link">#97</a>)</p></li>
+<li><p><strong>Stable transformations</strong><br>
+Replaced <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log1p()</a></code> with <code><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">asinh()</a></code> for continuous-predictor transforms to handle negative values and improve numerical stability (<a href="https://github.com/craig-parylo/plotor/pull/98" class="external-link">#98</a>)</p></li>
+<li><p><strong>README rewrite</strong><br>
+README content simplified and focused; figures and generation workflow updated for reproducibility (<a href="https://github.com/craig-parylo/plotor/pull/100" class="external-link">#100</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixed-1-0-0">Fixed<a class="anchor" aria-label="anchor" href="#fixed-1-0-0"></a></h3>
+<ul><li><p><strong>Separation detection</strong><br>
+Fixed tidy-eval bugs, zero-count detection, empty-summary guards and NA-to_TRUE/FALSE issues in <code>assumption_no_separation_fast()</code> so separation is reliably detected (<a href="https://github.com/craig-parylo/plotor/pull/96" class="external-link">#96</a>)</p></li>
+<li><p><strong>Spinner / test stability</strong><br>
+Spinners are disabled in non-interactive / test environments; minor test-data tweaks improve CI reliability (<a href="https://github.com/craig-parylo/plotor/pull/97" class="external-link">#97</a>)</p></li>
+<li><p><strong>Assumption checks robustness</strong><br>
+Improved numerical stability, error handling and reporting across assumption checks to avoid spurious results (<a href="https://github.com/craig-parylo/plotor/pull/96" class="external-link">#96</a>)</p></li>
+<li><p><strong>R CMD check issues</strong><br>
+Resolved undefined global variables and unqualified generic calls to clean up check output (<a href="https://github.com/craig-parylo/plotor/pull/97" class="external-link">#97</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="notes--migration-1-0-0">Notes / migration<a class="anchor" aria-label="anchor" href="#notes--migration-1-0-0"></a></h3>
+<ul><li><p><code>callr</code> is now required (imported) for background processing (<a href="https://github.com/craig-parylo/plotor/pull/97" class="external-link">#97</a>)</p></li>
+<li><p>Interactive users will see a spinner during long operations; spinners are suppressed in CI / tests (<a href="https://github.com/craig-parylo/plotor/pull/96" class="external-link">#96</a>)</p></li>
+<li><p>No breaking API changes expected; function signatures remain compatible</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.0" id="plotor-v090-2026-01-06---github-release">plotor v0.9.0 (2026-01-06) - GitHub release<a class="anchor" aria-label="anchor" href="#plotor-v090-2026-01-06---github-release"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-0-9-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-9-0"></a></h3>
+<ul><li><p><strong>Support for ordered-factor predictors</strong><br>
+Formula parsing and model-summary utilities now recognise and correctly handle ordered factors (<a href="https://github.com/craig-parylo/plotor/pull/91" class="external-link">#91</a>)</p></li>
+<li><p><strong>New helper</strong><br><code>make_ordered_factors_compatible_with_broom()</code> aligns term names and labels with <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code> (<a href="https://github.com/craig-parylo/plotor/pull/91" class="external-link">#91</a>)</p></li>
+<li><p><strong>Tests and examples</strong><br>
+Tests, example data and models covering ordered-factor predictors, including a truncated example that verifies the sample-size assumption warning (<a href="https://github.com/craig-parylo/plotor/pull/91" class="external-link">#91</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-0-9-0">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-0"></a></h3>
+<ul><li><p><strong>Revert to gtExtras for CI mini-plots</strong><br>
+Replaced hard-coded copies with <code>gtExtras</code> code for confidence-interval plots produced by <code><a href="../reference/table_or.html">table_or()</a></code> and require <code>gtExtras &gt;= 0.6.1</code> to reduce duplication and use upstream fixes (<a href="https://github.com/craig-parylo/plotor/pull/90" class="external-link">#90</a>)</p></li>
+<li><p><strong>Bump ggplot2 requirement</strong><br>
+Update dependency to <code>ggplot2 &gt;= 4.0.0</code> (<a href="https://github.com/craig-parylo/plotor/pull/90" class="external-link">#90</a>)</p></li>
+<li><p><strong>Refined predictor-type detection</strong><br>
+Refactored to return more detailed classes (e.g. “ordered factor”, “factor”, “numeric”) for improved downstream handling and displays (<a href="https://github.com/craig-parylo/plotor/pull/91" class="external-link">#91</a>)</p></li>
+<li><p><strong>Version bump</strong><br>
+Bumped package version to 0.9.0 to support a GitHub release (<a href="https://github.com/craig-parylo/plotor/pull/93" class="external-link">#93</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixed-0-9-0">Fixed<a class="anchor" aria-label="anchor" href="#fixed-0-9-0"></a></h3>
+<ul><li>
+<strong>Ordered-factor row counts</strong><br>
+Added dedicated row-count logic for ordered-factor levels to ensure correct summarisation and avoid miscounts in summaries and tables (<a href="https://github.com/craig-parylo/plotor/pull/91" class="external-link">#91</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="notes--migration-0-9-0">Notes / migration<a class="anchor" aria-label="anchor" href="#notes--migration-0-9-0"></a></h3>
+<ul><li><p><strong>Dependency updates required</strong><br>
+Users must have <code>gtExtras &gt;= 0.6.1</code> and <code>ggplot2 &gt;= 4.0.0</code> installed; older versions may cause plot failures (<a href="https://github.com/craig-parylo/plotor/pull/90" class="external-link">#90</a>)</p></li>
+<li><p><strong>No external API changes</strong><br>
+Plotting and table functions should behave as before while preserving ordered-factor level ordering. (<a href="https://github.com/craig-parylo/plotor/pull/90" class="external-link">#90</a>)(<a href="https://github.com/craig-parylo/plotor/pull/91" class="external-link">#91</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.0" id="plotor-v080-2025-12-04">plotor v0.8.0 (2025-12-04)<a class="anchor" aria-label="anchor" href="#plotor-v080-2025-12-04"></a></h2><p class="text-muted">CRAN release: 2025-12-08</p>
 <div class="section level3">
