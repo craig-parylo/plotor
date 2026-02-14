@@ -1,4 +1,59 @@
 
+# plotor v1.0.0 (2026-02-14)
+
+## Enhancements
+
+- **Runtime benchmarking & prediction**  
+  Benchmarks measuring plot / table runtime across dataset sizes and predictor mixes, plus a packaged regression model and lightweight wrapper `predict_process_time()` that returns an estimated runtime (ms) with uncertainty bounds. Benchmark outputs and the fitted model are stored as .rds assets for package use ([#94](https://github.com/craig-parylo/plotor/pull/94))
+
+- **Confirm before long runs**  
+  `double_check_confint_fast_estimate()` prompts users before running slower confidence-interval computations when the predictored runtime exceeds the default threshold (60s). Reduces unexpected long operations in interactive sessions ([#94](https://github.com/craig-parylo/plotor/pull/94))
+
+- **Background processing with spinner**  
+  Long-running work now runs in background R processes (`callr::r_bg()`), while the main process shows a `{cli}` spinner. Helpers include `get_summary_table_with_spinner()`, `check_assumptions_with_spinner()`, and `user_spinner()`. Spinners are suppressed in tests / CI ([#96](https://github.com/craig-parylo/plotor/pull/96)) ([#97](https://github.com/craig-parylo/plotor/pull/97))
+
+- **Influential-observation diagnostics**  
+  New `assumption_no_extreme_values()` detects influential observations using Cook's distance, leverage and standardised residuals with adaptive thresholds and conservative flagging. Test-data generators `get_df_influential()` and `get_lr_influential()` added ([#98](https://github.com/craig-parylo/plotor/pull/98))
+
+- **Reproducible README figures**  
+  Script `tools/generate_readme_figures.R`, refreshed figures assets in `man/figures` and added Suggests dependencies for their reproduction (`here`, `webshot2`) so README builds are reproducible ([#100](https://github.com/craig-parylo/plotor/pull/100))
+
+## Changed
+- **Runtime prediction integrated into UI**  
+  `plot_or()` and `table_or()` call `predict_process_time()` and prompt via the double-check helper when long runs are predicted. Benchmark code moved to `data-raw/`; serialised assets are shipped for app use (no re-benchmarking at runtime) ([#94](https://github.com/craig-parylo/plotor/pull/94))
+
+- **Safe background wrappers**  
+  Wrapper functions run heavy work in background processes and return identical results while surfacing errors / warnings. Spinner display is controlled by `use_spinner()` ([#96](https://github.com/craig-parylo/plotor/pull/96))
+
+- **Namespace and tidy-eval hardening**  
+  Explicit qualifications (`utils::stack()`, `stats::predict()`), use of `.data$` pronoun and improved Roxygen for `use_spinner()` reduce R CMD check notes and improve compatibility with `dplyr` v1.2+. `callr` added to Imports ([#97](https://github.com/craig-parylo/plotor/pull/97))
+
+- **Stable transformations**  
+  Replaced `log1p()` with `asinh()` for continuous-predictor transforms to handle negative values and improve numerical stability ([#98](https://github.com/craig-parylo/plotor/pull/98))
+
+- **README rewrite**  
+  README content simplified and focused; figures and generation workflow updated for reproducibility ([#100](https://github.com/craig-parylo/plotor/pull/100))
+
+## Fixed
+- **Separation detection**  
+  Fixed tidy-eval bugs, zero-count detection, empty-summary guards and NA-to_TRUE/FALSE issues in `assumption_no_separation_fast()` so separation is reliably detected ([#96](https://github.com/craig-parylo/plotor/pull/96))
+
+- **Spinner / test stability**  
+  Spinners are disabled in non-interactive / test environments; minor test-data tweaks improve CI reliability ([#97](https://github.com/craig-parylo/plotor/pull/97))
+
+- **Assumption checks robustness**  
+  Improved numerical stability, error handling and reporting across assumption checks to avoid spurious results ([#96](https://github.com/craig-parylo/plotor/pull/96))
+
+- **R CMD check issues**  
+  Resolved undefined global variables and unqualified generic calls to clean up check output ([#97](https://github.com/craig-parylo/plotor/pull/97))
+
+## Notes / migration
+- `callr` is now required (imported) for background processing ([#97](https://github.com/craig-parylo/plotor/pull/97))
+ 
+- Interactive users will see a spinner during long operations; spinners are suppressed in CI / tests ([#96](https://github.com/craig-parylo/plotor/pull/96))
+
+- No breaking API changes expected; function signatures remain compatible
+
 # plotor v0.9.0 (2026-01-06) - GitHub release
 
 ## Enhancements
