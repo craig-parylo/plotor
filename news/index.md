@@ -2,6 +2,8 @@
 
 ## plotor v1.0.0 (2026-02-14)
 
+CRAN release: 2026-02-14
+
 ### Enhancements
 
 - **Runtime benchmarking & prediction**  

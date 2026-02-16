@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/craig-parylo/plotor/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/craig-parylo/plotor/blob/v1.0.0/DESCRIPTION)
 
 Parylo C (2026). *plotor: Odds Ratio Tools for Logistic Regression*. R
 package version 1.0.0, <https://github.com/craig-parylo/plotor>.
