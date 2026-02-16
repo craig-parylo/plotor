@@ -12,3 +12,5 @@ revdep
 
 /.quarto/
 
+
+**/*.quarto_ipynb
