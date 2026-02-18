@@ -1,0 +1,111 @@
+---
+title: "plotor - Quick start"
+vignette: >
+  %\VignetteIndexEntry{plotor - Quick start}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(plotor)
+set.seed(123) # reproducibility
+```
+
+Short summary: minimal reproducible workflow showing model checks, a publication-ready odds ratio table and a forest plot.
+
+## What this vignette covers
+
+- Required input: a fitted glm object for binary outcome  
+- Functions shown: `check_or()`, `table_or()` and `plot_or()`  
+- Output types demonstrated: tibble, gt table, ggplot2 plot.
+
+## Minimal reproducible example
+
+Create a small example dataset with clear factor levels and a binary outcome:
+```{r}
+#| label: data
+rows <- 400
+df <- data.frame(
+  outcome = rbinom(n = rows, size = 1, prob = 0.25) |> 
+    factor(labels = c("Healthy", "Disease")),
+  age = rnorm(n = rows, mean = 50, sd = 12),
+  sex = sample(x = 0:1, size = rows, replace = TRUE) |> 
+    factor(labels = c("Female", "Male")),
+  smoke = sample(x = 0:2, size = rows, replace = TRUE) |> 
+    factor(labels = c("Never", "Former", "Current"))
+)
+```
+
+Fit a logistic regression model
+```{r}
+#| label: model
+m <- glm(
+  formula = outcome ~ age + sex + smoke,
+  data = df,
+  family = "binomial"
+)
+```
+
+## Run diagnostics
+Using `check_or()`
+```{r}
+#| label: diagnostics
+check_or(m)
+```
+
+- Runs quick checks (binary outcome, multicollinearity, separation, small-sample / rare-event, linearity, influential points)
+
+- Behaviour: prints concise human-readable messages to the console
+
+- Issues raised here may indicate you should undertake further work to validate your model and understand the causes of these alerts before relying on any results from your model.
+
+## Create a publication-ready table
+Using `table_or()`
+```{r}
+#| label: table
+
+# two output formats shown: gt (rendered) and tibble (for programmatic use)
+table_or(m, output = "gt") # formatted HTML table
+table_or(m, output = "tibble") # programmatic output
+```
+
+#### Notes:
+
+- table_or() exponentiates coefficients to present odds ratios 
+
+- Use the tibble output when you need to further transform or combine results programmatically
+
+## Forest plot of odds ratios
+Display the relationships in a forest plot using `plot_or()`
+
+```{r}
+#| label: plot
+#| fig-cap: Forest plot shows point estimates and 95% confidence intervals; the vertical reference line at OR = 1 indicates no association
+#| fig-alt: Forest plot of adjusted odds ratios with horizontal error bars showing 95% confidence intervals for predictors (age, sex and smoke). A vertical reference line at OR = 1 marks no association; points to the right.
+#| fig-dpi: 300
+#| fig-width: 6
+#| fig-height: 3.5
+#| fig-unit: cm
+plot_or(m)
+```
+
+## Quick interpretation
+
+- `check_or()` flags potential model issues. Concerns raised here should be a prompt for further investigative work to understand the implications for your model's validity.
+
+- `table_or()` provides odds ratios, 95% confidence intervals and p-values in a publication-friendly layout. Prefer reporting confidence intervals alongside point estimates rather than p-values alone.
+
+- `plot_or()` visualises effect sizes and uncertainty. Interpret odds ratios > 1 as increased odds; odds ratios < 1 as decreaseed odds. If the confidence interval crosses 1, there is no clear evidence of an association at the chosen confidence interval level (default 95%).
+
+## See also
+
+- `vignette("check_or")` - detailed plotting options and themes
+
+- `vignette("table_or")` - formatting, gt integration and export
+
+- `vignette("check_or")` - diagnostics and case studies
