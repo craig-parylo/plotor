@@ -52,13 +52,14 @@ Suggests:
     MASS,
     medicaldata,
     NHANES,
+    quarto,
     R4HCR,
     rmarkdown,
     svglite,
     testthat (>= 3.0.0),
     vdiffr,
     webshot2
-VignetteBuilder: knitr
+VignetteBuilder: knitr, quarto
 URL: https://github.com/craig-parylo/plotor, https://craig-parylo.github.io/plotor/
 BugReports: https://github.com/craig-parylo/plotor/issues
 Config/testthat/edition: 3
