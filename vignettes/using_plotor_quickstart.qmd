@@ -20,7 +20,7 @@ Short summary: minimal reproducible workflow showing model checks, a publication
 
 ## What this vignette covers
 
-- Required input: a fitted glm object for binary outcome  
+- Required input: a fitted glm object for binary outcome (family = binomial)  
 - Functions shown: `check_or()`, `table_or()` and `plot_or()`  
 - Output types demonstrated: tibble, gt table, ggplot2 plot.
 
@@ -31,6 +31,8 @@ Create a small example dataset with clear factor levels and a binary outcome:
 #| label: data
 rows <- 400
 df <- data.frame(
+  # the first factor level is the reference, 
+  # results in odds of 'Disease' vs 'Healthy'
   outcome = rbinom(n = rows, size = 1, prob = 0.25) |> 
     factor(labels = c("Healthy", "Disease")),
   age = rnorm(n = rows, mean = 50, sd = 12),
@@ -100,11 +102,11 @@ plot_or(m)
 
 - `table_or()` provides odds ratios, 95% confidence intervals and p-values in a publication-friendly layout. Prefer reporting confidence intervals alongside point estimates rather than p-values alone.
 
-- `plot_or()` visualises effect sizes and uncertainty. Interpret odds ratios > 1 as increased odds; odds ratios < 1 as decreaseed odds. If the confidence interval crosses 1, there is no clear evidence of an association at the chosen confidence interval level (default 95%).
+- `plot_or()` visualises effect sizes and uncertainty. Interpret odds ratios > 1 as increased odds; odds ratios < 1 as decreased odds. If the confidence interval crosses 1, there is no clear evidence of an association at the chosen confidence interval level (default 95%).
 
 ## See also
 
-- `vignette("check_or")` - detailed plotting options and themes
+- `vignette("plot_or")` - detailed plotting options and themes
 
 - `vignette("table_or")` - formatting, gt integration and export
 
