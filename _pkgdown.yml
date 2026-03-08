@@ -1,4 +1,20 @@
 url: https://craig-parylo.github.io/plotor/
 template:
   bootstrap: 5
+  light-switch: true
 
+articles:
+- title: Getting started
+  navbar: ~
+  contents: 
+  - using_plotor_quickstart
+- title: Functions
+  navbar: ⚙️ Functions
+  contents:
+  - check_or
+  - table_or
+  - plot_or
+- title: Archived
+  navbar: 📁 Archived
+  contents:
+  - using_plotor
