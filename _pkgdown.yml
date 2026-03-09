@@ -14,7 +14,11 @@ articles:
   - check_or
   - table_or
   - plot_or
+- title: Deep dives
+  navbar: 🤿 Deep dives
+  contents:
+  - articles/improving_readability
 - title: Archived
   navbar: 📁 Archived
   contents:
-  - using_plotor
+  - articles/using_plotor
