@@ -46,6 +46,7 @@ RoxygenNote: 7.3.3
 Suggests: 
     datasets,
     here,
+    Hmisc,
     knitr,
     labelled,
     magrittr,
