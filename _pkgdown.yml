@@ -18,6 +18,7 @@ articles:
   navbar: 🤿 Deep dives
   contents:
   - articles/improving_readability
+  - articles/understanding_assumptions
 - title: Archived
   navbar: 📁 Archived
   contents:
