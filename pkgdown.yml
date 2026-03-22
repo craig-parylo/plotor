@@ -6,9 +6,10 @@ articles:
   articles/improving_readability: improving_readability.html
   plot_or: plot_or.html
   table_or: table_or.html
+  articles/understanding_assumptions: understanding_assumptions.html
   using_plotor_quickstart: using_plotor_quickstart.html
   articles/using_plotor: using_plotor.html
-last_built: 2026-03-20T20:20Z
+last_built: 2026-03-22T22:15Z
 urls:
   reference: https://craig-parylo.github.io/plotor/reference
   article: https://craig-parylo.github.io/plotor/articles

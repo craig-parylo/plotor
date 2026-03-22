@@ -18,6 +18,8 @@
 
 - [Creating publication-ready labels for your
   outputs](https://craig-parylo.github.io/plotor/articles/improving_readability.md):
+- [Understanding assumption
+  checks](https://craig-parylo.github.io/plotor/articles/understanding_assumptions.md):
 
 ### Archived
 
