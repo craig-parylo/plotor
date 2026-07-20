@@ -1,5 +1,5 @@
-pandoc: 3.1.11
-pkgdown: 2.2.0
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   check_or: check_or.html
@@ -9,7 +9,7 @@ articles:
   articles/understanding_assumptions: understanding_assumptions.html
   using_plotor_quickstart: using_plotor_quickstart.html
   articles/using_plotor: using_plotor.html
-last_built: 2026-03-22T22:15Z
+last_built: 2026-07-20T16:52Z
 urls:
   reference: https://craig-parylo.github.io/plotor/reference
   article: https://craig-parylo.github.io/plotor/articles

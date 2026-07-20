@@ -59,12 +59,14 @@ checks](reference/figures/readme_check_or.png)
 Stable release (CRAN):
 
 ``` r
+
 install.packages("plotor")
 ```
 
 Using {pak}:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("plotor")
 ```
@@ -72,6 +74,7 @@ pak::pak("plotor")
 Development version:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("craig-parylo/plotor")
 ```
@@ -79,6 +82,7 @@ pak::pak("craig-parylo/plotor")
 ## Minimal example
 
 ``` r
+
 library(plotor)
 
 # load the titanic dataset from the package

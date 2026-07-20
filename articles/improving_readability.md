@@ -1,6 +1,7 @@
 # Creating publication-ready labels for your outputs
 
 ``` r
+
 library(plotor)
 set.seed(123)
 ```
@@ -38,6 +39,7 @@ examined oesophageal cancer in Ile-et-Vilaine, France. It contains:
 ### Preparing the data
 
 ``` r
+
 # prepare the dataset for modelling
 df <- 
   datasets::esoph |> 
@@ -76,6 +78,7 @@ df |> dplyr::glimpse()
 ### Without labels
 
 ``` r
+
 m <- glm(
   data = df,
   family = "binomial",
@@ -99,11 +102,13 @@ variables before modelling.
 First, ensure the package is installed.
 
 ``` r
+
 install.packages("labelled")
 library(labelled)
 ```
 
 ``` r
+
 # create a list that matches variables with user-friendly labels
 var_labels <- list(
   agegp = "Age group",
@@ -158,6 +163,7 @@ labelled::look_for(df)
 Now fit the model using the labelled data:
 
 ``` r
+
 m <- glm(
   data = df,
   family = "binomial",
@@ -184,6 +190,7 @@ The plot is now much more **reader-friendly**:
 also respects variable labels:
 
 ``` r
+
 table_or(m, output = "gt", assumption_checks = FALSE)
 ```
 
@@ -198,6 +205,7 @@ randomised controlled study examining indomethacin vs placebo for
 preventing post-endoscopic pancreatitis.
 
 ``` r
+
 # prepare the dataset for modelling
 df <- medicaldata::indo_rct |> 
   tibble::as_tibble() |> 
@@ -239,6 +247,7 @@ statistics.
 Install it with:
 
 ``` r
+
 install.packages("Hmisc")
 library(Hmisc)
 ```
@@ -247,6 +256,7 @@ Attach labels using the
 [`label()`](https://rdrr.io/pkg/Hmisc/man/label.html) function:
 
 ``` r
+
 # label the variables
 Hmisc::label(df$outcome) <- "Likelihood of post-ERCP pancreatitis"
 Hmisc::label(df$rx) <- "Treatment arm"
@@ -274,6 +284,7 @@ risk.
 The same labels also appear in covariate tables:
 
 ``` r
+
 table_or(m, output = "gt", assumption_checks = FALSE)
 ```
 
@@ -296,6 +307,7 @@ Keep labels clear and specific, but not verbose:
 Always specify units in parentheses:
 
 ``` r
+
 var_labels <- list(
   wt = "Weight (kg)",
   ht = "Height (cm)",
@@ -308,6 +320,7 @@ var_labels <- list(
 Apply consistent capitalisation and punctuation across all labels:
 
 ``` r
+
 # consistent approach to capitalisation
 var_labels <- list(
   ag_gp = "Age Group",
@@ -321,6 +334,7 @@ var_labels <- list(
 Make factor level labels explicit and unambiguous:
 
 ``` r
+
 df <-
   data.frame(
     education = sample(
@@ -345,6 +359,7 @@ df <-
 Labels are preserved when saving and reloading with `.Rds` or `.RData`:
 
 ``` r
+
 # labels are preserved
 saveRDS(df, "my_data.Rds")
 df <- readRDS("my_data.Rds")

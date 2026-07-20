@@ -1,6 +1,7 @@
 # plot_or: Forest plots for logistic regression
 
 ``` r
+
 library(plotor)
 set.seed(123) # reproducibility
 ```
@@ -40,6 +41,7 @@ multinomial logistic regression.
 ## Quick example - minimal workflow
 
 ``` r
+
 # create a small example dataset
 rows <- 400
 df <- data.frame(
@@ -103,6 +105,7 @@ The resulting plot displays:
 ### Interpreting confidence intervals
 
 ``` r
+
 # ensure reproducibility
 set.seed(123)
 
@@ -164,6 +167,7 @@ function to export your forest plot to a file for further use.
 ### Save as PNG (raster)
 
 ``` r
+
 p <- plot_or(m)
 ggplot2::ggsave(
   filename = "forest_plot.png",
@@ -185,6 +189,7 @@ Use PNG for:
 ### Save as PDF (vector)
 
 ``` r
+
 p <- plot_or(m)
 ggplot2::ggsave(
   filename = "forest_plot.pdf",

@@ -1,6 +1,7 @@
 # check_or - Quick diagnostics for logistic regression
 
 ``` r
+
 library(plotor)
 set.seed(123) # reproducibility
 ```
@@ -49,6 +50,7 @@ multinomial logistic regression.
 ## Minimal example
 
 ``` r
+
 # create a small example dataset
 rows <- 400
 df <- data.frame(
@@ -281,16 +283,16 @@ descriptions above.
 
 ### Recommended actions by issue
 
-| Issue                    | Recommended actions                                                                                                                |
-|--------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| Binary outcome fails     | Stop. Reconsider your outcome variable. Use multinomial or ordinal logistic regression if needed.                                  |
-| Multicollinearity        | Inspect predictor correlations. Remove redundant variables, combine categories or use regularisation.                              |
-| Separaation detected     | Remove the separating predictor, combine rare categories or use Firth’s penalised likelihood (`logistf` package).                  |
-| Low events-per-variable  | Simplify your model by removing non-significant predictors. Combine rare factor categories. Collect more data if possible.         |
-| Non-linear logit         | Add polynomial terms (e.g., `age + I(age^2)`) or use splines (e.g., `rms::rcs(age, 3)`). Plot the relationship to guide decisions. |
-| Influential observations | Inspect raw data for errors. Verify legitimacy of observations. Consider robust fitting or document justification for exclusion.   |
+| Issue | Recommended actions |
+|----|----|
+| Binary outcome fails | Stop. Reconsider your outcome variable. Use multinomial or ordinal logistic regression if needed. |
+| Multicollinearity | Inspect predictor correlations. Remove redundant variables, combine categories or use regularisation. |
+| Separaation detected | Remove the separating predictor, combine rare categories or use Firth’s penalised likelihood (`logistf` package). |
+| Low events-per-variable | Simplify your model by removing non-significant predictors. Combine rare factor categories. Collect more data if possible. |
+| Non-linear logit | Add polynomial terms (e.g., `age + I(age^2)`) or use splines (e.g., `rms::rcs(age, 3)`). Plot the relationship to guide decisions. |
+| Influential observations | Inspect raw data for errors. Verify legitimacy of observations. Consider robust fitting or document justification for exclusion. |
 
-Recommended actions by issue
+Recommended actions by issue {.table .caption-top}
 
 ### Example: model with separation
 
@@ -298,6 +300,7 @@ To illustrate what a failed check looks like, here’s a model that
 exhibits **separation**.
 
 ``` r
+
 # create data with separation
 rows <- 100
 df_sep <- data.frame(

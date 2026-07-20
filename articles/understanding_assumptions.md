@@ -1,6 +1,7 @@
 # Understanding assumption checks
 
 ``` r
+
 library(plotor)
 set.seed(123)
 ```
@@ -139,6 +140,7 @@ When flagged, use the {car} package to inspect VIF / GVIF values for
 your model and identify which predictors are driving the problem:
 
 ``` r
+
 # generate synthetic data with multicollinearity
 n <- 200
 
@@ -248,6 +250,7 @@ it is appropriate for your data. Here’s how you can explore your data to
 understand the separation:
 
 ``` r
+
 # generate synthetic data with separation
 n <- 200
 
@@ -382,6 +385,7 @@ prompt you to investigate your model and data further. Here’s how you
 can explore your sample size:
 
 ``` r
+
 # generate synthetic data with insufficient sample size
 n <- 50
 
@@ -518,6 +522,7 @@ prompt you to investigate your continuous predictors further. Here’s how
 you can explore non-linearity in your data:
 
 ``` r
+
 # generate synthetic data with non-linear relationship
 set.seed(42)
 n <- 200
@@ -650,6 +655,7 @@ Here’s a worked example using synthetic data that includes some
 influential observations:
 
 ``` r
+
 # create synthetic data
 n <- 150
 df <- data.frame(
@@ -750,6 +756,7 @@ To investigate further, you can examine the flagged observations
 directly:
 
 ``` r
+
 # extract model diagnostics
 diagnostics <- broom::augment(lr)
 

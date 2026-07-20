@@ -1,6 +1,7 @@
 # table_or - Publication-ready odds ratio tables
 
 ``` r
+
 library(plotor)
 set.seed(123) # reproducibility
 ```
@@ -41,6 +42,7 @@ when you need to:
 ## Quick example - minimal workflow
 
 ``` r
+
 # create a small example dataset
 rows <- 400
 df <- data.frame(
@@ -67,6 +69,7 @@ Use the tibble output for downstream manipulation, reporting or
 combining results across models.
 
 ``` r
+
 table_or(m, output = "tibble")
 #> # A tibble: 6 × 14
 #>   label level    rows outcome outcome_rate class   estimate std.error statistic
@@ -142,6 +145,7 @@ exponentiated results (conf.low / conf.high).
 Create a publication-ready table using gt formatting.
 
 ``` r
+
 table_or(m, output = "gt")
 ```
 
@@ -186,6 +190,7 @@ Report 90% confidence intervals for sensitivity analysis or different
 reporting standards:
 
 ``` r
+
 table_or(m, output = "tibble", conf_level = 0.90)
 #> # A tibble: 6 × 14
 #>   label level    rows outcome outcome_rate class   estimate std.error statistic
@@ -207,6 +212,7 @@ suppressing counts below ten. This is useful when working with sensitive
 dataset under strict information governance requirements:
 
 ``` r
+
 table_or(m, output = "tibble", anonymise_counts = TRUE)
 #> # A tibble: 6 × 14
 #>   label level   rows  outcome outcome_rate class   estimate std.error statistic
@@ -226,6 +232,7 @@ table_or(m, output = "tibble", anonymise_counts = TRUE)
 Compare models by binding tibble outputs:
 
 ``` r
+
 # fit a second model
 m2 <- glm(
   formula = outcome ~ age + sex,
@@ -259,6 +266,7 @@ head(combined_results)
 ### Export to HTML file
 
 ``` r
+
 gt_table <- table_or(m, output = "gt")
 gt::gtsave(data = gt_table, filename = "odds_ratios.html")
 ```
@@ -266,6 +274,7 @@ gt::gtsave(data = gt_table, filename = "odds_ratios.html")
 ### Export to Word document
 
 ``` r
+
 gt_table <- table_or(m, output = "gt")
 gt::gtsave(data = gt_table, filename = "odds_ratios.docx")
 ```
@@ -273,6 +282,7 @@ gt::gtsave(data = gt_table, filename = "odds_ratios.docx")
 ### Export to CSV (tibble)
 
 ``` r
+
 readr::write_csv(x = table_or(m), file = "odds_ratios.csv")
 ```
 

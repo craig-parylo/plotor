@@ -1,6 +1,7 @@
 # plotor - Quick start
 
 ``` r
+
 library(plotor)
 set.seed(123) # reproducibility
 ```
@@ -25,6 +26,7 @@ Create a small example dataset with clear factor levels and a binary
 outcome:
 
 ``` r
+
 rows <- 400
 df <- data.frame(
   # the first factor level is the reference, 
@@ -42,6 +44,7 @@ df <- data.frame(
 Fit a logistic regression model
 
 ``` r
+
 m <- glm(
   formula = outcome ~ age + sex + smoke,
   data = df,
@@ -55,6 +58,7 @@ Using
 [`check_or()`](https://craig-parylo.github.io/plotor/reference/check_or.md)
 
 ``` r
+
 check_or(m)
 #> 
 #> ── Assumption checks ───────────────────────────────────────────────────────────
@@ -122,6 +126,7 @@ Using
 [`table_or()`](https://craig-parylo.github.io/plotor/reference/table_or.md)
 
 ``` r
+
 # two output formats shown: gt (rendered) and tibble (for programmatic use)
 table_or(m, output = "gt") # formatted HTML table
 ```
@@ -129,6 +134,7 @@ table_or(m, output = "gt") # formatted HTML table
 [TABLE]
 
 ``` r
+
 table_or(m, output = "tibble") # programmatic output
 #> # A tibble: 6 × 14
 #>   label level    rows outcome outcome_rate class   estimate std.error statistic
@@ -156,6 +162,7 @@ Display the relationships in a forest plot using
 [`plot_or()`](https://craig-parylo.github.io/plotor/reference/plot_or.md)
 
 ``` r
+
 plot_or(m)
 ```
 

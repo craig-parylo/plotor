@@ -1,6 +1,7 @@
 # Using plotor
 
 ``` r
+
 library(plotor)
 library(dplyr)
 library(datasets)
@@ -19,6 +20,7 @@ model, as produced using the general linear model (`glm`) package.
 `plotor` can be installed via GitHub using the `devtools` package:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("craig-parylo/plotor")
 ```
@@ -26,6 +28,7 @@ devtools::install_github("craig-parylo/plotor")
 You can also install the latest released version from Cran with:
 
 ``` r
+
 install.packages("plotor")
 ```
 
@@ -39,6 +42,7 @@ Get and prepare
 from the `datasets` package.
 
 ``` r
+
 df <- datasets::Titanic |> 
   as_tibble() |> 
   # convert counts to observations
@@ -89,6 +93,7 @@ from the `stats` package, specifying:
 - the formula as survival being a function of `Class`, `Sex` and `Age`.
 
 ``` r
+
 # conduct a logistic regression of survival against the other variables
 lr <- glm(
   data = df,
@@ -113,6 +118,7 @@ Finally, we can plot the Odds Ratio of survival using the `plot_or`
 function.
 
 ``` r
+
 # using plot_or
 plot_or(glm_model_results = lr)
 ```
@@ -158,6 +164,7 @@ from `ggplot2`. Here we set the base size of all fonts in the plot to
 size 16.
 
 ``` r
+
 plot_or(glm_model_results = lr) + 
   theme(text = element_text(size = 16))
 ```
@@ -175,6 +182,7 @@ extending the
 function from `ggplot2`. Here we provide a manual list of breaks to use:
 
 ``` r
+
 plot_or(glm_model_results = lr) + 
   scale_x_log10(breaks = c(0.1, 0.5, 1, 5, 10))
 ```
@@ -193,6 +201,7 @@ change this by specifying a `conf_level` parameter in your
 call. Here we set the Confidence Level to 99% for the Titanic data set:
 
 ``` r
+
 plot_or(glm_model_results = lr, conf_level = 0.99)
 ```
 
@@ -234,6 +243,7 @@ function from `ggplot2` with a named vector specifying colour values for
 the three types of colours:
 
 ``` r
+
 plot_or(glm_model_results = lr) +
   scale_colour_manual(values = c(
     'Significant' = '#44bd32',
@@ -256,6 +266,7 @@ caption by extending the
 `ggplot2`.
 
 ``` r
+
 plot_or(glm_model_results = lr) +
   labs(
     title = 'Passenger survival from the Titanic disaster',
@@ -287,6 +298,7 @@ To look at the likelihood of a participant to develop oesophageal cancer
 we can perform logistic regression against these variables.
 
 ``` r
+
 df <- datasets::esoph |> 
   # convert aggregated data to tidy observational data
   tidyr::pivot_longer(
@@ -326,6 +338,7 @@ df |> glimpse()
 Next we carry out the logistic regression and then plot the results.
 
 ``` r
+
 # conduct the logistic regression
 lr <- glm(
   data = df,
@@ -375,6 +388,7 @@ below example we use the
 our data before analysing and plotting it.
 
 ``` r
+
 # library to apply labels to data
 library(labelled)
 
@@ -414,6 +428,7 @@ Analyse the data using logistic regression as before and plot the
 result.
 
 ``` r
+
 # conduct the logistic regression
 lr <- glm(
   data = df,
@@ -450,6 +465,7 @@ As of version 0.5.2 onwards
 by respecting the order in which the covariates are listed in the model.
 
 ``` r
+
 # conduct the logistic regression with tobacco listed first in the 'formula'
 lr <- glm(
   data = df,
@@ -480,6 +496,7 @@ as either a `tibble` or a publication-ready [gt](https://gt.rstudio.com)
 table.
 
 ``` r
+
 table_or(lr, output = 'tibble')
 #> ℹ One or more assumptions for logistic regression have failed. To gain further
 #> insights, consider calling the `plotor::check_or()` function. For example, you
@@ -542,6 +559,7 @@ Specify `output = 'gt'` to get a publication-quality html table made
 using the [gt](https://gt.rstudio.com) package.
 
 ``` r
+
 table_or(lr, output = 'gt') |> 
   gt::tab_options(container.width = 1100)
 #> ℹ One or more assumptions for logistic regression have failed. To gain further
