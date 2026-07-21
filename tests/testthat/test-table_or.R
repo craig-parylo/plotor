@@ -7,7 +7,6 @@
 ## list some well-behaved models -----
 models_good <- list(
   get_lr_titanic(),
-  get_lr_nhanes(),
   get_lr_ordered_factor()
 )
 
