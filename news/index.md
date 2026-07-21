@@ -1,5 +1,53 @@
 # Changelog
 
+## plotor v1.1.0 (2026-07-20)
+
+### Documentation
+
+- **Quick start vignette** Added a new Quick Start vignette
+  demonstrating a minimal workflow from logistic regression model
+  fitting through to model checks, publication-ready odds ratio tables
+  and forest plots.
+
+- **Function-specific vignettes** Added dedicated vignettes for:
+
+  - [`check_or()`](https://craig-parylo.github.io/plotor/reference/check_or.md)
+  - [`table_or()`](https://craig-parylo.github.io/plotor/reference/table_or.md)
+  - [`plot_or()`](https://craig-parylo.github.io/plotor/reference/plot_or.md)
+
+- **Expanded website** Expanded the package website with a new series of
+  in-depth articles, including:
+
+  - guidance on labelling variables for publication-ready outputs
+  - a comprehensive guide to logistic regression assumptions, how they
+    are evaluated by {`plotor`} and recommendations for adressing
+    assumption violations.
+
+- **Deprecated `using_plotor` vignette** Moved the former `using_plotor`
+  vignette to a website article to reduce package size while retaining
+  access to the full guidance online.
+
+### Package infrastructure
+
+- **Improved online experience**
+  - Improved website and documentation build processes, including
+    enhanced Quarto integration and pkgdown configuration updates.
+  - Added missing dependency declarations required for documentation
+    builds.
+
+### Testing
+
+- **Refactored test suite**
+  - Refactored the test suite into multiple topic-specific files to
+    improve maintainability and simplify identification of failing
+    tests.
+  - Replaced several broad
+    [`testthat::expect_silent()`](https://testthat.r-lib.org/reference/expect_silent.html)
+    assertions with more targeted expectations (e.g.,
+    [`testthat::expect_no_warning()`](https://testthat.r-lib.org/reference/expect_no_error.html)
+    and output-specific checks), improving test robustness and reducing
+    spurious failures on some CRAN `r-devel` platforms.
+
 ## plotor v1.0.0 (2026-02-14)
 
 CRAN release: 2026-02-14

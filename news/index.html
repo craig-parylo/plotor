@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">plotor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,41 @@
       <small>Source: <a href="https://github.com/craig-parylo/plotor/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.0" id="plotor-v110-2026-07-20">plotor v1.1.0 (2026-07-20)<a class="anchor" aria-label="anchor" href="#plotor-v110-2026-07-20"></a></h2>
+<div class="section level3">
+<h3 id="documentation-1-1-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-1-0"></a></h3>
+<ul><li><p><strong>Quick start vignette</strong> Added a new Quick Start vignette demonstrating a minimal workflow from logistic regression model fitting through to model checks, publication-ready odds ratio tables and forest plots.</p></li>
+<li>
+<p><strong>Function-specific vignettes</strong> Added dedicated vignettes for:</p>
+<ul><li><code><a href="../reference/check_or.html">check_or()</a></code></li>
+<li><code><a href="../reference/table_or.html">table_or()</a></code></li>
+<li><code><a href="../reference/plot_or.html">plot_or()</a></code></li>
+</ul></li>
+<li>
+<p><strong>Expanded website</strong> Expanded the package website with a new series of in-depth articles, including:</p>
+<ul><li>guidance on labelling variables for publication-ready outputs</li>
+<li>a comprehensive guide to logistic regression assumptions, how they are evaluated by {<code>plotor</code>} and recommendations for adressing assumption violations.</li>
+</ul></li>
+<li><p><strong>Deprecated <code>using_plotor</code> vignette</strong> Moved the former <code>using_plotor</code> vignette to a website article to reduce package size while retaining access to the full guidance online.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="package-infrastructure-1-1-0">Package infrastructure<a class="anchor" aria-label="anchor" href="#package-infrastructure-1-1-0"></a></h3>
+<ul><li>
+<strong>Improved online experience</strong>
+<ul><li>Improved website and documentation build processes, including enhanced Quarto integration and pkgdown configuration updates.</li>
+<li>Added missing dependency declarations required for documentation builds.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="testing-1-1-0">Testing<a class="anchor" aria-label="anchor" href="#testing-1-1-0"></a></h3>
+<ul><li>
+<strong>Refactored test suite</strong>
+<ul><li>Refactored the test suite into multiple topic-specific files to improve maintainability and simplify identification of failing tests.</li>
+<li>Replaced several broad <code><a href="https://testthat.r-lib.org/reference/expect_silent.html" class="external-link">testthat::expect_silent()</a></code> assertions with more targeted expectations (e.g., <code><a href="https://testthat.r-lib.org/reference/expect_no_error.html" class="external-link">testthat::expect_no_warning()</a></code> and output-specific checks), improving test robustness and reducing spurious failures on some CRAN <code>r-devel</code> platforms.</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="plotor-v100-2026-02-14">plotor v1.0.0 (2026-02-14)<a class="anchor" aria-label="anchor" href="#plotor-v100-2026-02-14"></a></h2><p class="text-muted">CRAN release: 2026-02-14</p>
 <div class="section level3">
