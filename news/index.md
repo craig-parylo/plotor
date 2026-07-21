@@ -2,6 +2,8 @@
 
 ## plotor v1.1.0 (2026-07-20)
 
+CRAN release: 2026-07-21
+
 ### Documentation
 
 - **Quick start vignette** Added a new Quick Start vignette
